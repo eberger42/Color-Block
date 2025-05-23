@@ -25,6 +25,8 @@ namespace Assets.Scripts.Grid.components
 
         public abstract bool IsNeighborOccupied(GridPosition direction);
 
-        public abstract void MoveData(GridPosition direction);
+        public abstract INode GetNeighbor(GridPosition direction);
+
+        public abstract void ClearNodeData<K>(K nodeData);
     }
 }

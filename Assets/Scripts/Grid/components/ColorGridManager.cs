@@ -32,7 +32,7 @@ namespace Assets.Scripts.Grid.components
         private NodeConfiguration config;
 
         private readonly CommandManager commandManager = new CommandManager();
-        private GridPosition placementPosition = new GridPosition(5, 18);
+        private GridPosition placementPosition = new GridPosition(20, 18);
 
 
         private void Awake()

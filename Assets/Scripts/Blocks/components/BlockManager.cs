@@ -17,6 +17,7 @@ namespace Assets.Scripts.Blocks.components
         //Events
         public event Action<ITakeBlockCommand> OnTargetCreated;
 
+        int callCount = 0;
         
 
         private void Awake()
@@ -41,8 +42,15 @@ namespace Assets.Scripts.Blocks.components
 
         private void CreateNewBlock()
         {
+            callCount++;
+            if (callCount > 100)
+            {
+                Debug.LogWarning("Handler called too many times — breaking loop.");
+                return;
+            }
 
-            if(_currentEntity is IGravity gravityBlock)
+
+            if (_currentEntity is IGravity gravityBlock)
             {
                 gravityBlock.OnBottomContact -= CreateNewBlock;
             }

@@ -4,10 +4,15 @@ using Assets.Scripts.Grid.components;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Assets.Scripts.Blocks.components
 {
+    /// <summary>
+    /// The task Queue is used to execute the commands in order, one at a time. Preventing blocks phasing through each other
+    /// </summary>
     public class ColorBlockGroup : MonoBehaviour, IBlockGroup, IColor, IGravity
     {
         public event Action OnBottomContact;
@@ -19,6 +24,12 @@ namespace Assets.Scripts.Blocks.components
         private IBlock pivotBlock;
         private List<IBlock> blocks = new List<IBlock>();
         private CommandManager commandManager;
+        private bool spawnNewBlockFlag = false;
+        private bool canTakeCommands = true;
+        private bool canFall = true;
+        private bool executingAction = false;
+        private Queue<Func<Task>> _actionQueue = new Queue<Func<Task>>();
+
 
         private void Awake()
         {
@@ -33,6 +44,8 @@ namespace Assets.Scripts.Blocks.components
             foreach (var position in _positions)
             {
                 var block = factory.CreateBlock(Color.red) as IBlock;
+                (block as IGravity).OnBottomContact += (this as IGravity).TriggerBottomReahed;
+
                 blocks.Add(block);
 
                 _positionsDeltaMap.Add(block, position);
@@ -95,6 +108,7 @@ namespace Assets.Scripts.Blocks.components
         ///////////////////////////////////////////////////////////////////
         void ITakeBlockCommand.Place(Grid<BlockNode>  colorGrid, GridPosition position)
         {
+
             foreach (var block in blocks)
             {
                 var delta = _positionsDeltaMap[block];
@@ -107,10 +121,13 @@ namespace Assets.Scripts.Blocks.components
 
         void ITakeBlockCommand.Move(GridPosition direction)
         {
+            if(canFall == false)
+                return;
+
             foreach (var block in blocks)
             {
                 block.Move(direction);
-            }
+            } 
         }
 
         bool ITakeBlockCommand.CheckForValidMove(GridPosition direction)
@@ -138,16 +155,55 @@ namespace Assets.Scripts.Blocks.components
         {
             return blocks;
         }
+        bool ITakeBlockCommand.CanTakePlayerCommands()
+        {
+            return canTakeCommands;
+        }
+        bool ITakeBlockCommand.CanTakeGravityCommands()
+        {
+            return canFall;
+        }
+        void ITakeBlockCommand.AddActionCommand(Func<Task> action)
+        {
+            _actionQueue.Enqueue(action);
+            CheckActionQueue();
+        }
+
+        
 
         void IGravity.TriggerBottomReahed()
         {
-            
+
+            if (spawnNewBlockFlag)
+                return;
+            spawnNewBlockFlag = true;
+            canTakeCommands = false;
+            canFall = false;
+            OnBottomContact?.Invoke();
         }
 
         void IEntity.SetGridNode(INode node)
         {
             //Noop
         }
+
+        async void CheckActionQueue()
+        {
+            if (executingAction)
+                return;
+
+            if (_actionQueue.Count > 0)
+            {
+                Debug.Log($"Executing action queue: {_actionQueue.Count}");
+                var action = _actionQueue.Dequeue();
+                executingAction = true;
+                await action?.Invoke();
+                executingAction = false;
+                CheckActionQueue();
+            }
+        }
+
+
 
     }
 }

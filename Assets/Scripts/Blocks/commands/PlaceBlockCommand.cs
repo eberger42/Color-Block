@@ -27,7 +27,10 @@ namespace Assets.Scripts.Blocks.commands
 
         public override async Task Execute()
         {
-            Debug.Log($"Executing PlaceBlockCommand with target: {_target}");
+            if (_target.CanTakePlayerCommands() == false)
+                return;
+
+            //Debug.Log($"Executing PlaceBlockCommand with target: {_target}");
             
             _target.Place(colorGrid, position);
             await Task.Delay(100);

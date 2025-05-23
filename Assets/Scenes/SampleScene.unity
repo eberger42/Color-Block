@@ -150,7 +150,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gridWidth: 40
-  gridHeight: 20
+  gridHeight: 22
   origin: {x: 0, y: 0}
   config: {fileID: 11400000, guid: 0ce4fb80072063d4494a23dd7726c8be, type: 2}
 --- !u!224 &169767178

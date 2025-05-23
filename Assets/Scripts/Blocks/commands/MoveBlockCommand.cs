@@ -1,11 +1,13 @@
 ﻿using Assets.Scripts.Blocks.interfaces;
 using Assets.Scripts.Player.Interfaces;
+using System;
 using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Assets.Scripts.Blocks.commands
 {
+    
     public class MoveBlockCommand : BlockCommand
     {
         private GridPosition _direction;
@@ -19,13 +21,27 @@ namespace Assets.Scripts.Blocks.commands
 
         public override async Task Execute()
         {
-            Debug.Log($"Executing MoveBlockCommand with direction: {_target}");
-            var isValidMove = _target.CheckForValidMove(_direction);
-            if (!isValidMove)
-                return;
-            _target.Move(_direction);
 
-            await Task.Delay(100);
+            Func<Task> task = async () =>
+            {
+                if (_target.CanTakePlayerCommands() == false)
+                    return;
+
+                //Debug.Log($"Executing MoveBlockCommand with direction: {_target}");
+                if (_target.CanTakePlayerCommands() == false)
+                    return;
+
+                var isValidMove = _target.CheckForValidMove(_direction);
+                if (!isValidMove)
+                    return;
+                _target.Move(_direction);
+                await Task.Delay(10);
+            };
+            
+
+            _target.AddActionCommand(task);
+
+            await Task.Delay(55);
         }
     }
 

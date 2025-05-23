@@ -4,6 +4,7 @@ using Assets.Scripts.Grid.components;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using static Unity.Collections.AllocatorManager;
@@ -22,6 +23,8 @@ namespace Assets.Scripts.Blocks.components
         private CommandManager commandManager;
         private ColorRank colorRank;
         private INode node;
+        private bool canTakeCommands = true;
+        private bool canFall = true;
 
         private void Awake()
         {
@@ -49,6 +52,10 @@ namespace Assets.Scripts.Blocks.components
         public void SetGridPosition(GridPosition position)
         {
             this.gridPosition = position;
+
+            if(gridPosition.y == 0)
+                OnBottomContact?.Invoke();
+
             this.OnPositionUpdated?.Invoke(position);
         }
 
@@ -91,9 +98,12 @@ namespace Assets.Scripts.Blocks.components
 
         void ITakeBlockCommand.Move(GridPosition direction)
         {
-            node.MoveData(direction);
+
+            var neigborNode = node.GetNeighbor(direction);
+            node.ClearNodeData(this);
+            neigborNode.SetNodeData(this);
         }
-        void ITakeBlockCommand.Place(Grid<BlockNode>  colorGrid, GridPosition position)
+        void ITakeBlockCommand.Place(Grid<BlockNode> colorGrid, GridPosition position)
         {
             colorGrid.SetNodeData(position.x, position.y, this);
         }
@@ -103,6 +113,19 @@ namespace Assets.Scripts.Blocks.components
             return new List<IBlock>() { this };
         }
 
-       
+        bool ITakeBlockCommand.CanTakePlayerCommands()
+        {
+            return canTakeCommands;
+        }
+
+        bool ITakeBlockCommand.CanTakeGravityCommands()
+        {
+            return canFall;
+        }
+
+        void ITakeBlockCommand.AddActionCommand(Func<Task> action)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

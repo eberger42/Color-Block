@@ -4,6 +4,7 @@ using NUnit.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using UnityEngine;
 
@@ -18,6 +19,11 @@ namespace Assets.Scripts.Blocks.interfaces
         public void Move(GridPosition direction);
         public void Place(Grid<BlockNode>  colorGrid, GridPosition position);
 
+
         public List<IBlock> GetBlocks();
+        public bool CanTakePlayerCommands();
+        public bool CanTakeGravityCommands();
+
+        public void AddActionCommand(Func<Task> action);
     }
 }

@@ -78,43 +78,38 @@ namespace Assets.Scripts.Blocks.components
             {
                 this._data = block;
                 this._data.SetGridNode(this);
-            }
-            else if (nodeData == null)//Clears out Node Data
-            { 
-                this._data = null;
+
             }
             else
             {
                 Debug.LogError($"Node data is not of type {typeof(IBlock)}");
             }
         }
+
+        public override void ClearNodeData<K>(K nodeData)
+        {
+            if (nodeData is IBlock block)
+            {
+                if (this._data == block)
+                {
+                    this._data = null;
+                }
+            }
+        }
+
         public override void SetGridListener<K>(K gridListener)
         {
             this.gridListener = gridListener as Grid<BlockNode>;
         }
 
 
-        public override void MoveData(GridPosition direction)
+        public override INode GetNeighbor(GridPosition direction)
         {
             var newPosition = new GridPosition(this.gridPosition.x + (int)direction.x, this.gridPosition.y + (int)direction.y);
 
-
-            if(newPosition.y < 0)
-            {
-                (this._data as IGravity).TriggerBottomReahed();
-                return;
-            }
-            
             var node = gridListener.GetNode(newPosition.x, newPosition.y);
 
-            if(node.IsOccupied())
-            {
-                return;
-            }
-
-            var dataToBeMoved = this._data;
-            this.SetNodeData<object>(null);
-            node.SetNodeData(dataToBeMoved);
+            return node;
 
             
         }

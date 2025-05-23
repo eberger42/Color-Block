@@ -1,5 +1,6 @@
 ﻿using Assets.Scripts.Blocks.interfaces;
 using Assets.Scripts.Player.Interfaces;
+using System;
 using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -19,10 +20,25 @@ namespace Assets.Scripts.Blocks.commands
 
         public override async Task Execute()
         {
-            Debug.Log($"Executing MoveBlockCommand with direction: {_target}");
+
+            Func<Task> task = async () =>
+            {
+                if (_target.CanTakeGravityCommands() == false)
+                    return;
+
+                //Debug.Log($"Executing GravityBlockCommand with direction: {_target}");
+
+                if (_target.CanTakeGravityCommands() == false)
+                    return;
+                _target.CheckForValidMove(_direction);
+                _target.Move(_direction);
+
+                await Task.Delay(50);
+            };
+
+            _target.AddActionCommand(task);
             await Task.Delay(500);
-            _target.CheckForValidMove(_direction);
-            _target.Move(_direction);
+
 
         }
     }
