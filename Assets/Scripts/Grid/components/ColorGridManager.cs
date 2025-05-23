@@ -1,14 +1,19 @@
-﻿using Assets.Scripts.Blocks.components;
+﻿using Assets.Scripts.Blocks.commands;
+using Assets.Scripts.Blocks.components;
+using Assets.Scripts.Blocks.interfaces;
 using Assets.Scripts.Blocks.scriptable_objects;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 namespace Assets.Scripts.Grid.components
 {
     public class ColorGridManager : MonoBehaviour
     {
 
         public static ColorGridManager Instance { get; private set; } = null;
+
+       
 
         private Grid<BlockNode> colorBlockGrid;
 
@@ -21,12 +26,13 @@ namespace Assets.Scripts.Grid.components
         [SerializeField]
         private Vector2 origin;
 
-        private GridPosition placementPosition = new GridPosition(5, 0);
 
 
         [SerializeField]
         private NodeConfiguration config;
 
+        private readonly CommandManager commandManager = new CommandManager();
+        private GridPosition placementPosition = new GridPosition(5, 18);
 
 
         private void Awake()
@@ -48,13 +54,18 @@ namespace Assets.Scripts.Grid.components
         {
             colorBlockGrid.GenerateGrid(config);
 
-            BlockManager.Instance.OnBlockCreated += PlaceBlock;
+            BlockManager.Instance.OnTargetCreated += PlaceBlock;
         }
 
         private void OnDestroy()
         {
-            BlockManager.Instance.OnBlockCreated -= PlaceBlock;
+            BlockManager.Instance.OnTargetCreated -= PlaceBlock;
 
+        }
+
+        public Vector2 GetWorldPosition(GridPosition gridPosition)
+        {
+            return new Vector2(gridPosition.x, gridPosition.y);
         }
 
         public bool CheckIfSpacesAreOccupied(List<GridPosition> positions)
@@ -66,16 +77,19 @@ namespace Assets.Scripts.Grid.components
         {
             var newPositions = positions.ConvertAll(pos => pos + directionVector);
 
-            Debug.Log($"Checking if spaces are available for positions: {string.Join(", ", newPositions)}");
             return CheckIfSpacesAreOccupied(newPositions);
         }
 
 
 
 
-        private void PlaceBlock(ColorBlock block)
+        private async void PlaceBlock(ITakeBlockCommand target)
         {
-            colorBlockGrid.SetNodeData<ColorBlock>(placementPosition.x, placementPosition.y, block);
+            var placeBlockCommandConfigurer = new PlaceBlockCommandConfigurer(colorBlockGrid, placementPosition);
+            var command = new CommandManager.CommandBuilder().AddCommand<PlaceBlockCommand>(target, placeBlockCommandConfigurer).Build();
+            await commandManager.ExecuteCommands(command);
+
+
         }
 
 

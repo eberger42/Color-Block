@@ -6,11 +6,11 @@ using UnityEngine;
 
 namespace Assets.Scripts.Blocks.commands
 {
-    public class MoveBlockCommand : BlockCommand
+    public class GravityBlockCommand : BlockCommand
     {
         private GridPosition _direction;
 
-        public MoveBlockCommand(ITakeBlockCommand target) : base(target) { }
+        public GravityBlockCommand(ITakeBlockCommand target) : base(target) { }
 
         public void SetDirection(GridPosition direction)
         {
@@ -20,20 +20,18 @@ namespace Assets.Scripts.Blocks.commands
         public override async Task Execute()
         {
             Debug.Log($"Executing MoveBlockCommand with direction: {_target}");
-            var isValidMove = _target.CheckForValidMove(_direction);
-            if (!isValidMove)
-                return;
+            await Task.Delay(500);
+            _target.CheckForValidMove(_direction);
             _target.Move(_direction);
 
-            await Task.Delay(100);
         }
     }
 
-    public class MoveBlockCommandConfigurer : IConfigureCommand
+    public class GravityBlockCommandConfigurer : IConfigureCommand
     {
         private GridPosition _direction;
 
-        public MoveBlockCommandConfigurer(GridPosition direction)
+        public GravityBlockCommandConfigurer(GridPosition direction)
         {
             _direction = direction;
         }
@@ -42,11 +40,11 @@ namespace Assets.Scripts.Blocks.commands
         {
             try
             {
-                if (!(command is MoveBlockCommand))
-                    throw new System.Exception("Command is not a MoveBlockCommand");
+                if (!(command is GravityBlockCommand))
+                    throw new System.Exception("Command is not a GravityBlockCommand");
 
-                (command as MoveBlockCommand).SetDirection(_direction);
-                
+                (command as GravityBlockCommand).SetDirection(_direction);
+
             }
             catch (System.Exception e)
             {
@@ -55,4 +53,5 @@ namespace Assets.Scripts.Blocks.commands
         }
 
     }
+
 }

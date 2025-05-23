@@ -15,6 +15,8 @@ namespace Assets.Scripts.Blocks.commands
 
         public bool IsExecuting { get; private set; } = false;
 
+        private List<ICommand> _bufferedCommand = new List<ICommand>();
+
         readonly CommandInvoker _commandInvoker = new CommandInvoker();
 
         public async Task ExecuteCommands(List<ICommand> commands)
@@ -28,9 +30,9 @@ namespace Assets.Scripts.Blocks.commands
         {
             private List<ICommand> _commands = new List<ICommand>();
 
-            public CommandBuilder AddCommand<T>(IEntity entity, IConfigureCommand commandConfigurer) where T : BlockCommand
+            public CommandBuilder AddCommand<T>(ITakeBlockCommand target, IConfigureCommand commandConfigurer) where T : BlockCommand
             {
-                var command = BlockCommand.Create<T>(entity);
+                var command = BlockCommand.Create<T>(target);
                 commandConfigurer.Configure(command);
                 _commands.Add(command);
                 return this;
@@ -58,17 +60,17 @@ namespace Assets.Scripts.Blocks.commands
     public abstract class BlockCommand : ICommand
     {
 
-        protected readonly IEntity _entity;
-        protected BlockCommand(IEntity entity)
+        protected readonly ITakeBlockCommand _target;
+        protected BlockCommand(ITakeBlockCommand target)
         {
-            this._entity = entity;
+            this._target = target;
         }
 
         public abstract Task Execute();
 
-        public static T Create<T>(IEntity entity) where T : BlockCommand
+        public static T Create<T>(ITakeBlockCommand target) where T : BlockCommand
         {
-            return (T)System.Activator.CreateInstance(typeof(T), entity);
+            return (T)System.Activator.CreateInstance(typeof(T), target);
         }
     }
 

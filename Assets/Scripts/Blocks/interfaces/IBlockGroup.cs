@@ -1,10 +1,13 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Scripts.Blocks.interfaces
 {
-    public interface IBlockGroup : IEntity
+    public interface IBlockGroup : IEntity, ITakeBlockCommand
     {
+
+        public void AddBlock(IBlock block);
 
         public void GetPivotBlock(IBlock block);
 
@@ -13,6 +16,7 @@ namespace Assets.Scripts.Blocks.interfaces
         public void DestroyBlockGroup();
 
         public void ReleaseBlock(IBlock block);
+        public List<GridPosition> GetGridPositions();
 
     }
 }

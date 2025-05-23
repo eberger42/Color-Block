@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Scripts.Blocks.interfaces
 {
-    public interface IBlock : IEntity
+    public interface IBlock : IEntity, ITakeBlockCommand
     {
-        public event Action<GridPosition> OnMoveDirection;
+        public GridPosition GetGridPosition();
     }
 }

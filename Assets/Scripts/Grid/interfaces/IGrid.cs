@@ -18,14 +18,36 @@ public struct GridPosition
     {
         return new GridPosition(a.x + b.x, a.y + b.y);
     }
-    
 
     public static GridPosition operator -(GridPosition a, GridPosition b) =>new GridPosition(a.x - b.x, a.y - b.y);
+
+
+    public static bool operator ==(GridPosition a, GridPosition b)
+    {
+        return a.x == b.x && a.y == b.y;
+    }
+
+    public static bool operator !=(GridPosition a, GridPosition b)
+    {
+        return a.x != b.x && a.y != b.y;
+    }
+
+    public override bool Equals(object obj)
+    {
+        return obj is GridPosition position &&
+               x == position.x &&
+               y == position.y;
+    }
+
+    public override int GetHashCode()
+    {
+        return (x, y).GetHashCode();
+    }
 
     public override string ToString()
     {
         return $"[{x}, {y}]";
-    }   
+    }
 }
 
 public interface IGrid<T>

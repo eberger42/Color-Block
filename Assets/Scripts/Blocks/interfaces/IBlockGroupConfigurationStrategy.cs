@@ -1,16 +1,15 @@
 ﻿using NUnit.Framework;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Scripts.Blocks.interfaces
 {
-    public interface IEntity
+    public interface IBlockGroupConfigurationStrategy
     {
-        public event Action<GridPosition> OnMoveDirection;
+        List<GridPosition> GetPositions();
 
-        public void SetGridNode(INode node);
-
+        GridPosition GetPivotPosition();
+        
     }
 }

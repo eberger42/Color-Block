@@ -16,7 +16,7 @@ namespace Assets.Scripts.Player
         private BlockManager blockManager;
         private ColorGridManager colorGridManager;
 
-        private IEntity _targetEntity;
+        private ITakeBlockCommand _target;
 
         private void Awake()
         {
@@ -27,14 +27,12 @@ namespace Assets.Scripts.Player
         private void Start()
         {
             blockManager = BlockManager.Instance;
-            Debug.Log(blockManager);
-            blockManager.OnBlockCreated += OnBlockCreated;
+            blockManager.OnTargetCreated += OnBlockCreated;
         }
 
         private void OnDestroy()
         {
-
-            blockManager.OnBlockCreated -= OnBlockCreated;
+            blockManager.OnTargetCreated -= OnBlockCreated;
         }
 
         private void Update()
@@ -46,7 +44,7 @@ namespace Assets.Scripts.Player
             float vertical = Mathf.Round(Input.GetAxisRaw("Vertical"));
             float horizontal = Mathf.Round(Input.GetAxisRaw("Horizontal"));
 
-            if (vertical != 0)
+            if (vertical == -1)
             {
                 MoveTargetEntity(new Vector2(0, vertical));
             }
@@ -62,31 +60,32 @@ namespace Assets.Scripts.Player
         {
 
             var gridDirection = new GridPosition((int)direction.x, (int)direction.y);
-            var gridPositions = _targetEntity.GetGridPositions();
+            var isValidMove = _target.CheckForValidMove(gridDirection);
 
-            var positionsToCheck = gridPositions.Where(pos => !gridPositions.Contains(pos + gridDirection)).ToList();
-            var areSpacesOccupied = colorGridManager.CheckIfSpacesAreOccupied(positionsToCheck, gridDirection);
-
-            if(areSpacesOccupied)
+            if(!isValidMove)
             {
                 Debug.Log("Invalid move");
+                if(gridDirection.y == -1)
+                {
+                    (_target as IGravity).TriggerBottomReahed();
+                }
                 return;
             }
 
             var moveBlockCommandConfigurer = new MoveBlockCommandConfigurer(gridDirection);
-            var command = new CommandManager.CommandBuilder().AddCommand<MoveBlockCommand>(_targetEntity, moveBlockCommandConfigurer).Build();
+            var command = new CommandManager.CommandBuilder().AddCommand<MoveBlockCommand>(_target, moveBlockCommandConfigurer).Build();
             await commandManager.ExecuteCommands(command);
         }
 
 
-        private void OnBlockCreated(ColorBlock block)
+        private void OnBlockCreated(ITakeBlockCommand target)
         {
-            SetTargetEntity(block);
+            SetTargetEntity(target);
         }
 
-        private void SetTargetEntity(IEntity targetEntity)
+        private void SetTargetEntity(ITakeBlockCommand target)
         {
-            _targetEntity = targetEntity;
+            _target = target;
         }
 
 

@@ -1,5 +1,6 @@
 ﻿
 
+using Assets.Scripts.Blocks.commands;
 using Assets.Scripts.Blocks.interfaces;
 using Assets.Scripts.Blocks.scriptable_objects;
 using Assets.Scripts.Grid.components;
@@ -10,7 +11,7 @@ using static Unity.Collections.AllocatorManager;
 
 namespace Assets.Scripts.Blocks.components
 {
-    public class BlockNode : Node<IBlock>
+    public class BlockNode : Node<IEntity>
     {
 
         private static GameObject collection = new GameObject("BlockNodeCollection");
@@ -19,6 +20,8 @@ namespace Assets.Scripts.Blocks.components
         private GridPosition gridPosition;
         private GameObject gameObject;
         private Grid<BlockNode> gridListener;
+
+        public GridPosition GridPosition { get => gridPosition; }
 
         public BlockNode()
         {
@@ -60,7 +63,7 @@ namespace Assets.Scripts.Blocks.components
 
         }
 
-        public override GridPosition GetPosition()
+        public override GridPosition GetGridPosition()
         {
             return gridPosition;
         }
@@ -73,25 +76,11 @@ namespace Assets.Scripts.Blocks.components
         {
             if (nodeData is IBlock block)
             {
-
-                if(this._data != null)
-                    this._data.OnMoveDirection -= MoveDirection;  
-
                 this._data = block;
-
-                this._data.SetWorldPosition(new Vector2(gridPosition.x, gridPosition.y));
-                this._data.SetGridPosition(gridPosition);
-
-                this._data.OnMoveDirection += MoveDirection;
-                
-
-
+                this._data.SetGridNode(this);
             }
-            else if (nodeData == null)
-            {
-                if(this._data != null)
-                    this._data.OnMoveDirection -= MoveDirection;  
-
+            else if (nodeData == null)//Clears out Node Data
+            { 
                 this._data = null;
             }
             else
@@ -105,11 +94,17 @@ namespace Assets.Scripts.Blocks.components
         }
 
 
-        private void MoveDirection(GridPosition direction)
+        public override void MoveData(GridPosition direction)
         {
-
             var newPosition = new GridPosition(this.gridPosition.x + (int)direction.x, this.gridPosition.y + (int)direction.y);
 
+
+            if(newPosition.y < 0)
+            {
+                (this._data as IGravity).TriggerBottomReahed();
+                return;
+            }
+            
             var node = gridListener.GetNode(newPosition.x, newPosition.y);
 
             if(node.IsOccupied())
@@ -127,6 +122,19 @@ namespace Assets.Scripts.Blocks.components
         public override bool IsOccupied()
         {
             return _data is IEntity;
+        }
+
+        public override bool IsNeighborOccupied(GridPosition direction)
+        {
+            var neighborPosition = new GridPosition(this.gridPosition.x + (int)direction.x, this.gridPosition.y + (int)direction.y);   
+            
+            var isInBounds = gridListener.IsInBounds(neighborPosition.x, neighborPosition.y);
+
+            if (!isInBounds)
+                return true;
+
+            var neighborNode = gridListener.GetNode(neighborPosition.x, neighborPosition.y);
+            return neighborNode.IsOccupied();
         }
     }
 }

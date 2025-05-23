@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Scripts.Blocks.interfaces;
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -8,14 +9,13 @@ namespace Assets.Scripts.Blocks.components
     {
         public static BlockManager Instance { get; private set; }
 
+        ITakeBlockCommand _currentEntity;
 
         [SerializeField]
         private BlockFactory blockFactory;  
 
-
-
         //Events
-        public event Action<ColorBlock> OnBlockCreated;
+        public event Action<ITakeBlockCommand> OnTargetCreated;
 
         
 
@@ -35,8 +35,28 @@ namespace Assets.Scripts.Blocks.components
 
         private void Start()
         {
-            var block = blockFactory.CreateBlock(Color.red);
-            OnBlockCreated?.Invoke(block);
+            CreateNewBlock();
         }
+
+
+        private void CreateNewBlock()
+        {
+
+            if(_currentEntity is IGravity gravityBlock)
+            {
+                gravityBlock.OnBottomContact -= CreateNewBlock;
+            }
+
+            var target = blockFactory.CreateBlockGroup(Color.red);
+
+            _currentEntity = target;
+            (_currentEntity as IGravity).OnBottomContact += CreateNewBlock;
+
+            Debug.Log("New Block Created");
+            OnTargetCreated?.Invoke(target);
+        }
+
+
+
     }
 }

@@ -13,7 +13,7 @@ namespace Assets.Scripts.Grid.components
 
         public abstract void GenerateNode();
 
-        public abstract GridPosition GetPosition();
+        public abstract GridPosition GetGridPosition();
 
         public abstract void SetNodeData<K>(K nodeData);
 
@@ -22,5 +22,9 @@ namespace Assets.Scripts.Grid.components
         public abstract bool IsOccupied();
 
         public abstract  void SetGridListener<K>(K gridListener);
+
+        public abstract bool IsNeighborOccupied(GridPosition direction);
+
+        public abstract void MoveData(GridPosition direction);
     }
 }

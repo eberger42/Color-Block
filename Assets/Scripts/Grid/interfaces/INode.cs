@@ -5,11 +5,17 @@ using UnityEngine;
 public interface INode
 { 
     public void SetPosition(GridPosition position);
-    public GridPosition GetPosition();
+    public GridPosition GetGridPosition();
     public void GenerateNode();
     public void Configure(NodeConfiguration config, GridPosition gridPosition);
-    public void SetNodeData<K>(K nodeData);
     public void SetGridListener<T>(T gridListener);
-    public abstract bool IsOccupied();
+
+    //Control
+    public void SetNodeData<K>(K nodeData);
+    public void MoveData(GridPosition direction);
+
+    //FeedBack
+    public bool IsOccupied();
+    public bool IsNeighborOccupied(GridPosition direction);
 
 }
