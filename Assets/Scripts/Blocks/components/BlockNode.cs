@@ -114,6 +114,15 @@ namespace Assets.Scripts.Blocks.components
             
         }
 
+        public override INode GetRotationNode(GridPosition targetPosition)
+        {
+            var newPosition = new GridPosition(this.gridPosition.x + (int)targetPosition.x, this.gridPosition.y + (int)targetPosition.y);
+
+            var node = gridListener.GetNode(newPosition.x, newPosition.y);
+
+            return node;
+        }
+
         public override bool IsOccupied()
         {
             return _data is IEntity;

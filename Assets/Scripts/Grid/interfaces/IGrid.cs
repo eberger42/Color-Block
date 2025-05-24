@@ -20,6 +20,7 @@ public struct GridPosition
     }
 
     public static GridPosition operator -(GridPosition a, GridPosition b) =>new GridPosition(a.x - b.x, a.y - b.y);
+    public static GridPosition operator *(GridPosition a, GridPosition b) => new GridPosition(a.x * b.x, a.y * b.y);
 
 
     public static bool operator ==(GridPosition a, GridPosition b)

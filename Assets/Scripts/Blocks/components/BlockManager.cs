@@ -1,6 +1,9 @@
-﻿using Assets.Scripts.Blocks.interfaces;
+﻿using Assets.Scripts.Blocks.components.colors;
+using Assets.Scripts.Blocks.interfaces;
+using NUnit.Framework;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Scripts.Blocks.components
@@ -12,7 +15,14 @@ namespace Assets.Scripts.Blocks.components
         ITakeBlockCommand _currentEntity;
 
         [SerializeField]
-        private BlockFactory blockFactory;  
+        private BlockFactory blockFactory; 
+        
+        private List<Type> primaryColors = new List<Type>
+        {
+            typeof(RedBlockColor),
+            typeof(BlueBlockColor),
+            typeof(YellowBlockColor)
+        };
 
         //Events
         public event Action<ITakeBlockCommand> OnTargetCreated;
@@ -55,7 +65,8 @@ namespace Assets.Scripts.Blocks.components
                 gravityBlock.OnBottomContact -= CreateNewBlock;
             }
 
-            var target = blockFactory.CreateBlockGroup(Color.red);
+            var blockColor = BlockColorFactory.GenerateRandomPrimaryColor();
+            var target = blockFactory.CreateBlockGroup(blockColor);
 
             _currentEntity = target;
             (_currentEntity as IGravity).OnBottomContact += CreateNewBlock;

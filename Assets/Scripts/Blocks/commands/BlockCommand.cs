@@ -1,10 +1,12 @@
 ﻿using Assets.Scripts.Blocks.interfaces;
 using Assets.Scripts.Player.Interfaces;
 using NUnit.Framework;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEditor.PackageManager;
+using UnityEditor.Rendering;
 using UnityEngine;
 
 namespace Assets.Scripts.Blocks.commands
@@ -24,6 +26,16 @@ namespace Assets.Scripts.Blocks.commands
             IsExecuting = true;
             await _commandInvoker.ExecuteCommannd(commands);
             IsExecuting = false;
+        }
+
+        public async Task ExecuteCommands(List<ICommand> commands, Func<bool> IsExecutingGetter, Action<bool> isExecutingSetter )
+        {
+            if(IsExecutingGetter())
+                return;
+
+            isExecutingSetter(true);
+            await _commandInvoker.ExecuteCommannd(commands);
+            isExecutingSetter(false);
         }
 
         public class CommandBuilder

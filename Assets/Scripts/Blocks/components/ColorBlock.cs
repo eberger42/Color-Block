@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.Blocks.commands;
+using Assets.Scripts.Blocks.components.colors;
 using Assets.Scripts.Blocks.interfaces;
 using Assets.Scripts.Grid.components;
 using System;
@@ -11,7 +12,7 @@ using static Unity.Collections.AllocatorManager;
 
 namespace Assets.Scripts.Blocks.components
 {
-    public class ColorBlock : MonoBehaviour, IBlock, IColor, IGravity
+    public class ColorBlock : MonoBehaviour, IBlock, IGravity
     {
 
         public event Action<GridPosition> OnPositionUpdated;
@@ -19,9 +20,13 @@ namespace Assets.Scripts.Blocks.components
         public event Action OnBottomContact;
         public event Action OnMovementBlocked;
 
+        public event Action<IBlockColor> OnColorUpdated;
+
+
+        private IBlockColor color;
+
         private GridPosition gridPosition;
         private CommandManager commandManager;
-        private ColorRank colorRank;
         private INode node;
         private bool canTakeCommands = true;
         private bool canFall = true;
@@ -34,13 +39,7 @@ namespace Assets.Scripts.Blocks.components
 
         public ColorRank GetColorRank()
         {
-            throw new System.NotImplementedException();
-        }
-
-       
-        public void SetColorRank(ColorRank rank)
-        {
-            this.colorRank = rank;
+            return color.GetColorRank();
         }
 
         public void SetWorldPosition(Vector2 position)
@@ -72,7 +71,13 @@ namespace Assets.Scripts.Blocks.components
         /////////////////////////////////////////////////////////////////
         /// IBlock Interface
         /////////////////////////////////////////////////////////////////
-        
+
+        void IBlock.SetColor(IBlockColor color)
+        {
+            this.color = color;
+            OnColorUpdated?.Invoke(color);
+
+        }
 
         /////////////////////////////////////////////////////////////////
         /// IEntity Interface
@@ -127,5 +132,22 @@ namespace Assets.Scripts.Blocks.components
         {
             throw new NotImplementedException();
         }
+
+        bool ITakeBlockCommand.CheckForValidRotation(GridPosition position)
+        {
+
+
+            var isValidMove = !node.IsNeighborOccupied(position);
+
+            return isValidMove;
+        }
+
+        void ITakeBlockCommand.Rotate(GridPosition delta)
+        {
+            var neigborNode = node.GetRotationNode(delta);
+            node.ClearNodeData(this);
+            neigborNode.SetNodeData(this);
+        }
+
     }
 }

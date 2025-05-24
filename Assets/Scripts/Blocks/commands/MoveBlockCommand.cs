@@ -35,13 +35,13 @@ namespace Assets.Scripts.Blocks.commands
                 if (!isValidMove)
                     return;
                 _target.Move(_direction);
-                await Task.Delay(10);
+                await Task.Delay(5);
             };
             
 
             _target.AddActionCommand(task);
 
-            await Task.Delay(55);
+            await Task.Delay(75);
         }
     }
 

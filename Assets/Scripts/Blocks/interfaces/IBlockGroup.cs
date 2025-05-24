@@ -17,6 +17,7 @@ namespace Assets.Scripts.Blocks.interfaces
 
         public void ReleaseBlock(IBlock block);
         public List<GridPosition> GetGridPositions();
+        public void SetColor(IBlockColor color);
 
     }
 }

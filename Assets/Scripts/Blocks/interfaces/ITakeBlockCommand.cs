@@ -16,7 +16,9 @@ namespace Assets.Scripts.Blocks.interfaces
         public event Action<GridPosition> OnPositionUpdated;
 
         public bool CheckForValidMove(GridPosition direction);
+        public bool CheckForValidRotation(GridPosition position);
         public void Move(GridPosition direction);
+        public void Rotate(GridPosition delta);
         public void Place(Grid<BlockNode>  colorGrid, GridPosition position);
 
 

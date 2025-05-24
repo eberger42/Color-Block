@@ -14,6 +14,7 @@ public interface INode
     public void SetNodeData<K>(K nodeData);
     public void ClearNodeData<K>(K nodeData);
     public INode GetNeighbor(GridPosition direction);
+    public INode GetRotationNode(GridPosition direction);
 
     //FeedBack
     public bool IsOccupied();

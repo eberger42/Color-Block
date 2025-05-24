@@ -16,6 +16,10 @@ namespace Assets.Scripts.Player
         private BlockManager blockManager;
         private ColorGridManager colorGridManager;
 
+        private bool _isMovingExecutionFlag = false;
+        private bool _isGravityExecutionFlag = false;
+
+
         private ITakeBlockCommand _target;
 
         private void Awake()
@@ -38,11 +42,18 @@ namespace Assets.Scripts.Player
         private void Update()
         {
 
-            if(commandManager.IsExecuting)
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                RotateTargetEntity(1);
+                return;
+            }
+
+            if (commandManager.IsExecuting)
                 return;
 
             float vertical = Mathf.Round(Input.GetAxisRaw("Vertical"));
             float horizontal = Mathf.Round(Input.GetAxisRaw("Horizontal"));
+
 
             if (vertical == -1)
             {
@@ -74,9 +85,18 @@ namespace Assets.Scripts.Player
 
             var moveBlockCommandConfigurer = new MoveBlockCommandConfigurer(gridDirection);
             var command = new CommandManager.CommandBuilder().AddCommand<MoveBlockCommand>(_target, moveBlockCommandConfigurer).Build();
-            await commandManager.ExecuteCommands(command);
+            await commandManager.ExecuteCommands(command, () => _isMovingExecutionFlag, (isMoving) => _isMovingExecutionFlag = isMoving);
         }
 
+        private async void RotateTargetEntity(int direction)
+        {
+
+            Debug.Log($"Rotating target entity with direction: {direction}");
+            var gridDirection = new GridPosition(-1 * direction, 1 * direction);
+            var rotateBlockCommandConfigurer = new RotateBlockCommandConfigurer(gridDirection);
+            var command = new CommandManager.CommandBuilder().AddCommand<RotateBlockCommand>(_target, rotateBlockCommandConfigurer).Build();
+            await commandManager.ExecuteCommands(command);
+        }
 
         private void OnBlockCreated(ITakeBlockCommand target)
         {

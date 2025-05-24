@@ -11,10 +11,11 @@ namespace Assets.Scripts.Blocks.components
         private readonly List<GridPosition> _positions = new List<GridPosition>
         {
             new GridPosition(0, 0),
-            new GridPosition(-1, 0),
-            new GridPosition(-2, 0),
-            new GridPosition(-3, 0),
-            new GridPosition(-3, 1),
+            new GridPosition(0, 1),
+            new GridPosition(1, 0),
+            new GridPosition(2, 0),
+            new GridPosition(3, 0),
+
         };
 
         private readonly GridPosition _pivotPosition = new GridPosition(0, 0);
@@ -40,6 +41,7 @@ namespace Assets.Scripts.Blocks.components
             new GridPosition(0, 0),
             new GridPosition(-1, 0),
             new GridPosition(1, 0),
+            new GridPosition(0, -2),
             new GridPosition(0, -1),
             new GridPosition(0, 1)
         };
@@ -58,7 +60,7 @@ namespace Assets.Scripts.Blocks.components
 
     }
 
-    public class OBarConfigurationStrategy : IBlockGroupConfigurationStrategy
+   /* public class OBarConfigurationStrategy : IBlockGroupConfigurationStrategy
     {
         //Stored As Deltas from GridPosition
         private readonly List<GridPosition> _positions = new List<GridPosition>
@@ -88,5 +90,5 @@ namespace Assets.Scripts.Blocks.components
         }
 
     }
-    
+    */
 }
