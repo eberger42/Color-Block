@@ -1,5 +1,6 @@
 ﻿using Assets.Scripts.Blocks.scriptable_objects;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Scripts.Grid.components
@@ -26,6 +27,7 @@ namespace Assets.Scripts.Grid.components
         public abstract bool IsNeighborOccupied(GridPosition direction);
 
         public abstract INode GetNeighbor(GridPosition direction);
+        public abstract List<INode> GetNeighbors();
         public abstract INode GetRotationNode(GridPosition direction);
 
         public abstract void ClearNodeData<K>(K nodeData);

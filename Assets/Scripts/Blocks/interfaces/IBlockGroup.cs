@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,11 +8,8 @@ namespace Assets.Scripts.Blocks.interfaces
     public interface IBlockGroup : IEntity, ITakeBlockCommand
     {
 
-        public void AddBlock(IBlock block);
-
-        public void GetPivotBlock(IBlock block);
-
-        public void RotateBlockGroup(Vector2Int direction);
+        public event Action OnMergeCheckTriggered;
+        public void AddBlock(IBlock block, GridPosition delta);
 
         public void DestroyBlockGroup();
 

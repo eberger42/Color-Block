@@ -109,6 +109,10 @@ namespace Assets.Scripts.Blocks.components.colors
 
         public bool CanCombine(IBlockColor other)
         {
+
+            if (_colorRank == ColorRank.Secondary)
+                return false;
+
             var colorType = other.GetColorType();
 
             if(_combinations.ContainsKey(colorType))

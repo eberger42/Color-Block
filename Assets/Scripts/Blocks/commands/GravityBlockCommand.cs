@@ -23,13 +23,11 @@ namespace Assets.Scripts.Blocks.commands
 
             Func<Task> task = async () =>
             {
-                if (_target.CanTakeGravityCommands() == false)
-                    return;
-
                 //Debug.Log($"Executing GravityBlockCommand with direction: {_target}");
 
                 if (_target.CanTakeGravityCommands() == false)
                     return;
+
                 _target.CheckForValidMove(_direction);
                 _target.Move(_direction);
 

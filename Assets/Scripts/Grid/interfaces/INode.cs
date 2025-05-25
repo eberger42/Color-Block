@@ -1,5 +1,6 @@
 using Assets.Scripts.Blocks.scriptable_objects;
 using Assets.Scripts.Grid.components;
+using System.Collections.Generic;
 using UnityEngine;
 
 public interface INode
@@ -14,6 +15,7 @@ public interface INode
     public void SetNodeData<K>(K nodeData);
     public void ClearNodeData<K>(K nodeData);
     public INode GetNeighbor(GridPosition direction);
+    public List<INode> GetNeighbors();
     public INode GetRotationNode(GridPosition direction);
 
     //FeedBack

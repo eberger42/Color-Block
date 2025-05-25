@@ -17,13 +17,14 @@ namespace Assets.Scripts.Blocks.components
 
         public event Action<GridPosition> OnPositionUpdated;
         public event Action<GridPosition> OnMoveDirection;
+        public event Action OnNeedGravity;
         public event Action OnBottomContact;
         public event Action OnMovementBlocked;
 
         public event Action<IBlockColor> OnColorUpdated;
 
 
-        private IBlockColor color;
+        public  IBlockColor Color { get; private set; }
 
         private GridPosition gridPosition;
         private CommandManager commandManager;
@@ -31,15 +32,34 @@ namespace Assets.Scripts.Blocks.components
         private bool canTakeCommands = true;
         private bool canFall = true;
 
+        private IBlockGroup parent;
+
         private void Awake()
         {
             commandManager = new CommandManager(); 
         }
 
+        public bool AttemptMerge(ColorBlock colorBlock)
+        {
+
+            if (!Color.CanCombine(colorBlock.Color))
+                return false;
+            Debug.LogWarning($"Attempting to merge {this.Color} with {colorBlock.Color}");
+            Debug.LogWarning($"Parent: {parent} - ColorBlock Parent: {(colorBlock as IBlock).GetParent()}");
+            if (parent == (colorBlock as IBlock).GetParent())
+                return false;
+
+            var newColor = Color.GetCombineColor(colorBlock.Color);
+
+            (this as IBlock).SetColor(newColor);
+
+            return true;
+
+        }
 
         public ColorRank GetColorRank()
         {
-            return color.GetColorRank();
+            return Color.GetColorRank();
         }
 
         public void SetWorldPosition(Vector2 position)
@@ -69,12 +89,50 @@ namespace Assets.Scripts.Blocks.components
         }
 
         /////////////////////////////////////////////////////////////////
+        /// IGravity Interface
+        /////////////////////////////////////////////////////////////////
+
+        bool IGravity.CheckIfFloating()
+        {
+            var southernNode = node.GetNeighbor(GridPosition.Down);
+
+            if(southernNode ==  null)
+                return true;
+
+            if (!southernNode.IsOccupied())
+                return true;
+
+            var block = (southernNode as BlockNode).GetData() as IBlock;
+
+            if(parent == block.GetParent())
+                return true;
+
+            return false;
+
+        }
+
+        /////////////////////////////////////////////////////////////////
         /// IBlock Interface
         /////////////////////////////////////////////////////////////////
 
+        void IBlock.SetParent(IBlockGroup parent)
+        {
+            if(this.parent != null)
+                this.parent.OnMergeCheckTriggered -= CheckNeighborsForMerge;
+
+            this.parent = parent;
+
+            if(this.parent != null)
+                this.parent.OnMergeCheckTriggered += CheckNeighborsForMerge;
+        }
+
+        IBlockGroup IBlock.GetParent()
+        {
+            return parent;
+        }
         void IBlock.SetColor(IBlockColor color)
         {
-            this.color = color;
+            this.Color = color;
             OnColorUpdated?.Invoke(color);
 
         }
@@ -135,8 +193,6 @@ namespace Assets.Scripts.Blocks.components
 
         bool ITakeBlockCommand.CheckForValidRotation(GridPosition position)
         {
-
-
             var isValidMove = !node.IsNeighborOccupied(position);
 
             return isValidMove;
@@ -147,6 +203,60 @@ namespace Assets.Scripts.Blocks.components
             var neigborNode = node.GetRotationNode(delta);
             node.ClearNodeData(this);
             neigborNode.SetNodeData(this);
+        }
+
+
+        private void CheckNeighborsForMerge()
+        {
+            if (Color.GetColorRank() == ColorRank.Secondary)
+                return;
+
+            var neighbors = node.GetNeighbors();
+            var siblingNeighbors = 0;
+
+            if(neighbors == null || neighbors.Count == 0)
+                return;
+
+            while (neighbors.Count > 0)
+            {
+                var random = new System.Random();
+                var neighbor = neighbors[random.Next(neighbors.Count)];
+                neighbors.Remove(neighbor);
+
+                if (!neighbor.IsOccupied())
+                    continue;
+
+
+                var block = (neighbor as BlockNode).GetData();
+
+                if((block as IBlock).GetParent() == parent)
+                    siblingNeighbors++;
+
+                if (block is ColorBlock colorBlock)
+                {
+
+                    var didMerge = colorBlock.AttemptMerge(this);
+
+                    if(didMerge)
+                    {
+                        node.ClearNodeData(this);
+                        parent.ReleaseBlock(this);
+                        Destroy(this.gameObject);
+                        break;
+                    }
+                }
+
+
+
+            }
+
+            Debug.Log($"Sibling Neighbors: {siblingNeighbors}");
+            if (siblingNeighbors > 0)
+                return;
+
+            var blockGroup = BlockManager.Instance.BlockFactory.CreateBlockGroup(Color);
+            (blockGroup as IBlockGroup).AddBlock(this, new GridPosition(0,0));
+        
         }
 
     }

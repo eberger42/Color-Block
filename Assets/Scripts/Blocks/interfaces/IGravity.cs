@@ -8,7 +8,10 @@ namespace Assets.Scripts.Blocks.interfaces
     {
 
         public event Action OnBottomContact;
+        public event Action OnNeedGravity;
         void TriggerBottomReahed();
+
+        public bool CheckIfFloating();
 
     }
 }

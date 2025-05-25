@@ -44,6 +44,9 @@ namespace Assets.Scripts.Grid.components
 
         public T GetNode(int x, int y)
         {
+            if (!IsInBounds(x, y))
+                return default(T);
+
             return gridArray[x, y];
         }
 

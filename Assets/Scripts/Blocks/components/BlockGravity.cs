@@ -27,7 +27,7 @@ namespace Assets.Scripts.Blocks.components
             commandManager = new CommandManager();
             _targetEntity = GetComponent<ITakeBlockCommand>();
 
-            _targetEntity.OnPositionUpdated += EntityPositionUpdated;
+            (_targetEntity as IGravity).OnNeedGravity += EntityPositionUpdated;
 
 
         }
@@ -38,10 +38,11 @@ namespace Assets.Scripts.Blocks.components
         }
         private void OnDisable()
         {
+            (_targetEntity as IGravity).OnNeedGravity -= EntityPositionUpdated;
             gravityTokenSource?.Cancel();
         }
 
-        private void EntityPositionUpdated(GridPosition position)
+        private void EntityPositionUpdated()
         {
             if (commandManager.IsExecuting)
                 return;
@@ -55,8 +56,7 @@ namespace Assets.Scripts.Blocks.components
             if (gravityTokenSource.IsCancellationRequested)
                 return;
 
-            var gridDirection = new GridPosition(0, -1);
-            var isValidMove = _targetEntity.CheckForValidMove(gridDirection);
+            var isValidMove = _targetEntity.CheckForValidMove(GridPosition.Down);
 
             if (!isValidMove)
             {
@@ -65,10 +65,9 @@ namespace Assets.Scripts.Blocks.components
                 return;
             }
 
-            var moveBlockCommandConfigurer = new GravityBlockCommandConfigurer(gridDirection);
+            var moveBlockCommandConfigurer = new GravityBlockCommandConfigurer(GridPosition.Down);
             var command = new CommandManager.CommandBuilder().AddCommand<GravityBlockCommand>(_targetEntity, moveBlockCommandConfigurer).Build();
             await commandManager.ExecuteCommands(command);
-
 
             GravityCalculation();
         }

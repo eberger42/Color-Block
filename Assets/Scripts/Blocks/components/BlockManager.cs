@@ -11,6 +11,7 @@ namespace Assets.Scripts.Blocks.components
     public class BlockManager : MonoBehaviour
     {
         public static BlockManager Instance { get; private set; }
+        public BlockFactory BlockFactory { get => blockFactory; }
 
         ITakeBlockCommand _currentEntity;
 

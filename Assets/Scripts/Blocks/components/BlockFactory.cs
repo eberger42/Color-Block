@@ -12,6 +12,7 @@ namespace Assets.Scripts.Blocks.components
     public class BlockFactory : MonoBehaviour
     {
         private static int _blockCount = 0;
+        private static int _groupCount = 0;
         [SerializeField]
         private Transform blockPrefab;
 
@@ -38,9 +39,11 @@ namespace Assets.Scripts.Blocks.components
         public ITakeBlockCommand CreateBlockGroup(IBlockColor blockColor)
         {
             ColorBlockGroup blockGroup = Instantiate(blockGroupPrefab, new Vector2(0, 0), Quaternion.identity).GetComponent<ColorBlockGroup>();
- 
+            blockGroup.transform.name = $"ColorBlockGroup: {_groupCount}";
             var configurationStrategy = GetRandomConfigurationStrategy();
             blockGroup.Initialize(configurationStrategy, this, blockColor);
+
+            _groupCount++;
             return blockGroup;
         }
 

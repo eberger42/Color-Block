@@ -14,24 +14,26 @@ public struct GridPosition
         this.y = y;
     }
 
-    public static GridPosition operator +(GridPosition a, GridPosition b)
-    {
-        return new GridPosition(a.x + b.x, a.y + b.y);
-    }
+    public static GridPosition Up => new GridPosition(0, 1);
+    public static GridPosition Down => new GridPosition(0, -1);
+    public static GridPosition Left => new GridPosition(-1, 0);
+    public static GridPosition Right => new GridPosition(1, 0);
 
-    public static GridPosition operator -(GridPosition a, GridPosition b) =>new GridPosition(a.x - b.x, a.y - b.y);
+    public static List<GridPosition> Directions => new List<GridPosition>
+    {
+        Up,
+        Down,
+        Left,
+        Right
+    };
+
+
+    public static GridPosition operator +(GridPosition a, GridPosition b) => new GridPosition(a.x + b.x, a.y + b.y);
+    public static GridPosition operator -(GridPosition a, GridPosition b) => new GridPosition(a.x - b.x, a.y - b.y);
     public static GridPosition operator *(GridPosition a, GridPosition b) => new GridPosition(a.x * b.x, a.y * b.y);
-
-
-    public static bool operator ==(GridPosition a, GridPosition b)
-    {
-        return a.x == b.x && a.y == b.y;
-    }
-
-    public static bool operator !=(GridPosition a, GridPosition b)
-    {
-        return a.x != b.x && a.y != b.y;
-    }
+    public static bool operator ==(GridPosition a, GridPosition b) => (a.x == b.x && a.y == b.y);
+    public static bool operator !=(GridPosition a, GridPosition b) => (a.x != b.x && a.y != b.y);
+    
 
     public override bool Equals(object obj)
     {

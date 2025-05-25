@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Assets.Scripts.Blocks.components
 {
@@ -16,6 +17,8 @@ namespace Assets.Scripts.Blocks.components
     public class ColorBlockGroup : MonoBehaviour, IBlockGroup, IGravity
     {
         public event Action OnBottomContact;
+        public event Action OnNeedGravity;
+        public event Action OnMergeCheckTriggered;
         public event Action<GridPosition> OnMoveDirection;
         public event Action<GridPosition> OnPositionUpdated;
 
@@ -23,9 +26,6 @@ namespace Assets.Scripts.Blocks.components
         //Block Positioning Helpers
         private Dictionary<IBlock,GridPosition> _positionsDeltaMap = new Dictionary<IBlock, GridPosition>();
         private Dictionary<IBlock, GridPosition> _positionsRotationUpdateDeltaMap;
-
-        private IBlock pivotBlock;
-
 
         
         //Grouped elements
@@ -35,7 +35,7 @@ namespace Assets.Scripts.Blocks.components
         private Queue<Func<Task>> _actionQueue = new Queue<Func<Task>>();
 
         //Flags
-        private bool spawnNewBlockFlag = false;
+        private bool ignoreOtherBottomReachedEvents = false;
         private bool canTakeCommands = true;
         private bool canFall = true;
         private bool executingAction = false;
@@ -48,22 +48,13 @@ namespace Assets.Scripts.Blocks.components
         public void Initialize(IBlockGroupConfigurationStrategy configurationStrategy, BlockFactory factory, IBlockColor color)
         {
             var _positions = configurationStrategy.GetPositions();
-            var pivotPosition = configurationStrategy.GetPivotPosition();
 
             foreach (var position in _positions)
             {
                 var block = factory.CreateBlock(color) as IBlock;
-                (block as MonoBehaviour).transform.SetParent(this.transform, false);
-                (block as IGravity).OnBottomContact += (this as IGravity).TriggerBottomReahed;
+                (this as IBlockGroup).AddBlock(block, position); //Add the block to the group
 
-                blocks.Add(block);
-
-                _positionsDeltaMap.Add(block, position);
-
-                if (position == pivotPosition)
-                {
-                    pivotBlock = block;
-                }
+                
             }
         }
 
@@ -77,19 +68,25 @@ namespace Assets.Scripts.Blocks.components
         }
         void IBlockGroup.ReleaseBlock(IBlock block)
         {
-            throw new NotImplementedException();
+            if(blocks.Contains(block) == false)
+                return;
+
+            blocks.Remove(block);
+            _positionsDeltaMap.Remove(block);
+            (block as MonoBehaviour).transform.SetParent(null, false);
+            (block as IGravity).OnBottomContact -= (this as IGravity).TriggerBottomReahed;
+            (block as IBlock).SetParent(null);
+
+             (this as IGravity).CheckIfFloating();
+
         }
-        void IBlockGroup.RotateBlockGroup(Vector2Int direction)
+        void IBlockGroup.AddBlock(IBlock block, GridPosition delta)
         {
-            throw new NotImplementedException();
-        }
-        void IBlockGroup.GetPivotBlock(IBlock block)
-        {
-            throw new NotImplementedException();
-        }
-        void IBlockGroup.AddBlock(IBlock block)
-        {
+            (block as MonoBehaviour).transform.SetParent(this.transform, false);
+            (block as IGravity).OnBottomContact += (this as IGravity).TriggerBottomReahed;
+            (block as IBlock).SetParent(this);
             this.blocks.Add(block);
+            _positionsDeltaMap.Add(block, delta);
         }
         List<GridPosition> IBlockGroup.GetGridPositions()
         {
@@ -126,17 +123,22 @@ namespace Assets.Scripts.Blocks.components
                 block.Place(colorGrid, newPosition);
             }
 
+            this.OnNeedGravity?.Invoke();
             this.OnPositionUpdated?.Invoke(position);
+            ignoreOtherBottomReachedEvents = false;
         }
         void ITakeBlockCommand.Move(GridPosition direction)
         {
             if(canFall == false)
                 return;
 
+            Debug.Log($"***Moving BlockGroup: {this} Direction: {direction}");
             foreach (var block in blocks)
             {
                 block.Move(direction);
-            } 
+            }
+
+            ignoreOtherBottomReachedEvents = false;
         }
         void ITakeBlockCommand.Rotate(GridPosition delta)
         {
@@ -234,13 +236,40 @@ namespace Assets.Scripts.Blocks.components
         void IGravity.TriggerBottomReahed()
         {
 
-            if (spawnNewBlockFlag)
+            if (ignoreOtherBottomReachedEvents)
                 return;
 
-            spawnNewBlockFlag = true;
+
+            ignoreOtherBottomReachedEvents = true;
             canTakeCommands = false;
             canFall = false;
             OnBottomContact?.Invoke();
+
+            this.OnMergeCheckTriggered?.Invoke();
+        }
+        bool IGravity.CheckIfFloating()
+        {
+            var isGroupFloating = true;
+            foreach (var block in blocks)
+            {
+                var isBlockFloating = (block as IGravity).CheckIfFloating();
+
+                if (!isBlockFloating)
+                {
+                    isGroupFloating = false;
+                    break;
+                }
+            }
+
+            if (isGroupFloating)
+            {
+                canFall = true;
+                canTakeCommands = false;
+                this.OnNeedGravity?.Invoke();
+            }
+
+            Debug.Log($"IsGroupFloating: {isGroupFloating}");
+            return isGroupFloating;
         }
 
 
@@ -265,7 +294,7 @@ namespace Assets.Scripts.Blocks.components
 
             if (_actionQueue.Count > 0)
             {
-                Debug.Log($"Executing action queue.");
+                Debug.Log($"Executing action queue. {canFall} {this}");
                 var action = _actionQueue.Dequeue();
                 executingAction = true;
                 await action?.Invoke();
@@ -279,5 +308,7 @@ namespace Assets.Scripts.Blocks.components
             return new GridPosition(position.y * deltaPosition.y, position.x * deltaPosition.x);
         }
 
+
+        
     }
 }

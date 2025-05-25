@@ -4,7 +4,9 @@ using Assets.Scripts.Blocks.commands;
 using Assets.Scripts.Blocks.interfaces;
 using Assets.Scripts.Blocks.scriptable_objects;
 using Assets.Scripts.Grid.components;
+using NUnit.Framework;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEditor.PackageManager;
 using UnityEngine;
 using static Unity.Collections.AllocatorManager;
@@ -28,6 +30,12 @@ namespace Assets.Scripts.Blocks.components
             
         }
 
+
+        public IEntity GetData()
+        {
+            return _data;
+        }
+
         public override void Configure(NodeConfiguration config, GridPosition gridPosition)
         {
             this.config = config;
@@ -36,10 +44,6 @@ namespace Assets.Scripts.Blocks.components
 
         }
 
-        public ColorRank GetColorRank()
-        {
-            throw new System.NotImplementedException();
-        }
 
         public override void GenerateNode()
         {
@@ -66,10 +70,6 @@ namespace Assets.Scripts.Blocks.components
         public override GridPosition GetGridPosition()
         {
             return gridPosition;
-        }
-
-        public void SetNode(IBlock block)
-        {
         }
 
         public override void SetNodeData<K>(K nodeData) 
@@ -113,7 +113,23 @@ namespace Assets.Scripts.Blocks.components
 
             return node;
 
-            
+        }
+
+        public override List<INode> GetNeighbors()
+        {
+            var nodes = new List<INode>();  
+
+            foreach(var direction in GridPosition.Directions)
+            {
+                var node = GetNeighbor(direction);
+
+                if(node == null)
+                    continue;
+
+                nodes.Add(node);
+            }
+            return nodes;
+
         }
 
         public override INode GetRotationNode(GridPosition targetPosition)
