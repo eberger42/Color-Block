@@ -53,6 +53,7 @@ namespace Assets.Scripts.Blocks.components
             foreach (var position in _positions)
             {
                 var block = factory.CreateBlock(color) as IBlock;
+                (block as MonoBehaviour).transform.SetParent(this.transform, false);
                 (block as IGravity).OnBottomContact += (this as IGravity).TriggerBottomReahed;
 
                 blocks.Add(block);
@@ -235,6 +236,7 @@ namespace Assets.Scripts.Blocks.components
 
             if (spawnNewBlockFlag)
                 return;
+
             spawnNewBlockFlag = true;
             canTakeCommands = false;
             canFall = false;

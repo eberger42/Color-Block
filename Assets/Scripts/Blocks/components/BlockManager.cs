@@ -17,13 +17,6 @@ namespace Assets.Scripts.Blocks.components
         [SerializeField]
         private BlockFactory blockFactory; 
         
-        private List<Type> primaryColors = new List<Type>
-        {
-            typeof(RedBlockColor),
-            typeof(BlueBlockColor),
-            typeof(YellowBlockColor)
-        };
-
         //Events
         public event Action<ITakeBlockCommand> OnTargetCreated;
 
@@ -65,7 +58,7 @@ namespace Assets.Scripts.Blocks.components
                 gravityBlock.OnBottomContact -= CreateNewBlock;
             }
 
-            var blockColor = BlockColorFactory.GenerateRandomPrimaryColor();
+            var blockColor = BlockColor.GenerateRandomPrimaryColor();
             var target = blockFactory.CreateBlockGroup(blockColor);
 
             _currentEntity = target;

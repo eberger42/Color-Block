@@ -77,7 +77,9 @@ namespace Assets.Scripts.Blocks.components
             if (nodeData is IBlock block)
             {
                 this._data = block;
-                this._data.SetGridNode(this);
+
+                if((this._data as MonoBehaviour))
+                    this._data.SetGridNode(this);
 
             }
             else

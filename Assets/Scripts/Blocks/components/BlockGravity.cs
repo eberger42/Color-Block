@@ -5,6 +5,7 @@ using Assets.Scripts.Player.Interfaces;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
 
 namespace Assets.Scripts.Blocks.components
@@ -17,7 +18,9 @@ namespace Assets.Scripts.Blocks.components
         private CommandManager commandManager;
         private ITakeBlockCommand _targetEntity;
 
-        private List<ICommand> _commandBuffer = new List<ICommand>();
+        private List<ICommand> _commandBuffer = new List<ICommand>(); 
+        private CancellationTokenSource gravityTokenSource;
+
 
         private void Awake()
         {
@@ -33,17 +36,24 @@ namespace Assets.Scripts.Blocks.components
         {
 
         }
+        private void OnDisable()
+        {
+            gravityTokenSource?.Cancel();
+        }
 
         private void EntityPositionUpdated(GridPosition position)
         {
             if (commandManager.IsExecuting)
                 return;
-
+            gravityTokenSource = new CancellationTokenSource();
             GravityCalculation();
         }
         
         private async void GravityCalculation()
         {
+
+            if (gravityTokenSource.IsCancellationRequested)
+                return;
 
             var gridDirection = new GridPosition(0, -1);
             var isValidMove = _targetEntity.CheckForValidMove(gridDirection);
@@ -58,6 +68,8 @@ namespace Assets.Scripts.Blocks.components
             var moveBlockCommandConfigurer = new GravityBlockCommandConfigurer(gridDirection);
             var command = new CommandManager.CommandBuilder().AddCommand<GravityBlockCommand>(_targetEntity, moveBlockCommandConfigurer).Build();
             await commandManager.ExecuteCommands(command);
+
+
             GravityCalculation();
         }
     }
