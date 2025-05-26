@@ -53,7 +53,11 @@ public struct GridPosition
     }
 }
 
-public interface IGrid<T>
+/// <summary>
+/// out T provides covariance, allowing the interface to be used with a more derived type.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+public interface IGrid<out T>
 {
 
     public void GenerateGrid(NodeConfiguration config);

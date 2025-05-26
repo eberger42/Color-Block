@@ -1,0 +1,36 @@
+﻿using Assets.Scripts.Grid.interfaces;
+using System.Collections;
+using UnityEngine;
+
+namespace Assets.Scripts.Grid.components
+{
+
+    public class NodeDataRemoved : NodeEvent
+    {
+        public NodeDataRemoved(INode sender) : base(sender)
+        {
+        }
+    }
+
+    public class NodeDataSet : NodeEvent
+    {
+        public NodeDataSet(INode sender) : base(sender)
+        {
+        }
+    }
+
+    public abstract class NodeEvent : INodeEvent
+    {
+        private INode sender;
+
+        public NodeEvent(INode sender)
+        {
+            this.sender = sender;
+        }
+
+        public virtual INode GetSender()
+        {
+            return sender;
+        }
+    }
+}

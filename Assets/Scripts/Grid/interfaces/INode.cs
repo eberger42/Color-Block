@@ -1,19 +1,26 @@
 using Assets.Scripts.Blocks.scriptable_objects;
 using Assets.Scripts.Grid.components;
+using Assets.Scripts.Grid.interfaces;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public interface INode
 { 
-    public void SetPosition(GridPosition position);
-    public GridPosition GetGridPosition();
-    public void GenerateNode();
+
+    //Events
+    public event Action<INodeEvent> OnNodeEvent;
+
+    //Setup
     public void Configure(NodeConfiguration config, GridPosition gridPosition);
-    public void SetGridListener<T>(T gridListener);
+    public void GenerateNode();
+
+    public GridPosition GetGridPosition();
+    public void SetGridListener(IGrid<INode> gridListener);
 
     //Control
-    public void SetNodeData<K>(K nodeData);
-    public void ClearNodeData<K>(K nodeData);
+    public void SetNodeData(INodeData nodeData);
+    public void ClearNodeData(INodeData nodeData);
     public INode GetNeighbor(GridPosition direction);
     public List<INode> GetNeighbors();
     public INode GetRotationNode(GridPosition direction);
@@ -21,5 +28,9 @@ public interface INode
     //FeedBack
     public bool IsOccupied();
     public bool IsNeighborOccupied(GridPosition direction);
+
+
+    //Event Handlers
+    public void OnNodeDataEvent(INodeEvent nodeEvent);
 
 }

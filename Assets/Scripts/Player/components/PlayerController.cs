@@ -47,7 +47,6 @@ namespace Assets.Scripts.Player
                 RotateTargetEntity(1);
                 return;
             }
-
             if (commandManager.IsExecuting)
                 return;
 
@@ -78,7 +77,7 @@ namespace Assets.Scripts.Player
                 Debug.Log("Invalid move");
                 if(gridDirection.y == -1)
                 {
-                    (_target as IGravity).TriggerBottomReahed();
+                    (_target as IGravity).SetEnable(false);
                 }
                 return;
             }

@@ -14,6 +14,7 @@ namespace Assets.Scripts.Blocks.components
     [RequireComponent(typeof(ITakeBlockCommand))]
     public class BlockGravity : MonoBehaviour
     {
+        public bool Enabled { get; private set; } = false;
 
         private CommandManager commandManager;
         private ITakeBlockCommand _targetEntity;
@@ -27,7 +28,7 @@ namespace Assets.Scripts.Blocks.components
             commandManager = new CommandManager();
             _targetEntity = GetComponent<ITakeBlockCommand>();
 
-            (_targetEntity as IGravity).OnNeedGravity += EntityPositionUpdated;
+            (_targetEntity as IGravity).OnEnableGravity += HandleGravityEnabledState;
 
 
         }
@@ -38,32 +39,44 @@ namespace Assets.Scripts.Blocks.components
         }
         private void OnDisable()
         {
-            (_targetEntity as IGravity).OnNeedGravity -= EntityPositionUpdated;
+            (_targetEntity as IGravity).OnEnableGravity -= HandleGravityEnabledState;
             gravityTokenSource?.Cancel();
         }
 
-        private void EntityPositionUpdated()
+        private void HandleGravityEnabledState(bool state)
         {
-            if (commandManager.IsExecuting)
+
+            if(this.Enabled == state)
                 return;
-            gravityTokenSource = new CancellationTokenSource();
-            GravityCalculation();
+
+            this.Enabled = state;
+
+
+            if(Enabled)
+            {
+                if (commandManager.IsExecuting)
+                    return;
+
+                gravityTokenSource = new CancellationTokenSource();
+
+                GravityCalculation();
+                return;
+            }
+            else
+            {
+                gravityTokenSource?.Cancel();
+                gravityTokenSource = null;
+            }
+            
         }
         
         private async void GravityCalculation()
         {
-
             if (gravityTokenSource.IsCancellationRequested)
                 return;
 
-            var isValidMove = _targetEntity.CheckForValidMove(GridPosition.Down);
-
-            if (!isValidMove)
-            {
-                Debug.Log("Finished Falling");
-                (_targetEntity as IGravity).TriggerBottomReahed();
+            if (!Enabled)
                 return;
-            }
 
             var moveBlockCommandConfigurer = new GravityBlockCommandConfigurer(GridPosition.Down);
             var command = new CommandManager.CommandBuilder().AddCommand<GravityBlockCommand>(_targetEntity, moveBlockCommandConfigurer).Build();

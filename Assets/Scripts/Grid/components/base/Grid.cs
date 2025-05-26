@@ -1,5 +1,6 @@
 ﻿using Assets.Scripts.Blocks.interfaces;
 using Assets.Scripts.Blocks.scriptable_objects;
+using Assets.Scripts.Grid.interfaces;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -35,7 +36,8 @@ namespace Assets.Scripts.Grid.components
                     T node = new T();
                     var origin = new Vector2(x * cellSize, y * cellSize) + offset;
                     node.Configure(config, new GridPosition(x,y));
-                    node.SetGridListener(this);
+                    Debug.Log($"Grid: {this}");
+                    node.SetGridListener(this as IGrid<INode>);
                     node.GenerateNode();
                     gridArray[x, y] = node;
                 }
@@ -55,7 +57,7 @@ namespace Assets.Scripts.Grid.components
             var isInBounds = x >= 0 && x < width && y >= 0 && y < height;
             return isInBounds;
         }
-
+        
         public bool IsSpacesOccupied(List<GridPosition> positions)
         {
             foreach (var position in positions)
@@ -78,8 +80,8 @@ namespace Assets.Scripts.Grid.components
             Debug.Log("All positions are free.");
             return false;
         }
-    
-        public void SetNodeData<K>(int x, int y, K nodeData)
+        
+        public void SetNodeData(int x, int y, INodeData nodeData)
         {
             if (!IsInBounds(x, y))
                 return;

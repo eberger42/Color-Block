@@ -6,12 +6,11 @@ namespace Assets.Scripts.Blocks.interfaces
 {
     public interface IGravity 
     {
+        public event Action<bool> OnEnableGravity;
 
-        public event Action OnBottomContact;
-        public event Action OnNeedGravity;
-        void TriggerBottomReahed();
-
+        void SetEnable(bool state);
         public bool CheckIfFloating();
+
 
     }
 }

@@ -54,16 +54,16 @@ namespace Assets.Scripts.Blocks.components
             }
 
 
-            if (_currentEntity is IGravity gravityBlock)
+            if (_currentEntity is ITriggerSpawn gravityBlock)
             {
-                gravityBlock.OnBottomContact -= CreateNewBlock;
+                gravityBlock.OnTriggerSpawn -= CreateNewBlock;
             }
 
             var blockColor = BlockColor.GenerateRandomPrimaryColor();
             var target = blockFactory.CreateBlockGroup(blockColor);
 
             _currentEntity = target;
-            (_currentEntity as IGravity).OnBottomContact += CreateNewBlock;
+            (_currentEntity as ITriggerSpawn).OnTriggerSpawn += CreateNewBlock;
 
             Debug.Log("New Block Created");
             OnTargetCreated?.Invoke(target);

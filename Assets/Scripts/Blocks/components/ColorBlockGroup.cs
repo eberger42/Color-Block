@@ -14,20 +14,17 @@ namespace Assets.Scripts.Blocks.components
     /// <summary>
     /// The task Queue is used to execute the commands in order, one at a time. Preventing blocks phasing through each other
     /// </summary>
-    public class ColorBlockGroup : MonoBehaviour, IBlockGroup, IGravity
+    public class ColorBlockGroup : MonoBehaviour, IBlockGroup, IGravity, ITriggerSpawn
     {
-        public event Action OnBottomContact;
-        public event Action OnNeedGravity;
+        private event Action<bool> _onEnableGravity;
         public event Action OnMergeCheckTriggered;
+        public event Action _onTriggerSpawn;
         public event Action<GridPosition> OnMoveDirection;
         public event Action<GridPosition> OnPositionUpdated;
 
-
         //Block Positioning Helpers
         private Dictionary<IBlock,GridPosition> _positionsDeltaMap = new Dictionary<IBlock, GridPosition>();
-        private Dictionary<IBlock, GridPosition> _positionsRotationUpdateDeltaMap;
 
-        
         //Grouped elements
         private List<IBlock> blocks = new List<IBlock>();
 
@@ -40,10 +37,7 @@ namespace Assets.Scripts.Blocks.components
         private bool canFall = true;
         private bool executingAction = false;
 
-
-        private void Awake()
-        {
-        }
+        
 
         public void Initialize(IBlockGroupConfigurationStrategy configurationStrategy, BlockFactory factory, IBlockColor color)
         {
@@ -58,14 +52,19 @@ namespace Assets.Scripts.Blocks.components
             }
         }
 
-
         ///////////////////////////////////////////////////////////////////
         /// IBlockGroup Interface
         ///////////////////////////////////////////////////////////////////
-        void IBlockGroup.DestroyBlockGroup()
+        void IBlockGroup.Disband()
         {
-            throw new NotImplementedException();
+            foreach(var block in blocks)
+            {
+                (block as MonoBehaviour).transform.SetParent(null, false);
+                (block as IGravity).OnEnableGravity -= (this as IGravity).SetEnable;
+                (block as IBlock).SetParent(null);
+            }
         }
+
         void IBlockGroup.ReleaseBlock(IBlock block)
         {
             if(blocks.Contains(block) == false)
@@ -74,20 +73,22 @@ namespace Assets.Scripts.Blocks.components
             blocks.Remove(block);
             _positionsDeltaMap.Remove(block);
             (block as MonoBehaviour).transform.SetParent(null, false);
-            (block as IGravity).OnBottomContact -= (this as IGravity).TriggerBottomReahed;
+            (block as IGravity).OnEnableGravity -= (this as IGravity).SetEnable;
             (block as IBlock).SetParent(null);
 
              (this as IGravity).CheckIfFloating();
 
         }
+        
         void IBlockGroup.AddBlock(IBlock block, GridPosition delta)
         {
             (block as MonoBehaviour).transform.SetParent(this.transform, false);
-            (block as IGravity).OnBottomContact += (this as IGravity).TriggerBottomReahed;
+            (block as IGravity).OnEnableGravity += (this as IGravity).SetEnable;
             (block as IBlock).SetParent(this);
             this.blocks.Add(block);
             _positionsDeltaMap.Add(block, delta);
         }
+        
         List<GridPosition> IBlockGroup.GetGridPositions()
         {
             List<GridPosition> gridPositions = new List<GridPosition>();
@@ -100,6 +101,7 @@ namespace Assets.Scripts.Blocks.components
 
             return gridPositions;
         }
+        
         void IBlockGroup.SetColor(IBlockColor color)
         {
             foreach (var block in blocks)
@@ -123,16 +125,17 @@ namespace Assets.Scripts.Blocks.components
                 block.Place(colorGrid, newPosition);
             }
 
-            this.OnNeedGravity?.Invoke();
+            (this as IGravity).CheckIfFloating();
             this.OnPositionUpdated?.Invoke(position);
             ignoreOtherBottomReachedEvents = false;
         }
         void ITakeBlockCommand.Move(GridPosition direction)
         {
+
+            Debug.Log($"Moving block group in direction: {direction} {this}");
             if(canFall == false)
                 return;
 
-            Debug.Log($"***Moving BlockGroup: {this} Direction: {direction}");
             foreach (var block in blocks)
             {
                 block.Move(direction);
@@ -209,7 +212,6 @@ namespace Assets.Scripts.Blocks.components
             }
             return true;
         }
-
         List<IBlock> ITakeBlockCommand.GetBlocks()
         {
             return blocks;
@@ -233,19 +235,43 @@ namespace Assets.Scripts.Blocks.components
         ///////////////////////////////////////////////////////////////////
         /// IGravity Interface
         ///////////////////////////////////////////////////////////////////
-        void IGravity.TriggerBottomReahed()
+
+        //Events
+        event Action<bool> IGravity.OnEnableGravity
+        {
+            add
+            {
+                _onEnableGravity += value;
+            }
+            remove
+            {
+                _onEnableGravity -= value;
+            }
+        }
+
+
+        //Functions
+        void IGravity.SetEnable(bool state)
         {
 
-            if (ignoreOtherBottomReachedEvents)
-                return;
+            if(state == false)
+            {
+
+                if (ignoreOtherBottomReachedEvents)
+                    return;
 
 
-            ignoreOtherBottomReachedEvents = true;
-            canTakeCommands = false;
-            canFall = false;
-            OnBottomContact?.Invoke();
+                ignoreOtherBottomReachedEvents = true;
+                canTakeCommands = false;
+                canFall = false;
 
-            this.OnMergeCheckTriggered?.Invoke();
+                _onEnableGravity?.Invoke(false);
+                _onTriggerSpawn?.Invoke();
+                OnMergeCheckTriggered?.Invoke();
+
+            }
+
+
         }
         bool IGravity.CheckIfFloating()
         {
@@ -264,8 +290,7 @@ namespace Assets.Scripts.Blocks.components
             if (isGroupFloating)
             {
                 canFall = true;
-                canTakeCommands = false;
-                this.OnNeedGravity?.Invoke();
+                _onEnableGravity?.Invoke(true);
             }
 
             Debug.Log($"IsGroupFloating: {isGroupFloating}");
@@ -273,15 +298,22 @@ namespace Assets.Scripts.Blocks.components
         }
 
 
+        ///////////////////////////////////////////////////////////////////
+        /// IGravity Interface
+        ///////////////////////////////////////////////////////////////////
 
-        ///////////////////////////////////////////////////////////////////
-        /// IEntity Interface
-        ///////////////////////////////////////////////////////////////////
-        void IEntity.SetGridNode(INode node)
+        //Events
+        event Action ITriggerSpawn.OnTriggerSpawn
         {
-            //Noop
+            add
+            {
+                _onTriggerSpawn += value;
+            }
+            remove
+            {
+                _onTriggerSpawn -= value;
+            }
         }
-
 
 
         ///////////////////////////////////////////////////////////////////

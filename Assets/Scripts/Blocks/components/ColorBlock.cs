@@ -2,6 +2,7 @@
 using Assets.Scripts.Blocks.components.colors;
 using Assets.Scripts.Blocks.interfaces;
 using Assets.Scripts.Grid.components;
+using Assets.Scripts.Grid.interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ namespace Assets.Scripts.Blocks.components
 
         public event Action<GridPosition> OnPositionUpdated;
         public event Action<GridPosition> OnMoveDirection;
+        public event Action<bool> OnEnableGravity; 
         public event Action OnNeedGravity;
         public event Action OnBottomContact;
         public event Action OnMovementBlocked;
@@ -33,6 +35,8 @@ namespace Assets.Scripts.Blocks.components
         private bool canFall = true;
 
         private IBlockGroup parent;
+
+       
 
         private void Awake()
         {
@@ -73,7 +77,9 @@ namespace Assets.Scripts.Blocks.components
             this.gridPosition = position;
 
             if(gridPosition.y == 0)
-                OnBottomContact?.Invoke();
+            {
+                OnEnableGravity?.Invoke(false);
+            }
 
             this.OnPositionUpdated?.Invoke(position);
         }
@@ -83,10 +89,7 @@ namespace Assets.Scripts.Blocks.components
             return gridPosition;
         }
 
-        public void TriggerBottomReahed()
-        {
-            OnBottomContact?.Invoke();
-        }
+        
 
         /////////////////////////////////////////////////////////////////
         /// IGravity Interface
@@ -109,6 +112,10 @@ namespace Assets.Scripts.Blocks.components
 
             return false;
 
+        }
+        void IGravity.SetEnable(bool state)
+        {
+            OnEnableGravity?.Invoke(state);
         }
 
         /////////////////////////////////////////////////////////////////
@@ -140,15 +147,7 @@ namespace Assets.Scripts.Blocks.components
         /////////////////////////////////////////////////////////////////
         /// IEntity Interface
         /////////////////////////////////////////////////////////////////
-        void IEntity.SetGridNode(INode node)
-        {
-            this.node = node;
-            var gridPosition = node.GetGridPosition();
-            var worldPosition = ColorGridManager.Instance.GetWorldPosition(gridPosition);
-            SetWorldPosition(worldPosition);
-            SetGridPosition(gridPosition);
-        }
-
+ 
         /////////////////////////////////////////////////////////////////
         /// ITakeBlockCommand Interface
         /////////////////////////////////////////////////////////////////
@@ -200,7 +199,7 @@ namespace Assets.Scripts.Blocks.components
 
         void ITakeBlockCommand.Rotate(GridPosition delta)
         {
-            var neigborNode = node.GetRotationNode(delta);
+            var neigborNode = node.GetNeighbor(delta);
             node.ClearNodeData(this);
             neigborNode.SetNodeData(this);
         }
@@ -212,7 +211,7 @@ namespace Assets.Scripts.Blocks.components
                 return;
 
             var neighbors = node.GetNeighbors();
-            var siblingNeighbors = 0;
+            bool markedForDustruction = false;  
 
             if(neighbors == null || neighbors.Count == 0)
                 return;
@@ -229,8 +228,6 @@ namespace Assets.Scripts.Blocks.components
 
                 var block = (neighbor as BlockNode).GetData();
 
-                if((block as IBlock).GetParent() == parent)
-                    siblingNeighbors++;
 
                 if (block is ColorBlock colorBlock)
                 {
@@ -239,10 +236,7 @@ namespace Assets.Scripts.Blocks.components
 
                     if(didMerge)
                     {
-                        node.ClearNodeData(this);
-                        parent.ReleaseBlock(this);
-                        Destroy(this.gameObject);
-                        break;
+                        markedForDustruction = true;
                     }
                 }
 
@@ -250,13 +244,46 @@ namespace Assets.Scripts.Blocks.components
 
             }
 
-            Debug.Log($"Sibling Neighbors: {siblingNeighbors}");
-            if (siblingNeighbors > 0)
-                return;
+            if (markedForDustruction)
+            {
+                Debug.LogWarning($"ColorBlock {this.Color} marked for destruction.");
+                node.ClearNodeData(this);
+                parent.ReleaseBlock(this);
+                Destroy(this.gameObject);
+            }
 
-            var blockGroup = BlockManager.Instance.BlockFactory.CreateBlockGroup(Color);
-            (blockGroup as IBlockGroup).AddBlock(this, new GridPosition(0,0));
-        
+        }
+
+        /////////////////////////////////////////////////////////////////
+        /// INodeData Interface
+        /////////////////////////////////////////////////////////////////
+        INode INodeData.GetNodeDataParent()
+        {
+            return node;
+        }
+
+        void INodeData.SetNodeDataParent(INode node)
+        {
+            this.node = node;
+            var gridPosition = node.GetGridPosition();
+            var worldPosition = ColorGridManager.Instance.GetWorldPosition(gridPosition);
+            SetWorldPosition(worldPosition);
+            SetGridPosition(gridPosition);
+        }
+
+        void INodeData.HandleNodeEvent(INodeEvent nodeEvent)
+        {
+            if(nodeEvent is NodeDataRemoved)
+            {
+                var sender = nodeEvent.GetSender() as INode;
+
+                var vectorTo = Node.VectorTo(node, sender);
+
+                if (vectorTo == GridPosition.Down)
+                {
+                    OnNeedGravity?.Invoke();
+                }
+            }
         }
 
     }

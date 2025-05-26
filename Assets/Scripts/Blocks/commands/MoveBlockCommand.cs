@@ -27,18 +27,17 @@ namespace Assets.Scripts.Blocks.commands
                 if (_target.CanTakePlayerCommands() == false)
                     return;
 
-                //Debug.Log($"Executing MoveBlockCommand with direction: {_target}");
                 if (_target.CanTakePlayerCommands() == false)
                     return;
 
                 var isValidMove = _target.CheckForValidMove(_direction);
                 if (!isValidMove)
                     return;
+
                 _target.Move(_direction);
                 await Task.Delay(5);
             };
             
-
             _target.AddActionCommand(task);
 
             await Task.Delay(75);
