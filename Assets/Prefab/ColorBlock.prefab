@@ -98,6 +98,7 @@ GameObject:
   - component: {fileID: 2187372020479753059}
   - component: {fileID: 9180265403523529319}
   - component: {fileID: 1627033383579814511}
+  - component: {fileID: 4031639107982992906}
   - component: {fileID: 6025151540547241939}
   m_Layer: 0
   m_Name: ColorBlock
@@ -187,6 +188,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2a100e5c4477a3f48afbde134be3032a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4031639107982992906
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4889093092540818832}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0511e81495d67234eaf1d4272331cde5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &6025151540547241939

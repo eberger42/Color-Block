@@ -5,8 +5,10 @@ using UnityEngine;
 
 namespace Assets.Scripts.Blocks.interfaces
 {
-    public interface IBlockGroup : ITakeBlockCommand
+    public interface IBlockGroup
     {
+        public event Action<GridPosition> OnPositionUpdated;
+
 
         public event Action OnMergeCheckTriggered;
         public void AddBlock(IBlock block, GridPosition delta);

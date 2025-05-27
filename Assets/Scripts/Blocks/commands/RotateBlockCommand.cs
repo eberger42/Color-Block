@@ -24,11 +24,7 @@ namespace Assets.Scripts.Blocks.commands
             Debug.Log($"Executing RotateBlockCommand with direction: {_rotationDelta}");
             Func<Task> task = async () =>
             {
-                if (_target.CanTakePlayerCommands() == false)
-                    return;
-
-                //Debug.Log($"Executing RotateBlockCommand with direction: {_target}");
-                if (_target.CanTakePlayerCommands() == false)
+                if (_target.CanTakeCommand(this) == false)
                     return;
 
                 var isValidRotate = _target.CheckForValidRotation(_rotationDelta);

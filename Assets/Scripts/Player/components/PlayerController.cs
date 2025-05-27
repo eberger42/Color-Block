@@ -2,6 +2,7 @@
 using Assets.Scripts.Blocks.components;
 using Assets.Scripts.Blocks.interfaces;
 using Assets.Scripts.Grid.components;
+using Assets.Scripts.Player.Interfaces;
 using System;
 using System.Collections;
 using System.Linq;
@@ -14,10 +15,8 @@ namespace Assets.Scripts.Player
 
         private CommandManager commandManager;
         private BlockManager blockManager;
-        private ColorGridManager colorGridManager;
 
         private bool _isMovingExecutionFlag = false;
-        private bool _isGravityExecutionFlag = false;
 
 
         private ITakeBlockCommand _target;
@@ -25,7 +24,6 @@ namespace Assets.Scripts.Player
         private void Awake()
         {
             commandManager = new CommandManager();
-            colorGridManager = FindFirstObjectByType<ColorGridManager>();
         }
 
         private void Start()
@@ -104,7 +102,17 @@ namespace Assets.Scripts.Player
 
         private void SetTargetEntity(ITakeBlockCommand target)
         {
+
+            if(_target is IPlayerControlled)
+            {
+                (_target as IPlayerControlled).SetEnabled(false);
+            }
+
             _target = target;
+
+            (_target as IPlayerControlled).SetEnabled(true);
+            (_target as IGravity).SetEnable(true);
+
         }
 
 

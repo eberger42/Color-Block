@@ -142,7 +142,7 @@ namespace Assets.Scripts.Grid.components
 
         public virtual bool IsOccupied()
         {
-            return _data is IEntity;
+            return _data is INodeData;
         }
 
         public virtual bool IsNeighborOccupied(GridPosition direction)

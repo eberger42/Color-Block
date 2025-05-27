@@ -1,6 +1,7 @@
 ﻿using Assets.Scripts.Blocks.commands;
 using Assets.Scripts.Blocks.interfaces;
 using Assets.Scripts.Grid.components;
+using Assets.Scripts.Player.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,13 +15,12 @@ namespace Assets.Scripts.Blocks.components
     /// <summary>
     /// The task Queue is used to execute the commands in order, one at a time. Preventing blocks phasing through each other
     /// </summary>
-    public class ColorBlockGroup : MonoBehaviour, IBlockGroup, IGravity, ITriggerSpawn
+    public class ColorBlockGroup : TakeBlockCommandMonobehaviour, IBlockGroup, IGravity, ITriggerSpawn, IPlayerControlled
     {
         private event Action<bool> _onEnableGravity;
-        public event Action OnMergeCheckTriggered;
-        public event Action _onTriggerSpawn;
-        public event Action<GridPosition> OnMoveDirection;
-        public event Action<GridPosition> OnPositionUpdated;
+        private event Action _onMergeCheckTriggered;
+        private event Action _onTriggerSpawn;
+        private event Action<GridPosition> _onPositionUpdated;
 
         //Block Positioning Helpers
         private Dictionary<IBlock,GridPosition> _positionsDeltaMap = new Dictionary<IBlock, GridPosition>();
@@ -28,16 +28,8 @@ namespace Assets.Scripts.Blocks.components
         //Grouped elements
         private List<IBlock> blocks = new List<IBlock>();
 
-        //Command/Action Queue
-        private Queue<Func<Task>> _actionQueue = new Queue<Func<Task>>();
-
         //Flags
-        private bool ignoreOtherBottomReachedEvents = false;
-        private bool canTakeCommands = true;
-        private bool canFall = true;
-        private bool executingAction = false;
-
-        
+        private bool canTriggeredSpawn = false;
 
         public void Initialize(IBlockGroupConfigurationStrategy configurationStrategy, BlockFactory factory, IBlockColor color)
         {
@@ -55,6 +47,33 @@ namespace Assets.Scripts.Blocks.components
         ///////////////////////////////////////////////////////////////////
         /// IBlockGroup Interface
         ///////////////////////////////////////////////////////////////////
+
+        //Events
+        event Action IBlockGroup.OnMergeCheckTriggered
+        {
+            add
+            {
+                _onMergeCheckTriggered += value;
+            }
+            remove
+            {
+                _onMergeCheckTriggered -= value;
+            }
+        }
+
+        event Action<GridPosition> IBlockGroup.OnPositionUpdated
+        {
+            add 
+            {                 
+                _onPositionUpdated += value;
+            }
+            remove 
+            {              
+                _onPositionUpdated -= value;
+            }
+        }
+
+        //Functions
         void IBlockGroup.Disband()
         {
             foreach(var block in blocks)
@@ -115,37 +134,35 @@ namespace Assets.Scripts.Blocks.components
         ///////////////////////////////////////////////////////////////////
         /// ITakeBlockCommand Interface
         ///////////////////////////////////////////////////////////////////
-        void ITakeBlockCommand.Place(Grid<BlockNode> colorGrid, GridPosition position)
+        public override void Place(Grid<BlockNode> colorGrid, GridPosition position)
         {
 
             foreach (var block in blocks)
             {
                 var delta = _positionsDeltaMap[block];
                 var newPosition = position + delta;
-                block.Place(colorGrid, newPosition);
+                (block as ITakeBlockCommand).Place(colorGrid, newPosition);
             }
 
-            (this as IGravity).CheckIfFloating();
-            this.OnPositionUpdated?.Invoke(position);
-            ignoreOtherBottomReachedEvents = false;
-        }
-        void ITakeBlockCommand.Move(GridPosition direction)
-        {
+            this._onPositionUpdated?.Invoke(position);
 
-            Debug.Log($"Moving block group in direction: {direction} {this}");
+        }
+        public override void Move(GridPosition direction)
+        {
+            var canFall = CanTakeCommand(typeof(GravityBlockCommand));
             if(canFall == false)
                 return;
 
             foreach (var block in blocks)
             {
-                block.Move(direction);
+                (block as ITakeBlockCommand).Move(direction);
             }
 
-            ignoreOtherBottomReachedEvents = false;
         }
-        void ITakeBlockCommand.Rotate(GridPosition delta)
+        public override void Rotate(GridPosition delta)
         {
-            if(canTakeCommands == false)
+            var canRotate = CanTakeCommand(typeof(RotateBlockCommand));
+            if(canRotate == false)
                 return;
 
             foreach (var block in blocks)
@@ -155,12 +172,12 @@ namespace Assets.Scripts.Blocks.components
 
                 var rotationPosition = targetDelta - currentDelta;
 
-                block.Rotate(rotationPosition);
+                (block as ITakeBlockCommand).Rotate(rotationPosition);
                 _positionsDeltaMap[block] = targetDelta;
 
             }
         }
-        bool ITakeBlockCommand.CheckForValidMove(GridPosition direction)
+        public override bool CheckForValidMove(GridPosition direction)
         {
             foreach (var block in blocks)
             {
@@ -171,7 +188,7 @@ namespace Assets.Scripts.Blocks.components
                     continue;
 
 
-                var isValid = block.CheckForValidMove(direction);
+                var isValid = (block as ITakeBlockCommand).CheckForValidMove(direction);
 
                 if (!isValid)
                 {
@@ -183,7 +200,7 @@ namespace Assets.Scripts.Blocks.components
             }
             return true;
         }
-        bool ITakeBlockCommand.CheckForValidRotation(GridPosition delta)
+        public override bool CheckForValidRotation(GridPosition delta)
         {
             foreach (var block in blocks)
             {
@@ -202,7 +219,7 @@ namespace Assets.Scripts.Blocks.components
                     continue;
 
 
-                var isValid = block.CheckForValidRotation(rotationPosition);
+                var isValid = (block as ITakeBlockCommand).CheckForValidRotation(rotationPosition);
 
                 if (!isValid)
                 {
@@ -212,25 +229,7 @@ namespace Assets.Scripts.Blocks.components
             }
             return true;
         }
-        List<IBlock> ITakeBlockCommand.GetBlocks()
-        {
-            return blocks;
-        }
-        bool ITakeBlockCommand.CanTakePlayerCommands()
-        {
-            return canTakeCommands;
-        }
-        bool ITakeBlockCommand.CanTakeGravityCommands()
-        {
-            return canFall;
-        }
-        void ITakeBlockCommand.AddActionCommand(Func<Task> action)
-        {
-            _actionQueue.Enqueue(action);
-            CheckActionQueue();
-        }
-
-
+        
 
         ///////////////////////////////////////////////////////////////////
         /// IGravity Interface
@@ -257,22 +256,28 @@ namespace Assets.Scripts.Blocks.components
             if(state == false)
             {
 
-                if (ignoreOtherBottomReachedEvents)
-                    return;
+                if (canTriggeredSpawn)
+                {
+                    Debug.LogWarning("Gravity is already disabled. No action taken.");
+                    (this as ITriggerSpawn).SetEnabled(false);
+                    _onTriggerSpawn?.Invoke();
+                }
 
-
-                ignoreOtherBottomReachedEvents = true;
-                canTakeCommands = false;
-                canFall = false;
+                RemoveCommandFromFilter(typeof(GravityBlockCommand));
 
                 _onEnableGravity?.Invoke(false);
-                _onTriggerSpawn?.Invoke();
-                OnMergeCheckTriggered?.Invoke();
+                _onMergeCheckTriggered?.Invoke();
 
             }
+            else
+            {
+                AddCommandToFilter(typeof(GravityBlockCommand));
 
+                _onEnableGravity?.Invoke(true);
+            }
 
         }
+
         bool IGravity.CheckIfFloating()
         {
             var isGroupFloating = true;
@@ -287,10 +292,9 @@ namespace Assets.Scripts.Blocks.components
                 }
             }
 
-            if (isGroupFloating)
+            if (isGroupFloating && !CanTakeCommand(typeof(GravityBlockCommand)))
             {
-                canFall = true;
-                _onEnableGravity?.Invoke(true);
+                (this as IGravity).SetEnable(true);
             }
 
             Debug.Log($"IsGroupFloating: {isGroupFloating}");
@@ -315,32 +319,36 @@ namespace Assets.Scripts.Blocks.components
             }
         }
 
+        ///////////////////////////////////////////////////////////////////
+        /// IPlayerControlled Interface
+        ///////////////////////////////////////////////////////////////////
+        void IPlayerControlled.SetEnabled(bool state)
+        {
+            if (state)
+            {
+                PlayerCommands.ForEach(commandType => AddCommandToFilter(commandType));
+            }
+            else
+            {
+                PlayerCommands.ForEach(commandType => RemoveCommandFromFilter(commandType));
+            }
+        }
+
+        ///////////////////////////////////////////////////////////////////
+        /// ITriggerSpawn Interface
+        ///////////////////////////////////////////////////////////////////
+        void ITriggerSpawn.SetEnabled(bool state)
+        {
+            canTriggeredSpawn = state;
+        }
 
         ///////////////////////////////////////////////////////////////////
         /// Private Helpers
         ///////////////////////////////////////////////////////////////////
-        async void CheckActionQueue()
-        {
-            if (executingAction)
-                return;
-
-            if (_actionQueue.Count > 0)
-            {
-                Debug.Log($"Executing action queue. {canFall} {this}");
-                var action = _actionQueue.Dequeue();
-                executingAction = true;
-                await action?.Invoke();
-                executingAction = false;
-                CheckActionQueue();
-            }
-        }
-
         private GridPosition GetDeltaPosition(GridPosition position, GridPosition deltaPosition)
         {
             return new GridPosition(position.y * deltaPosition.y, position.x * deltaPosition.x);
         }
 
-
-        
     }
 }

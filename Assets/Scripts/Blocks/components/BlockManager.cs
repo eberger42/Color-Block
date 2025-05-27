@@ -60,10 +60,12 @@ namespace Assets.Scripts.Blocks.components
             }
 
             var blockColor = BlockColor.GenerateRandomPrimaryColor();
-            var target = blockFactory.CreateBlockGroup(blockColor);
+            //var target = blockFactory.CreateBlockGroup(blockColor);
+            var target = blockFactory.CreateBlock(blockColor);
 
             _currentEntity = target;
             (_currentEntity as ITriggerSpawn).OnTriggerSpawn += CreateNewBlock;
+            (_currentEntity as ITriggerSpawn).SetEnabled(true);
 
             Debug.Log("New Block Created");
             OnTargetCreated?.Invoke(target);

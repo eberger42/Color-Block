@@ -25,7 +25,7 @@ namespace Assets.Scripts.Blocks.commands
             {
                 //Debug.Log($"Executing GravityBlockCommand with direction: {_target}");
 
-                if (_target.CanTakeGravityCommands() == false)
+                if (_target.CanTakeCommand(this) == false)
                     return;
 
                 _target.CheckForValidMove(_direction);

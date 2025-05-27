@@ -65,7 +65,6 @@ namespace Assets.Scripts.Blocks.components
             else
             {
                 gravityTokenSource?.Cancel();
-                gravityTokenSource = null;
             }
             
         }

@@ -86,5 +86,4 @@ namespace Assets.Scripts.Blocks.commands
         }
     }
 
-   
 }

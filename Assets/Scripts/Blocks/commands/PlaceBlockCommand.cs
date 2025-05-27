@@ -27,7 +27,7 @@ namespace Assets.Scripts.Blocks.commands
 
         public override async Task Execute()
         {
-            if (_target.CanTakePlayerCommands() == false)
+            if (_target.CanTakeCommand(this) == false)
                 return;
 
             //Debug.Log($"Executing PlaceBlockCommand with target: {_target}");

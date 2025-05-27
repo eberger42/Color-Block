@@ -24,10 +24,7 @@ namespace Assets.Scripts.Blocks.commands
 
             Func<Task> task = async () =>
             {
-                if (_target.CanTakePlayerCommands() == false)
-                    return;
-
-                if (_target.CanTakePlayerCommands() == false)
+                if (_target.CanTakeCommand(this) == false)
                     return;
 
                 var isValidMove = _target.CheckForValidMove(_direction);

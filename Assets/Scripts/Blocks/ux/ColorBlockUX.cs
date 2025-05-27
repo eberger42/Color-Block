@@ -21,7 +21,7 @@ namespace Assets.Scripts.Blocks.ux
             _spriteRenderer = GetComponent<SpriteRenderer>();
             _colorBlock = GetComponent<ColorBlock>();
 
-            _colorBlock.OnColorUpdated += UpdateColor;
+            (_colorBlock as IBlock).OnColorUpdated += UpdateColor;
 
         }
 
