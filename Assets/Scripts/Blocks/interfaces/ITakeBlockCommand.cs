@@ -15,6 +15,7 @@ namespace Assets.Scripts.Blocks.interfaces
     {
         //Commands
         public void Move(GridPosition direction);
+        public void Gravity();
         public void Rotate(GridPosition delta);
         public void Place(Grid<BlockNode> colorGrid, GridPosition position);
 

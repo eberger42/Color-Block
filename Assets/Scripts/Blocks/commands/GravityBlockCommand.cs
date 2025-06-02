@@ -28,8 +28,17 @@ namespace Assets.Scripts.Blocks.commands
                 if (_target.CanTakeCommand(this) == false)
                     return;
 
-                _target.CheckForValidMove(_direction);
-                _target.Move(_direction);
+                var isFloating = (_target as IGravity).CheckIfFloating();
+                
+                if(isFloating)
+                {
+                    _target.Gravity();
+                    return;
+                }
+                else
+                { 
+                    (_target as IGravity).SetEnable(false);
+                }
 
                 await Task.Delay(50);
             };

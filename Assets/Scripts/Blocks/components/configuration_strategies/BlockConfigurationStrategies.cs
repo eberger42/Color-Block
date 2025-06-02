@@ -70,6 +70,7 @@ namespace Assets.Scripts.Blocks.components
             new GridPosition(-2, 0),
 
             new GridPosition(0, -1),
+            new GridPosition(-1, -1),
             new GridPosition(-2, -1),
 
             new GridPosition(0, -2),

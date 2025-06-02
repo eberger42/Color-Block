@@ -9,13 +9,15 @@ using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static Unity.Collections.AllocatorManager;
+using static UnityEngine.GraphicsBuffer;
 
 namespace Assets.Scripts.Blocks.components
 {
     /// <summary>
     /// The task Queue is used to execute the commands in order, one at a time. Preventing blocks phasing through each other
     /// </summary>
-    public class ColorBlockGroup : TakeBlockCommandMonobehaviour, IBlockGroup, IGravity, ITriggerSpawn, IPlayerControlled
+    public class ColorBlockGroupController : TakeBlockCommandMonobehaviour, IBlockGroup, IGravity, ITriggerSpawn, IPlayerControlled
     {
         private event Action<bool> _onEnableGravity;
         private event Action _onMergeCheckTriggered;
@@ -30,6 +32,7 @@ namespace Assets.Scripts.Blocks.components
 
         //Flags
         private bool canTriggeredSpawn = false;
+        private bool waitForInit = true;
 
         public void Initialize(IBlockGroupConfigurationStrategy configurationStrategy, BlockFactory factory, IBlockColor color)
         {
@@ -40,8 +43,33 @@ namespace Assets.Scripts.Blocks.components
                 var block = factory.CreateBlock(color) as IBlock;
                 (this as IBlockGroup).AddBlock(block, position); //Add the block to the group
 
-                
             }
+            waitForInit = false;
+        }
+
+        public void Initialize(List<IBlock> blocks)
+        {
+            var firstPosition = blocks[0].GetGridPosition();
+
+            foreach (var block in blocks)
+            {
+                var delta = block.GetGridPosition() - firstPosition;
+                (this as IBlockGroup).AddBlock(block, delta); //Add the block to the group
+            }
+            waitForInit = false;
+            canTriggeredSpawn = false;
+
+            var isFloating = (this as IGravity).CheckIfFloating(); //Check if the group is floating and set the gravity accordingly
+
+            if (!isFloating)
+            {
+                (this as IGravity).SetEnable(false);
+                return;
+            }
+
+            Debug.Log($"Group: { this } is floating, enabling gravity for the group.");
+            (this as IGravity).SetEnable(true); //Enable gravity if the group is floating
+
         }
 
         ///////////////////////////////////////////////////////////////////
@@ -79,7 +107,7 @@ namespace Assets.Scripts.Blocks.components
             foreach(var block in blocks)
             {
                 (block as MonoBehaviour).transform.SetParent(null, false);
-                (block as IGravity).OnEnableGravity -= (this as IGravity).SetEnable;
+                (block as IGravity).OnEnableGravity -= HandleChildBlockGravityUpdate;
                 (block as IBlock).SetParent(null);
             }
         }
@@ -92,33 +120,21 @@ namespace Assets.Scripts.Blocks.components
             blocks.Remove(block);
             _positionsDeltaMap.Remove(block);
             (block as MonoBehaviour).transform.SetParent(null, false);
-            (block as IGravity).OnEnableGravity -= (this as IGravity).SetEnable;
+            (block as IGravity).OnEnableGravity -= HandleChildBlockGravityUpdate;
             (block as IBlock).SetParent(null);
 
-             (this as IGravity).CheckIfFloating();
+
+            BlockManager.Instance.AssignBlockGroupToBlocks(new List<IBlock> { block });
 
         }
         
         void IBlockGroup.AddBlock(IBlock block, GridPosition delta)
         {
             (block as MonoBehaviour).transform.SetParent(this.transform, false);
-            (block as IGravity).OnEnableGravity += (this as IGravity).SetEnable;
+            (block as IGravity).OnEnableGravity += HandleChildBlockGravityUpdate;
             (block as IBlock).SetParent(this);
             this.blocks.Add(block);
             _positionsDeltaMap.Add(block, delta);
-        }
-        
-        List<GridPosition> IBlockGroup.GetGridPositions()
-        {
-            List<GridPosition> gridPositions = new List<GridPosition>();
-            foreach (var block in blocks)
-            {
-                var gridPosition = block.GetGridPosition();
-                gridPositions.Add(gridPosition);
-                
-            }
-
-            return gridPositions;
         }
         
         void IBlockGroup.SetColor(IBlockColor color)
@@ -136,16 +152,26 @@ namespace Assets.Scripts.Blocks.components
         ///////////////////////////////////////////////////////////////////
         public override void Place(Grid<BlockNode> colorGrid, GridPosition position)
         {
+            var isGroupFloating = true;
 
             foreach (var block in blocks)
             {
                 var delta = _positionsDeltaMap[block];
                 var newPosition = position + delta;
                 (block as ITakeBlockCommand).Place(colorGrid, newPosition);
+
+                var isFloating = CheckSingleBlockIfFloating(block);
+
+                if (!isFloating)
+                {
+                    isGroupFloating = false;
+                }
             }
 
             this._onPositionUpdated?.Invoke(position);
 
+            (this as IGravity).SetEnable(isGroupFloating);
+            
         }
         public override void Move(GridPosition direction)
         {
@@ -153,12 +179,46 @@ namespace Assets.Scripts.Blocks.components
             if(canFall == false)
                 return;
 
+            var isGroupFloating = true;
+
             foreach (var block in blocks)
             {
                 (block as ITakeBlockCommand).Move(direction);
+                
             }
 
+
+            if(direction != GridPosition.Down) //If the direction is not down, we don't need to check for floating blocks
+                return;
+
+            foreach(var block in blocks)
+            {
+                var isFloating = CheckSingleBlockIfFloating(block);
+
+                if (!isFloating)
+                {
+                    isGroupFloating = false;
+                }
+            }
+
+            (this as IGravity).SetEnable(isGroupFloating);
         }
+
+
+        public override void Gravity()
+        {
+            var direction = GridPosition.Down;
+            var canFall = CanTakeCommand(typeof(GravityBlockCommand));
+            if (canFall == false)
+                return;
+
+            foreach (var block in blocks)
+            {
+                (block as ITakeBlockCommand).Move(direction);
+
+            }
+        }
+
         public override void Rotate(GridPosition delta)
         {
             var canRotate = CanTakeCommand(typeof(RotateBlockCommand));
@@ -172,7 +232,7 @@ namespace Assets.Scripts.Blocks.components
 
                 var rotationPosition = targetDelta - currentDelta;
 
-                (block as ITakeBlockCommand).Rotate(rotationPosition);
+                (block as ITakeBlockCommand).Move(rotationPosition);
                 _positionsDeltaMap[block] = targetDelta;
 
             }
@@ -186,7 +246,6 @@ namespace Assets.Scripts.Blocks.components
 
                 if(_positionsDeltaMap.ContainsValue(targetPosition)) //Check if the target position is occupied by another block in the group
                     continue;
-
 
                 var isValid = (block as ITakeBlockCommand).CheckForValidMove(direction);
 
@@ -209,11 +268,6 @@ namespace Assets.Scripts.Blocks.components
                 var targetDelta = GetDeltaPosition(currentDelta, delta);
 
                 var rotationPosition = targetDelta - currentDelta;
-
-                Debug.Log($"CurrentDelta: {currentDelta}");
-                Debug.Log($"TargetDelta: {targetDelta}");
-                Debug.Log($"RotationPosition: {rotationPosition}");
-                    
 
                 if (_positionsDeltaMap.ContainsValue(targetDelta)) //Check if the target position is occupied by another block in the group
                     continue;
@@ -252,13 +306,15 @@ namespace Assets.Scripts.Blocks.components
         //Functions
         void IGravity.SetEnable(bool state)
         {
+            if(waitForInit)
+                return;
 
             if(state == false)
             {
 
                 if (canTriggeredSpawn)
                 {
-                    Debug.LogWarning("Gravity is already disabled. No action taken.");
+                    //Debug.LogWarning("Gravity is already disabled. No action taken.");
                     (this as ITriggerSpawn).SetEnabled(false);
                     _onTriggerSpawn?.Invoke();
                 }
@@ -266,7 +322,7 @@ namespace Assets.Scripts.Blocks.components
                 RemoveCommandFromFilter(typeof(GravityBlockCommand));
 
                 _onEnableGravity?.Invoke(false);
-                _onMergeCheckTriggered?.Invoke();
+                CheckBlocksForMerger();
 
             }
             else
@@ -283,7 +339,7 @@ namespace Assets.Scripts.Blocks.components
             var isGroupFloating = true;
             foreach (var block in blocks)
             {
-                var isBlockFloating = (block as IGravity).CheckIfFloating();
+                var isBlockFloating = CheckSingleBlockIfFloating(block);
 
                 if (!isBlockFloating)
                 {
@@ -292,12 +348,6 @@ namespace Assets.Scripts.Blocks.components
                 }
             }
 
-            if (isGroupFloating && !CanTakeCommand(typeof(GravityBlockCommand)))
-            {
-                (this as IGravity).SetEnable(true);
-            }
-
-            Debug.Log($"IsGroupFloating: {isGroupFloating}");
             return isGroupFloating;
         }
 
@@ -350,5 +400,69 @@ namespace Assets.Scripts.Blocks.components
             return new GridPosition(position.y * deltaPosition.y, position.x * deltaPosition.x);
         }
 
+        private bool CheckSingleBlockIfFloating(IBlock block)
+        {
+            var targetPosition = _positionsDeltaMap[block] + GridPosition.Down;
+
+            if (_positionsDeltaMap.ContainsValue(targetPosition)) //Check if the target position is occupied by another block in the group
+                return true;
+
+            var isFloating = (block as IGravity).CheckIfFloating();
+            return isFloating;
+        }
+
+        private void CheckBlocksForMerger()
+        {
+            var blockToRemove = new List<IBlock>();
+            foreach (var block in blocks)
+            {
+                var canMerge = (block as IBlock).CheckNeighborsForMerge();
+
+                if(canMerge)
+                {
+                    blockToRemove.Add(block);
+                }
+            }
+
+            if(blockToRemove.Count == 0)
+            {
+                Debug.Log("No blocks to remove.");
+                return;
+            }
+
+            foreach (var block in blockToRemove)
+            {
+                (block as IEntity).Destroy();
+                blocks.Remove(block);
+            }
+            while(blocks.Count > 0)
+            {
+                var block = blocks[0];
+                (this as IBlockGroup).ReleaseBlock(block);
+
+                if(blocks.Contains(block) == false) //If the block was removed from the group, we can continue
+                    continue;
+
+                blocks.Remove(block);
+            }
+
+            Destroy(this.gameObject);
+        }
+
+        private void HandleChildBlockGravityUpdate(bool isFloating)
+        {
+            if (isFloating)
+            {
+                var groupIsFloating = (this as IGravity).CheckIfFloating();
+                if (groupIsFloating)
+                {
+                    if (!CanTakeCommand(typeof(GravityBlockCommand))){
+
+                        (this as ITakeBlockCommand).Gravity(); //Used to have blocks fall at same pace
+                    }
+                    (this as IGravity).SetEnable(true);
+                }
+            }
+        }
     }
 }

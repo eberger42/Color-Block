@@ -45,9 +45,11 @@ namespace Assets.Scripts.Blocks.components
 
         private void HandleGravityEnabledState(bool state)
         {
-
+            Debug.Log($"Gravity state changed to: {state}");
             if(this.Enabled == state)
+            {
                 return;
+            }
 
             this.Enabled = state;
 
@@ -56,7 +58,6 @@ namespace Assets.Scripts.Blocks.components
             {
                 if (commandManager.IsExecuting)
                     return;
-
                 gravityTokenSource = new CancellationTokenSource();
 
                 GravityCalculation();
@@ -64,19 +65,20 @@ namespace Assets.Scripts.Blocks.components
             }
             else
             {
+                Debug.Log("Gravity disabled, cancelling gravity calculations.");
+                commandManager.Cancel();
                 gravityTokenSource?.Cancel();
             }
             
         }
         
         private async void GravityCalculation()
-        {
+        {/*
             if (gravityTokenSource.IsCancellationRequested)
-                return;
+                return;*/
 
             if (!Enabled)
                 return;
-
             var moveBlockCommandConfigurer = new GravityBlockCommandConfigurer(GridPosition.Down);
             var command = new CommandManager.CommandBuilder().AddCommand<GravityBlockCommand>(_targetEntity, moveBlockCommandConfigurer).Build();
             await commandManager.ExecuteCommands(command);

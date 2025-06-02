@@ -18,6 +18,7 @@ public struct GridPosition
     public static GridPosition Down => new GridPosition(0, -1);
     public static GridPosition Left => new GridPosition(-1, 0);
     public static GridPosition Right => new GridPosition(1, 0);
+    public static GridPosition Zero => new GridPosition(0, 0);
 
     public static List<GridPosition> Directions => new List<GridPosition>
     {

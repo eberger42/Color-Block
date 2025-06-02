@@ -11,6 +11,6 @@ namespace Assets.Scripts.Blocks.interfaces
     {
         public event Action<GridPosition> OnMoveDirection;
 
-
+        void Destroy();
     }
 }

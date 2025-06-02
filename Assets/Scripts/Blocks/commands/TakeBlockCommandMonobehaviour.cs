@@ -30,6 +30,7 @@ namespace Assets.Scripts.Blocks.commands
        
         //Abstract
         public abstract void Move(GridPosition direction);
+        public abstract void Gravity();
         public abstract void Place(Grid<BlockNode> colorGrid, GridPosition position);
         public abstract void Rotate(GridPosition delta);
         public abstract bool CheckForValidMove(GridPosition direction);
@@ -102,7 +103,7 @@ namespace Assets.Scripts.Blocks.commands
 
             if (_commandFilter.Contains(blockCommandType))
             {
-                Debug.LogWarning($"Command type {blockCommandType} is already in the filter. No action taken.");
+                //Debug.LogWarning($"Command type {blockCommandType} is already in the filter. No action taken.");
                 return;
             }
 
@@ -115,7 +116,7 @@ namespace Assets.Scripts.Blocks.commands
 
             if (!_commandFilter.Contains(blockCommandType))
             {
-                Debug.LogWarning($"Command type {blockCommandType} is not in the filter. No action taken.");
+                //Debug.LogWarning($"Command type {blockCommandType} is not in the filter. No action taken.");
                 return;
             }
 

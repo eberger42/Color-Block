@@ -38,12 +38,26 @@ namespace Assets.Scripts.Blocks.components
 
         public ITakeBlockCommand CreateBlockGroup(IBlockColor blockColor)
         {
-            ColorBlockGroup blockGroup = Instantiate(blockGroupPrefab, new Vector2(0, 0), Quaternion.identity).GetComponent<ColorBlockGroup>();
-            blockGroup.transform.name = $"ColorBlockGroup: {_groupCount}";
+            _groupCount++;
+
+            var gameObject = Instantiate(blockGroupPrefab, new Vector2(0, 0), Quaternion.identity).GetComponent<ColorBlockGroupController>();
+            var blockGroup = gameObject.GetComponent<ColorBlockGroupController>();
             var configurationStrategy = GetRandomConfigurationStrategy();
+
+            blockGroup.transform.name = $"ColorBlockGroup: {_groupCount}";
             blockGroup.Initialize(configurationStrategy, this, blockColor);
 
+            return blockGroup;
+        }
+
+        public ColorBlockGroupController AssignBlockGroup()
+        {
             _groupCount++;
+
+            var gameObject = Instantiate(blockGroupPrefab, new Vector2(0, 0), Quaternion.identity).GetComponent<ColorBlockGroupController>();
+            var blockGroup = gameObject.GetComponent<ColorBlockGroupController>();
+
+            blockGroup.transform.name = $"ColorBlockGroup: {_groupCount}";
             return blockGroup;
         }
 

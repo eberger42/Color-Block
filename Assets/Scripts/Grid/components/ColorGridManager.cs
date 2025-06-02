@@ -80,9 +80,6 @@ namespace Assets.Scripts.Grid.components
             return CheckIfSpacesAreOccupied(newPositions);
         }
 
-
-
-
         private async void PlaceBlock(ITakeBlockCommand target)
         {
             var placeBlockCommandConfigurer = new PlaceBlockCommandConfigurer(colorBlockGrid, placementPosition);

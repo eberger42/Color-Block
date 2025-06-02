@@ -14,7 +14,6 @@ namespace Assets.Scripts.Blocks.interfaces
         public void AddBlock(IBlock block, GridPosition delta);
         public void ReleaseBlock(IBlock block);
         public void Disband();
-        public List<GridPosition> GetGridPositions();
         public void SetColor(IBlockColor color);
 
     }

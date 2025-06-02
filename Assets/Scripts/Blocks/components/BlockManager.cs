@@ -60,8 +60,8 @@ namespace Assets.Scripts.Blocks.components
             }
 
             var blockColor = BlockColor.GenerateRandomPrimaryColor();
-            //var target = blockFactory.CreateBlockGroup(blockColor);
-            var target = blockFactory.CreateBlock(blockColor);
+            var target = blockFactory.CreateBlockGroup(blockColor);
+            //var target = blockFactory.CreateBlock(blockColor);
 
             _currentEntity = target;
             (_currentEntity as ITriggerSpawn).OnTriggerSpawn += CreateNewBlock;
@@ -71,7 +71,13 @@ namespace Assets.Scripts.Blocks.components
             OnTargetCreated?.Invoke(target);
         }
 
+        public void AssignBlockGroupToBlocks(List<IBlock> blocks)
+        {
+            var blockGroup = blockFactory.AssignBlockGroup();
 
+            blockGroup.Initialize(blocks);
+
+        }
 
     }
 }

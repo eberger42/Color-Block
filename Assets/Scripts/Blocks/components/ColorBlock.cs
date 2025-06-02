@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 using static Unity.Collections.AllocatorManager;
 
 namespace Assets.Scripts.Blocks.components
@@ -33,10 +34,8 @@ namespace Assets.Scripts.Blocks.components
         //Properties
         public IBlockColor Color { get; private set; }
 
-
         public bool AttemptMerge(ColorBlock colorBlock)
         {
-
             if (!Color.CanCombine(colorBlock.Color))
                 return false;
 
@@ -45,7 +44,6 @@ namespace Assets.Scripts.Blocks.components
             (this as IBlock).SetColor(newColor);
 
             return true;
-
         }
 
         public ColorRank GetColorRank()
@@ -62,12 +60,6 @@ namespace Assets.Scripts.Blocks.components
         public void SetGridPosition(GridPosition position)
         {
             this.gridPosition = position;
-
-            if(gridPosition.y == 0)
-            {
-                (this as IGravity).SetEnable(false);
-            }
-
         }
 
         public GridPosition GetGridPosition()
@@ -97,37 +89,19 @@ namespace Assets.Scripts.Blocks.components
         //Functions
         bool IGravity.CheckIfFloating()
         {
-            var southernNode = node.GetNeighbor(GridPosition.Down);
-            var isFloating = false;
-
-            if (southernNode ==  null)
-                isFloating = true;
-            else if (!southernNode.IsOccupied())
-                isFloating = true;
-
-            (this as IGravity).SetEnable(isFloating);
-
-            return isFloating;
-
+            var isSoutherNodeOccupied = node.IsNeighborOccupied(GridPosition.Down);
+            return !isSoutherNodeOccupied;
         }
+        
         void IGravity.SetEnable(bool state)
         {
             if (state == false)
             {
                 _onEnableGravity?.Invoke(false);
-                RemoveCommandFromFilter(typeof(GravityBlockCommand));
-                CheckNeighborsForMerge();
-
-                if (canTriggerSpawn)
-                {
-                    (this as ITriggerSpawn).SetEnabled(false);
-                    _onTriggerSpawn?.Invoke();
-                }
 
             }
             else
             {
-                AddCommandToFilter(typeof(GravityBlockCommand));
                 _onEnableGravity?.Invoke(true);
                 
             }
@@ -165,6 +139,50 @@ namespace Assets.Scripts.Blocks.components
             _onColorUpdated?.Invoke(color);
 
         }
+        bool IBlock.CheckNeighborsForMerge()
+        {
+            if (Color.GetColorRank() == ColorRank.Secondary)
+                return false;
+
+            var neighbors = node.GetNeighbors();
+            bool markedForDustruction = false;
+
+            if (neighbors == null || neighbors.Count == 0)
+                return false;
+
+            while (neighbors.Count > 0)
+            {
+                var neighbor = neighbors[0];
+                neighbors.Remove(neighbor);
+
+                if (!neighbor.IsOccupied())
+                    continue;
+
+                var block = (neighbor as BlockNode).GetData();
+
+                if (block is ColorBlock colorBlock)
+                {
+                    var didMerge = colorBlock.AttemptMerge(this);
+
+                    if (didMerge)
+                    {
+                        markedForDustruction = true;
+                    }
+                }
+
+
+
+            }
+
+            if (markedForDustruction)
+            {
+                return true;
+            }
+
+            return false;
+
+        }
+
 
         /////////////////////////////////////////////////////////////////
         /// IEntity Interface
@@ -181,6 +199,11 @@ namespace Assets.Scripts.Blocks.components
             }
         }
 
+        void IEntity.Destroy()
+        {
+            node.ClearNodeData(this);
+            Destroy(this.gameObject);
+        }
 
 
         /////////////////////////////////////////////////////////////////
@@ -189,14 +212,15 @@ namespace Assets.Scripts.Blocks.components
 
         public override void Place(Grid<BlockNode> colorGrid, GridPosition position)
         {
-            
             colorGrid.SetNodeData(position.x, position.y, this);
-            (this as IGravity).CheckIfFloating();
-
+        }
+        public override void Gravity()
+        {
+            var postition = GridPosition.Down;
+            Move(postition);
         }
         public override void Move(GridPosition direction)
         {
-
             var canFall = CanTakeCommand(typeof(GravityBlockCommand));
             if (canFall == false)
                 return;
@@ -204,18 +228,14 @@ namespace Assets.Scripts.Blocks.components
             var neigborNode = node.GetNeighbor(direction);
             node.ClearNodeData(this);
             neigborNode.SetNodeData(this);
-
-            (this as IGravity).CheckIfFloating();
         }
         public override void Rotate(GridPosition delta)
         {
-            var neigborNode = node.GetNeighbor(delta);
-            node.ClearNodeData(this);
-            neigborNode.SetNodeData(this);
+            //Singulare Block, so no rotation
         }
         public override bool CheckForValidMove(GridPosition direction)
         {
-            var isValidMove = !node.IsNeighborOccupied(direction);
+            var isValidMove = !this.node.IsNeighborOccupied(direction);
 
             return isValidMove;
         }
@@ -298,53 +318,12 @@ namespace Assets.Scripts.Blocks.components
             }
         }
 
+
+        
+
         ///////////////////////////////////////////////////////////////////
         /// Private Helpers
         ///////////////////////////////////////////////////////////////////
-
-        private void CheckNeighborsForMerge()
-        {
-            if (Color.GetColorRank() == ColorRank.Secondary)
-                return;
-
-            var neighbors = node.GetNeighbors();
-            bool markedForDustruction = false;
-
-            if (neighbors == null || neighbors.Count == 0)
-                return;
-
-            while (neighbors.Count > 0)
-            {
-                var neighbor = neighbors[0];
-                neighbors.Remove(neighbor);
-
-                if (!neighbor.IsOccupied())
-                    continue;
-
-                var block = (neighbor as BlockNode).GetData();
-
-                if (block is ColorBlock colorBlock)
-                {
-                    var didMerge = colorBlock.AttemptMerge(this);
-
-                    if (didMerge)
-                    {
-                        markedForDustruction = true;
-                    }
-                }
-
-
-
-            }
-
-            if (markedForDustruction)
-            {
-                Debug.LogWarning($"ColorBlock {this.Color} marked for destruction.");
-                node.ClearNodeData(this);
-                Destroy(this.gameObject);
-            }
-
-        }
 
     }
 }

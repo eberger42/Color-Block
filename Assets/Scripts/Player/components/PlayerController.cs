@@ -79,7 +79,7 @@ namespace Assets.Scripts.Player
                 }
                 return;
             }
-
+            Debug.Log($"Moving target entity with direction: {gridDirection}");
             var moveBlockCommandConfigurer = new MoveBlockCommandConfigurer(gridDirection);
             var command = new CommandManager.CommandBuilder().AddCommand<MoveBlockCommand>(_target, moveBlockCommandConfigurer).Build();
             await commandManager.ExecuteCommands(command, () => _isMovingExecutionFlag, (isMoving) => _isMovingExecutionFlag = isMoving);
@@ -109,7 +109,6 @@ namespace Assets.Scripts.Player
             }
 
             _target = target;
-
             (_target as IPlayerControlled).SetEnabled(true);
             (_target as IGravity).SetEnable(true);
 

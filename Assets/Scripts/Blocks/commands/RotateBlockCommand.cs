@@ -21,7 +21,6 @@ namespace Assets.Scripts.Blocks.commands
 
         public override async Task Execute()
         {
-            Debug.Log($"Executing RotateBlockCommand with direction: {_rotationDelta}");
             Func<Task> task = async () =>
             {
                 if (_target.CanTakeCommand(this) == false)
