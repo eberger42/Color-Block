@@ -42,6 +42,7 @@ namespace Assets.Scripts.Blocks.components
             var newColor = Color.GetCombineColor(colorBlock.Color);
 
             (this as IBlock).SetColor(newColor);
+            (node as BlockNode).ReportColorChange();
 
             return true;
         }
@@ -183,6 +184,12 @@ namespace Assets.Scripts.Blocks.components
 
         }
 
+        bool IBlock.DoColorsMatch(IBlock block)
+        {
+            var blockColor = (block as ColorBlock).Color;
+            return this.Color.Equals(blockColor);
+        }
+
 
         /////////////////////////////////////////////////////////////////
         /// IEntity Interface
@@ -319,7 +326,7 @@ namespace Assets.Scripts.Blocks.components
         }
 
 
-        
+
 
         ///////////////////////////////////////////////////////////////////
         /// Private Helpers

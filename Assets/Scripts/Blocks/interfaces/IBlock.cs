@@ -15,5 +15,7 @@ namespace Assets.Scripts.Blocks.interfaces
         public void SetParent(IBlockGroup parent);
         public IBlockGroup GetParent();
         public bool CheckNeighborsForMerge();
+
+        public bool DoColorsMatch(IBlock block);
     }
 }

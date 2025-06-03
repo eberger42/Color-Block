@@ -456,10 +456,6 @@ namespace Assets.Scripts.Blocks.components
                 var groupIsFloating = (this as IGravity).CheckIfFloating();
                 if (groupIsFloating)
                 {
-                    if (!CanTakeCommand(typeof(GravityBlockCommand))){
-
-                        (this as ITakeBlockCommand).Gravity(); //Used to have blocks fall at same pace
-                    }
                     (this as IGravity).SetEnable(true);
                 }
             }

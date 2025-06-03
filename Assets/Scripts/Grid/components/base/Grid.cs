@@ -1,6 +1,7 @@
 ﻿using Assets.Scripts.Blocks.interfaces;
 using Assets.Scripts.Blocks.scriptable_objects;
 using Assets.Scripts.Grid.interfaces;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,6 +10,9 @@ namespace Assets.Scripts.Grid.components
 {
     public class Grid<T> : IGrid<T> where T : INode, new()
     {
+
+        public event Action<INodeEvent> OnNodeEvent;
+
         private int width;
         private int height;
         private float cellSize = 1f; // Assuming each cell is 1 unit in size
@@ -39,7 +43,11 @@ namespace Assets.Scripts.Grid.components
                     Debug.Log($"Grid: {this}");
                     node.SetGridListener(this as IGrid<INode>);
                     node.GenerateNode();
+                    node.OnNodeEvent += TriggerNodeEvent;
+
                     gridArray[x, y] = node;
+
+
                 }
             }
         }
@@ -95,5 +103,11 @@ namespace Assets.Scripts.Grid.components
 
             
         }
+   
+        private void TriggerNodeEvent(INodeEvent nodeEvent)
+        {
+            OnNodeEvent?.Invoke(nodeEvent);
+        }
+    
     }
 }

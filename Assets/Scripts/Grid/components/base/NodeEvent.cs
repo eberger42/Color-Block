@@ -19,6 +19,15 @@ namespace Assets.Scripts.Grid.components
         }
     }
 
+    public class NodeDataColorChanged : NodeEvent
+    {
+        public INodeData NodeData { get; private set; }
+
+        public NodeDataColorChanged(INode sender) : base(sender)
+        {
+        }
+    }
+
     public abstract class NodeEvent : INodeEvent
     {
         private INode sender;

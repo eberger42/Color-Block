@@ -2,6 +2,8 @@
 using Assets.Scripts.Blocks.components;
 using Assets.Scripts.Blocks.interfaces;
 using Assets.Scripts.Blocks.scriptable_objects;
+using Assets.Scripts.Grid.interfaces;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,7 +15,9 @@ namespace Assets.Scripts.Grid.components
 
         public static ColorGridManager Instance { get; private set; } = null;
 
-       
+        public event Action<INodeEvent> OnNodeEvent;
+
+        public Grid<BlockNode> ColorBlockGrid { get => colorBlockGrid; }
 
         private Grid<BlockNode> colorBlockGrid;
 
@@ -38,6 +42,7 @@ namespace Assets.Scripts.Grid.components
         private void Awake()
         {
             colorBlockGrid = new Grid<BlockNode>(gridWidth, gridHeight, 1, origin);
+            colorBlockGrid.OnNodeEvent += TriggerNodeEvent;
 
             if (Instance != null && Instance != this)
             {
@@ -60,6 +65,7 @@ namespace Assets.Scripts.Grid.components
         private void OnDestroy()
         {
             BlockManager.Instance.OnTargetCreated -= PlaceBlock;
+            colorBlockGrid.OnNodeEvent -= TriggerNodeEvent;
 
         }
 
@@ -85,8 +91,11 @@ namespace Assets.Scripts.Grid.components
             var placeBlockCommandConfigurer = new PlaceBlockCommandConfigurer(colorBlockGrid, placementPosition);
             var command = new CommandManager.CommandBuilder().AddCommand<PlaceBlockCommand>(target, placeBlockCommandConfigurer).Build();
             await commandManager.ExecuteCommands(command);
+        }
 
-
+        private void TriggerNodeEvent(INodeEvent nodeEvent)
+        {
+            OnNodeEvent?.Invoke(nodeEvent);
         }
 
 

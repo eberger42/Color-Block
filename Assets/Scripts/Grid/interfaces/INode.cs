@@ -19,6 +19,7 @@ public interface INode
     public void SetGridListener(IGrid<INode> gridListener);
 
     //Control
+    public INodeData GetData();
     public void SetNodeData(INodeData nodeData);
     public void ClearNodeData(INodeData nodeData);
     public INode GetNeighbor(GridPosition direction);

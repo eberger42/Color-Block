@@ -47,5 +47,10 @@ namespace Assets.Scripts.Blocks.components
             }
         }
 
+        public void ReportColorChange()
+        {
+            this.TriggerNodeEvent(new NodeDataColorChanged(this));
+        }
+
     }
 }
