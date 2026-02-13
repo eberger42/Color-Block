@@ -111,6 +111,7 @@ namespace Assets.Scripts.Blocks.components
 
 
             SpawnCheck();
+            Destroy(this.gameObject);
 
         }
 

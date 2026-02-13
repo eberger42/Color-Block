@@ -40,7 +40,6 @@ namespace Assets.Scripts.Blocks.components
             var newColor = Color.GetCombineColor(colorBlock.Color);
 
             (this as IBlock).SetColor(newColor);
-            (node as BlockNode).ReportColorChange();
 
 
             return true;
@@ -226,17 +225,28 @@ namespace Assets.Scripts.Blocks.components
             var neigborNode = node.GetNeighbor(direction);
             node.ClearNodeData(this);
 
-            if(neigborNode.GetData() is ColorBlock block)
+            if(neigborNode.GetData() is ColorBlock block && parent.DoesContainBlock(block) == false)
             {
                 Debug.Log(block);
                 var didMerge = AttemptMerge(block);
                 Debug.Log($"DidMerge {block}:{didMerge}");
 
                 if (didMerge)
+                {
                     (block as IEntity).Destroy();
+                    neigborNode.SetNodeData(this);
+                    (neigborNode as BlockNode).ReportColorChange();
+
+                }
+            }
+            else
+            {
+                neigborNode.SetNodeData(this);
+
             }
 
-            neigborNode.SetNodeData(this);
+
+            
         }
         public override void Rotate(GridPosition delta)
         {
@@ -354,8 +364,8 @@ namespace Assets.Scripts.Blocks.components
         ///////////////////////////////////////////////////////////////////
         void ITick.Tick()
         {
-            var isFloating = (this as IGravity).CheckIfFloating();
 
+            var isFloating = (this as IGravity).CheckIfFloating();
             if (isFloating)
             {
                 (this as IGravity).SetEnable(true);

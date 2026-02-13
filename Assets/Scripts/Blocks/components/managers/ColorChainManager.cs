@@ -38,12 +38,15 @@ namespace Assets.Scripts.Blocks.components.managers
             var block = node.GetData() as IBlock;
             var neighbors = node.GetNeighbors();
 
-            List<IBlock> newColorChain = new List<IBlock>();
-
-            newColorChain.Add(block);
+            List<IBlock> newColorChain = new List<IBlock>
+            {
+                block
+            };
 
             var neighborChain = SearchNode(node, new List<INode>());
 
+            Debug.Log($"Node: [{node.GetData()}]");
+            Debug.Log($"Chain Size: [{neighborChain.Count}]");
             newColorChain.AddRange(neighborChain);
 
             if (newColorChain.Count > 5)
@@ -83,7 +86,6 @@ namespace Assets.Scripts.Blocks.components.managers
                     colorChain.AddRange(neighborChain);
                 }
             }
-
             return colorChain;
         }
 
