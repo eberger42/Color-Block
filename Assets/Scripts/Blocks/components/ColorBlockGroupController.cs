@@ -105,12 +105,13 @@ namespace Assets.Scripts.Blocks.components
         //Functions
         void IBlockGroup.Disband()
         {
-            foreach(var block in blocks)
-            {
-                (block as MonoBehaviour).transform.SetParent(null, false);
-                (block as IGravity).OnEnableGravity -= HandleChildBlockGravityUpdate;
-                (block as IBlock).SetParent(null);
-            }
+
+            while(blocks.Count > 0)
+                (this as IBlockGroup).ReleaseBlock(blocks[0]);
+
+
+            SpawnCheck();
+
         }
 
         void IBlockGroup.ReleaseBlock(IBlock block)
@@ -136,6 +137,7 @@ namespace Assets.Scripts.Blocks.components
             (block as IGravity).OnEnableGravity += HandleChildBlockGravityUpdate;
             (block as IGravity).OnTriggerGravity += (this as IGravity).Trigger;
             (block as IBlock).SetParent(this);
+            (block as IBlock).OnColorUpdated += HandleChildBlockColorUpdated;
             this.blocks.Add(block);
             _positionsDeltaMap.Add(block, delta);
         }
@@ -212,8 +214,6 @@ namespace Assets.Scripts.Blocks.components
             }
             (this as IGravity).SetEnable(isGroupFloating);
         }
-
-
         public override void Gravity()
         {
             var direction = GridPosition.Down;
@@ -227,7 +227,6 @@ namespace Assets.Scripts.Blocks.components
 
             }
         }
-
         public override void Rotate(GridPosition delta)
         {
             var canRotate = CanTakeCommand(typeof(RotateBlockCommand));
@@ -332,12 +331,7 @@ namespace Assets.Scripts.Blocks.components
             if(state == false)
             {
 
-                if (canTriggeredSpawn)
-                {
-                    Debug.LogWarning("Spawning Blocks.");
-                    (this as ITriggerSpawn).SetEnabled(false);
-                    _onTriggerSpawn?.Invoke();
-                }
+                SpawnCheck();
 
                 RemoveCommandFromFilter(typeof(GravityBlockCommand));
 
@@ -364,7 +358,6 @@ namespace Assets.Scripts.Blocks.components
 
                 if (!isBlockFloating)
                 {
-                    Debug.Log($"Group is not floating Gravity: {block.ToString()}");
                     isGroupFloating = false;
                     break;
                 }
@@ -448,7 +441,8 @@ namespace Assets.Scripts.Blocks.components
             }
 
             var blockToRemove = new List<IBlock>();
-            foreach (var block in blocks)
+            var tempParentBlocks = new List<IBlock>(blocks);
+            foreach (var block in tempParentBlocks)
             {
                 var canMerge = (block as IBlock).CheckNeighborsForMerge();
 
@@ -499,5 +493,22 @@ namespace Assets.Scripts.Blocks.components
             
         }
 
+        private void HandleChildBlockColorUpdated(IBlockColor blockColor)
+        {
+            if(blocks.Count > 1)
+            {
+                (this as IBlockGroup).Disband();
+            }
+        }
+
+        private void SpawnCheck()
+        {
+            if (canTriggeredSpawn)
+            {
+                Debug.LogWarning("Spawning Blocks.");
+                (this as ITriggerSpawn).SetEnabled(false);
+                _onTriggerSpawn?.Invoke();
+            }
+        }
     }
 }

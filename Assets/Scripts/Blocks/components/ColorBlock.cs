@@ -6,14 +6,7 @@ using Assets.Scripts.Grid.components;
 using Assets.Scripts.Grid.interfaces;
 using Assets.Scripts.Player.Interfaces;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.UIElements;
-using static Unity.Collections.AllocatorManager;
 
 namespace Assets.Scripts.Blocks.components
 {
@@ -46,6 +39,7 @@ namespace Assets.Scripts.Blocks.components
 
             (this as IBlock).SetColor(newColor);
             (node as BlockNode).ReportColorChange();
+            
 
             return true;
         }
@@ -184,6 +178,12 @@ namespace Assets.Scripts.Blocks.components
 
                 if (block is ColorBlock colorBlock)
                 {
+
+                    var isColorBlockFloating = (colorBlock.parent as IGravity).CheckIfFloating();
+
+                    if (isColorBlockFloating)
+                        continue;
+
                     var didMerge = colorBlock.AttemptMerge(this);
 
                     if (didMerge)
@@ -296,10 +296,15 @@ namespace Assets.Scripts.Blocks.components
         {
             if (nodeEvent is NodeDataRemoved removedDataEvent)
             {
-
+                //Ignoring events from the same parent as they move together and would not 
+                //cause a gravity check.
                 if(removedDataEvent.RemovedData is IBlock blockData)
+                {
+                    if (parent == null)
+                        return;
                     if(parent.DoesContainBlock(blockData))
                         return;
+                }
 
                 var sender = nodeEvent.GetSender() as INode;
 

@@ -5,6 +5,8 @@ using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Unity.Collections.AllocatorManager;
+using static UnityEngine.RuleTile.TilingRuleOutput;
 
 namespace Assets.Scripts.Blocks.components.managers
 {
@@ -12,8 +14,6 @@ namespace Assets.Scripts.Blocks.components.managers
     {
         private List<List<IBlock>> colorChainList = new List<List<IBlock>>();
         private Dictionary<IBlock, List<IBlock>> blockChainListMapping = new Dictionary<IBlock, List<IBlock>>();
-
-
 
         public void Awake()
         {
@@ -29,6 +29,62 @@ namespace Assets.Scripts.Blocks.components.managers
         {
             ColorGridManager.Instance.OnNodeEvent -= HandleNodeEvent;
         }
+
+        private void CheckForColorChain(INodeEvent nodeEvent)
+        {
+
+
+            var node = nodeEvent.GetSender();
+            var block = node.GetData() as IBlock;
+            var neighbors = node.GetNeighbors();
+
+            List<IBlock> newColorChain = new List<IBlock>();
+
+            newColorChain.Add(block);
+
+            var neighborChain = SearchNode(node, new List<INode>());
+
+            newColorChain.AddRange(neighborChain);
+
+            if (newColorChain.Count > 5)
+            {
+                foreach (var chainBlock in newColorChain)
+                {
+                    (chainBlock as IEntity).Destroy();
+                }
+            }
+
+        }
+        private List<IBlock> SearchNode(INode node, List<INode> searchedNodes)
+        {
+            var neighbors = node.GetNeighbors();
+            var block = node.GetData() as IBlock;
+            List<IBlock> colorChain = new List<IBlock>();
+            searchedNodes.Add(node);
+
+            foreach (var neighbor in neighbors)
+            {
+                if (searchedNodes.Contains(neighbor))
+                    continue;
+                if (!neighbor.IsOccupied())
+                    continue;
+
+                var neighborBlock = neighbor.GetData() as IBlock;
+
+                var doColorsMatch = block.DoColorsMatch(neighborBlock);
+
+                if (doColorsMatch)
+                {
+                    colorChain.Add(neighborBlock);
+                    var neighborChain = SearchNode(neighbor, searchedNodes);
+                    colorChain.AddRange(neighborChain);
+                }
+            }
+
+            return colorChain;
+        }
+
+
 
         private void AddBlockToColorChain(INodeEvent nodeEvent)
         {
@@ -79,7 +135,8 @@ namespace Assets.Scripts.Blocks.components.managers
         {
             if (nodeEvent is NodeDataColorChanged colorChangedEvent)
             {
-                AddBlockToColorChain(colorChangedEvent);
+                CheckForColorChain(nodeEvent);
+                //AddBlockToColorChain(colorChangedEvent);
             }
             else if (nodeEvent is NodeDataRemoved removedEvent)
             {
@@ -95,7 +152,7 @@ namespace Assets.Scripts.Blocks.components.managers
             }
             else if (nodeEvent is NodeDataLanded landedEvent)
             {
-                AddBlockToColorChain(landedEvent);
+                CheckForColorChain(nodeEvent);
             }
         }
         

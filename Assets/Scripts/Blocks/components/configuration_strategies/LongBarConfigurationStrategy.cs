@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.Blocks.components
 {
-  /*  public class LongBarConfigurationStrategy : IBlockGroupConfigurationStrategy
+  public class LongBarConfigurationStrategy : IBlockGroupConfigurationStrategy
     {
         //Stored As Deltas from GridPosition
         private readonly List<GridPosition> _positions = new List<GridPosition>
@@ -29,5 +29,5 @@ namespace Assets.Scripts.Blocks.components
         }
 
      
-    }*/
+    }
 }
