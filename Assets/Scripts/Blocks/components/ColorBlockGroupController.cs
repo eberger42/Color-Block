@@ -125,6 +125,8 @@ namespace Assets.Scripts.Blocks.components
             (block as IGravity).OnEnableGravity -= HandleChildBlockGravityUpdate;
             (block as IGravity).OnTriggerGravity -= (this as IGravity).Trigger;
             (block as IBlock).SetParent(null);
+            (block as IBlock).OnColorUpdated -= HandleChildBlockColorUpdated;
+            (block as IEntity).OnEntityDestroyed -= HandleChildBlockDestroyed;
 
 
             BlockManager.Instance.AssignBlockGroupToBlocks(new List<IBlock> { block });
@@ -138,6 +140,7 @@ namespace Assets.Scripts.Blocks.components
             (block as IGravity).OnTriggerGravity += (this as IGravity).Trigger;
             (block as IBlock).SetParent(this);
             (block as IBlock).OnColorUpdated += HandleChildBlockColorUpdated;
+            (block as IEntity).OnEntityDestroyed += HandleChildBlockDestroyed;
             this.blocks.Add(block);
             _positionsDeltaMap.Add(block, delta);
         }
@@ -191,8 +194,9 @@ namespace Assets.Scripts.Blocks.components
             if(canFall == false)
                 return;
 
+            var tempBlockList = new List<IBlock>(blocks);
 
-            foreach (var block in blocks)
+            foreach (var block in tempBlockList)
             {
                 (block as ITakeBlockCommand).Move(direction);
                 
@@ -218,10 +222,13 @@ namespace Assets.Scripts.Blocks.components
         {
             var direction = GridPosition.Down;
             var canFall = CanTakeCommand(typeof(GravityBlockCommand));
+
+            var tempBlockList = new List<IBlock>(blocks);
+
             if (canFall == false)
                 return;
 
-            foreach (var block in blocks)
+            foreach (var block in tempBlockList)
             {
                 (block as ITakeBlockCommand).Move(direction);
 
@@ -337,7 +344,6 @@ namespace Assets.Scripts.Blocks.components
 
                 isGrounded = true;
                 _onEnableGravity?.Invoke(false);
-                CheckBlocksForMerger();
 
             }
             else
@@ -432,51 +438,6 @@ namespace Assets.Scripts.Blocks.components
             return isFloating;
         }
 
-        private void CheckBlocksForMerger()
-        {
-
-            if(isGrounded == false)
-            {
-                return;
-            }
-
-            var blockToRemove = new List<IBlock>();
-            var tempParentBlocks = new List<IBlock>(blocks);
-            foreach (var block in tempParentBlocks)
-            {
-                var canMerge = (block as IBlock).CheckNeighborsForMerge();
-
-                if(canMerge)
-                {
-                    blockToRemove.Add(block);
-                }
-            }
-
-            if(blockToRemove.Count == 0)
-            {
-                Debug.Log("No blocks to remove.");
-                return;
-            }
-
-            foreach (var block in blockToRemove)
-            {
-                (block as IEntity).Destroy();
-                blocks.Remove(block);
-            }
-            while(blocks.Count > 0)
-            {
-                var block = blocks[0];
-                (this as IBlockGroup).ReleaseBlock(block);
-
-                if(blocks.Contains(block) == false) //If the block was removed from the group, we can continue
-                    continue;
-
-                blocks.Remove(block);
-            }
-
-            Destroy(this.gameObject);
-        }
-
         private void HandleChildBlockGravityUpdate(bool isFloating)
         {
 
@@ -499,6 +460,10 @@ namespace Assets.Scripts.Blocks.components
             {
                 (this as IBlockGroup).Disband();
             }
+        }
+        private void HandleChildBlockDestroyed(IEntity entity)
+        {
+            (this as IBlockGroup).Disband();
         }
 
         private void SpawnCheck()

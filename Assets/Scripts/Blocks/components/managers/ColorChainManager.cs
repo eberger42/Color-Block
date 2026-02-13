@@ -62,6 +62,9 @@ namespace Assets.Scripts.Blocks.components.managers
             List<IBlock> colorChain = new List<IBlock>();
             searchedNodes.Add(node);
 
+            if(block == null)
+                return colorChain;
+
             foreach (var neighbor in neighbors)
             {
                 if (searchedNodes.Contains(neighbor))

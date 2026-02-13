@@ -7,6 +7,7 @@ using Assets.Scripts.Grid.interfaces;
 using Assets.Scripts.Player.Interfaces;
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Assets.Scripts.Blocks.components
 {
@@ -17,6 +18,7 @@ namespace Assets.Scripts.Blocks.components
         private event Action<bool> _onEnableGravity;
         private event Action _onTriggerGravity;
         private event Action<IBlockColor> _onColorUpdated;
+        private event Action<IEntity> _onEntityDestroyed;
         private event Action _onTriggerSpawn;
 
         //Fields
@@ -39,7 +41,7 @@ namespace Assets.Scripts.Blocks.components
 
             (this as IBlock).SetColor(newColor);
             (node as BlockNode).ReportColorChange();
-            
+
 
             return true;
         }
@@ -99,8 +101,8 @@ namespace Assets.Scripts.Blocks.components
         //Functions
         bool IGravity.CheckIfFloating()
         {
-            var isSoutherNodeOccupied = node.IsNeighborOccupied(GridPosition.Down);
-            return !isSoutherNodeOccupied;
+            var isFloating = CheckForValidMove(GridPosition.Down);
+            return isFloating;
         }
 
         void IGravity.SetEnable(bool state)
@@ -140,6 +142,7 @@ namespace Assets.Scripts.Blocks.components
             }
         }
 
+
         //Functions
         void IBlock.SetParent(IBlockGroup parent)
         {
@@ -155,62 +158,15 @@ namespace Assets.Scripts.Blocks.components
             _onColorUpdated?.Invoke(color);
 
         }
-        bool IBlock.CheckNeighborsForMerge()
-        {
-            if (Color.GetColorRank() == ColorRank.Secondary)
-                return false;
-
-            var neighbors = node.GetNeighbors();
-            bool markedForDustruction = false;
-
-            if (neighbors == null || neighbors.Count == 0)
-                return false;
-
-            while (neighbors.Count > 0)
-            {
-                var neighbor = neighbors[0];
-                neighbors.Remove(neighbor);
-
-                if (!neighbor.IsOccupied())
-                    continue;
-
-                var block = (neighbor as BlockNode).GetData();
-
-                if (block is ColorBlock colorBlock)
-                {
-
-                    var isColorBlockFloating = (colorBlock.parent as IGravity).CheckIfFloating();
-
-                    if (isColorBlockFloating)
-                        continue;
-
-                    var didMerge = colorBlock.AttemptMerge(this);
-
-                    if (didMerge)
-                    {
-                        markedForDustruction = true;
-                    }
-                }
-
-
-
-            }
-
-            if (markedForDustruction)
-            {
-                return true;
-            }
-
-            return false;
-
-        }
-
         bool IBlock.DoColorsMatch(IBlock block)
         {
             var blockColor = (block as ColorBlock).Color;
             return this.Color.Equals(blockColor);
         }
-
+        bool IBlock.CheckMergeCompatability(IBlock block)
+        {
+            return Color.CanCombine(block.Color);
+        }
 
         /////////////////////////////////////////////////////////////////
         /// IEntity Interface
@@ -227,9 +183,23 @@ namespace Assets.Scripts.Blocks.components
             }
         }
 
+        event Action<IEntity> IEntity.OnEntityDestroyed
+        {
+            add
+            {
+                _onEntityDestroyed += value;
+            }
+            remove
+            {
+                _onEntityDestroyed -= value;
+            }
+        }
+
         void IEntity.Destroy()
         {
+            Debug.Log($"Destroyed: {this}");
             node.ClearNodeData(this);
+            _onEntityDestroyed?.Invoke(this);
             Destroy(this.gameObject);
         }
 
@@ -255,6 +225,17 @@ namespace Assets.Scripts.Blocks.components
 
             var neigborNode = node.GetNeighbor(direction);
             node.ClearNodeData(this);
+
+            if(neigborNode.GetData() is ColorBlock block)
+            {
+                Debug.Log(block);
+                var didMerge = AttemptMerge(block);
+                Debug.Log($"DidMerge {block}:{didMerge}");
+
+                if (didMerge)
+                    (block as IEntity).Destroy();
+            }
+
             neigborNode.SetNodeData(this);
         }
         public override void Rotate(GridPosition delta)
@@ -263,7 +244,19 @@ namespace Assets.Scripts.Blocks.components
         }
         public override bool CheckForValidMove(GridPosition direction)
         {
-            var isValidMove = !this.node.IsNeighborOccupied(direction);
+            var isValidMove = false;
+
+            if(node.GetNeighbor(direction) is INode neighbor)
+            {
+                if(neighbor.GetData() is IBlock block)
+                {
+                    isValidMove = block.CheckMergeCompatability(this);
+                }
+                else
+                {
+                    isValidMove = true;
+                }
+            }
 
             return isValidMove;
         }
