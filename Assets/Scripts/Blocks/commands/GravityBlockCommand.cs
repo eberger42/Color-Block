@@ -32,19 +32,21 @@ namespace Assets.Scripts.Blocks.commands
                 
                 if(isFloating)
                 {
-                    _target.Gravity();
+                    if(_target != null)
+                        _target.Gravity();
                     return;
                 }
                 else
-                { 
+                {
+                    Debug.Log("Disabling Gravity");
                     (_target as IGravity).SetEnable(false);
                 }
 
-                await Task.Delay(50);
+                await Task.Delay(00);
             };
 
             _target.AddActionCommand(task);
-            await Task.Delay(500);
+            await Task.Delay(10);
 
 
         }

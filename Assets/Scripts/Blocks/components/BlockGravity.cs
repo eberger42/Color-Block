@@ -1,5 +1,7 @@
 ﻿using Assets.Scripts.Blocks.commands;
 using Assets.Scripts.Blocks.interfaces;
+using Assets.Scripts.General;
+using Assets.Scripts.General.interfaces;
 using Assets.Scripts.Grid.components;
 using Assets.Scripts.Player.Interfaces;
 using System.Collections;
@@ -17,6 +19,7 @@ namespace Assets.Scripts.Blocks.components
         public bool Enabled { get; private set; } = false;
 
         private CommandManager commandManager;
+        private GameTickManager gameTickManager;
         private ITakeBlockCommand _targetEntity;
 
         private List<ICommand> _commandBuffer = new List<ICommand>(); 
@@ -26,9 +29,12 @@ namespace Assets.Scripts.Blocks.components
         private void Awake()
         {
             commandManager = new CommandManager();
+
             _targetEntity = GetComponent<ITakeBlockCommand>();
 
             (_targetEntity as IGravity).OnEnableGravity += HandleGravityEnabledState;
+            (_targetEntity as IGravity).OnTriggerGravity += TriggerGravity;
+
 
 
         }
@@ -43,18 +49,9 @@ namespace Assets.Scripts.Blocks.components
             gravityTokenSource?.Cancel();
         }
 
-        private void HandleGravityEnabledState(bool state)
+        void TriggerGravity()
         {
-            Debug.Log($"Gravity state changed to: {state}");
-            if(this.Enabled == state)
-            {
-                return;
-            }
-
-            this.Enabled = state;
-
-
-            if(Enabled)
+            if (Enabled)
             {
                 if (commandManager.IsExecuting)
                     return;
@@ -65,10 +62,22 @@ namespace Assets.Scripts.Blocks.components
             }
             else
             {
-                Debug.Log("Gravity disabled, cancelling gravity calculations.");
                 commandManager.Cancel();
                 gravityTokenSource?.Cancel();
             }
+        }
+
+        private void HandleGravityEnabledState(bool state)
+        {
+            if(this.Enabled == state)
+            {
+                return;
+            }
+            this.Enabled = state;
+/*
+            if (this.Enabled)
+                (this as ITick).Tick();*/
+
             
         }
         
@@ -83,7 +92,7 @@ namespace Assets.Scripts.Blocks.components
             var command = new CommandManager.CommandBuilder().AddCommand<GravityBlockCommand>(_targetEntity, moveBlockCommandConfigurer).Build();
             await commandManager.ExecuteCommands(command);
 
-            GravityCalculation();
         }
+
     }
 }

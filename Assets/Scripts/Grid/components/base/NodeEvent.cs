@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.Grid.interfaces;
+﻿using Assets.Scripts.Blocks.interfaces;
+using Assets.Scripts.Grid.interfaces;
 using System.Collections;
 using UnityEngine;
 
@@ -7,8 +8,10 @@ namespace Assets.Scripts.Grid.components
 
     public class NodeDataRemoved : NodeEvent
     {
-        public NodeDataRemoved(INode sender) : base(sender)
+        public INodeData RemovedData { get; private set; }
+        public NodeDataRemoved(INode sender, INodeData removedData) : base(sender)
         {
+            this.RemovedData = removedData;
         }
     }
 
@@ -28,6 +31,14 @@ namespace Assets.Scripts.Grid.components
         }
     }
 
+    public class NodeDataLanded : NodeEvent
+    {
+        public INodeData NodeData { get; private set; }
+
+        public NodeDataLanded(INode sender) : base(sender)
+        {
+        }
+    }
     public abstract class NodeEvent : INodeEvent
     {
         private INode sender;

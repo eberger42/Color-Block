@@ -16,5 +16,7 @@ namespace Assets.Scripts.Blocks.interfaces
         public void Disband();
         public void SetColor(IBlockColor color);
 
+        public bool DoesContainBlock(IBlock block);
+
     }
 }

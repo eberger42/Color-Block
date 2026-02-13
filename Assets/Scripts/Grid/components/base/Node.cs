@@ -2,6 +2,7 @@
 using Assets.Scripts.Blocks.interfaces;
 using Assets.Scripts.Blocks.scriptable_objects;
 using Assets.Scripts.General;
+using Assets.Scripts.General.interfaces;
 using Assets.Scripts.Grid.interfaces;
 using System;
 using System.Collections;
@@ -91,8 +92,9 @@ namespace Assets.Scripts.Grid.components
         {
             if (this._data == nodeData)
             {
+                var removedData = this._data;
                 this._data = default;
-                OnNodeEvent?.Invoke(new NodeDataRemoved(this));
+                OnNodeEvent?.Invoke(new NodeDataRemoved(this, removedData));
             }
         }
         
@@ -165,6 +167,11 @@ namespace Assets.Scripts.Grid.components
             OnNodeEvent?.Invoke(nodeEvent);
         }
 
+        ///////////////////////////////////////////////////////////
+        /// ITick Interface
+        ///////////////////////////////////////////////////////////
+        public abstract void Tick();
+
         void IDispose.Dispose()
         {
             foreach (var neighbor in neighbors.Values)
@@ -174,5 +181,6 @@ namespace Assets.Scripts.Grid.components
             }
 
         }
+
     }
 }

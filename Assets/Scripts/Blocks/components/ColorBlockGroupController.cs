@@ -20,6 +20,7 @@ namespace Assets.Scripts.Blocks.components
     public class ColorBlockGroupController : TakeBlockCommandMonobehaviour, IBlockGroup, IGravity, ITriggerSpawn, IPlayerControlled
     {
         private event Action<bool> _onEnableGravity;
+        private event Action _onTriggerGravity;
         private event Action _onMergeCheckTriggered;
         private event Action _onTriggerSpawn;
         private event Action<GridPosition> _onPositionUpdated;
@@ -32,6 +33,7 @@ namespace Assets.Scripts.Blocks.components
 
         //Flags
         private bool canTriggeredSpawn = false;
+        private bool isGrounded = false;
         private bool waitForInit = true;
 
         public void Initialize(IBlockGroupConfigurationStrategy configurationStrategy, BlockFactory factory, IBlockColor color)
@@ -67,7 +69,6 @@ namespace Assets.Scripts.Blocks.components
                 return;
             }
 
-            Debug.Log($"Group: { this } is floating, enabling gravity for the group.");
             (this as IGravity).SetEnable(true); //Enable gravity if the group is floating
 
         }
@@ -121,6 +122,7 @@ namespace Assets.Scripts.Blocks.components
             _positionsDeltaMap.Remove(block);
             (block as MonoBehaviour).transform.SetParent(null, false);
             (block as IGravity).OnEnableGravity -= HandleChildBlockGravityUpdate;
+            (block as IGravity).OnTriggerGravity -= (this as IGravity).Trigger;
             (block as IBlock).SetParent(null);
 
 
@@ -132,6 +134,7 @@ namespace Assets.Scripts.Blocks.components
         {
             (block as MonoBehaviour).transform.SetParent(this.transform, false);
             (block as IGravity).OnEnableGravity += HandleChildBlockGravityUpdate;
+            (block as IGravity).OnTriggerGravity += (this as IGravity).Trigger;
             (block as IBlock).SetParent(this);
             this.blocks.Add(block);
             _positionsDeltaMap.Add(block, delta);
@@ -145,6 +148,13 @@ namespace Assets.Scripts.Blocks.components
             }
         }
 
+        bool IBlockGroup.DoesContainBlock(IBlock block)
+        {
+            if(blocks.Count == 0) return false;
+
+            var containsBlock = this.blocks.Contains(block);
+            return containsBlock;
+        }
 
 
         ///////////////////////////////////////////////////////////////////
@@ -179,7 +189,6 @@ namespace Assets.Scripts.Blocks.components
             if(canFall == false)
                 return;
 
-            var isGroupFloating = true;
 
             foreach (var block in blocks)
             {
@@ -191,6 +200,7 @@ namespace Assets.Scripts.Blocks.components
             if(direction != GridPosition.Down) //If the direction is not down, we don't need to check for floating blocks
                 return;
 
+            var isGroupFloating = true;
             foreach(var block in blocks)
             {
                 var isFloating = CheckSingleBlockIfFloating(block);
@@ -200,7 +210,6 @@ namespace Assets.Scripts.Blocks.components
                     isGroupFloating = false;
                 }
             }
-
             (this as IGravity).SetEnable(isGroupFloating);
         }
 
@@ -302,6 +311,17 @@ namespace Assets.Scripts.Blocks.components
             }
         }
 
+        event Action IGravity.OnTriggerGravity
+        {
+            add
+            {
+                _onTriggerGravity += value;
+            }
+            remove
+            {
+                _onTriggerGravity -= value;
+            }
+        }
 
         //Functions
         void IGravity.SetEnable(bool state)
@@ -314,13 +334,14 @@ namespace Assets.Scripts.Blocks.components
 
                 if (canTriggeredSpawn)
                 {
-                    //Debug.LogWarning("Gravity is already disabled. No action taken.");
+                    Debug.LogWarning("Spawning Blocks.");
                     (this as ITriggerSpawn).SetEnabled(false);
                     _onTriggerSpawn?.Invoke();
                 }
 
                 RemoveCommandFromFilter(typeof(GravityBlockCommand));
 
+                isGrounded = true;
                 _onEnableGravity?.Invoke(false);
                 CheckBlocksForMerger();
 
@@ -328,8 +349,8 @@ namespace Assets.Scripts.Blocks.components
             else
             {
                 AddCommandToFilter(typeof(GravityBlockCommand));
-
                 _onEnableGravity?.Invoke(true);
+                isGrounded = false;
             }
 
         }
@@ -343,6 +364,7 @@ namespace Assets.Scripts.Blocks.components
 
                 if (!isBlockFloating)
                 {
+                    Debug.Log($"Group is not floating Gravity: {block.ToString()}");
                     isGroupFloating = false;
                     break;
                 }
@@ -351,6 +373,10 @@ namespace Assets.Scripts.Blocks.components
             return isGroupFloating;
         }
 
+        void IGravity.Trigger()
+        {
+            _onTriggerGravity?.Invoke();
+        }
 
         ///////////////////////////////////////////////////////////////////
         /// IGravity Interface
@@ -368,6 +394,7 @@ namespace Assets.Scripts.Blocks.components
                 _onTriggerSpawn -= value;
             }
         }
+
 
         ///////////////////////////////////////////////////////////////////
         /// IPlayerControlled Interface
@@ -408,11 +435,18 @@ namespace Assets.Scripts.Blocks.components
                 return true;
 
             var isFloating = (block as IGravity).CheckIfFloating();
+
             return isFloating;
         }
 
         private void CheckBlocksForMerger()
         {
+
+            if(isGrounded == false)
+            {
+                return;
+            }
+
             var blockToRemove = new List<IBlock>();
             foreach (var block in blocks)
             {
@@ -451,14 +485,19 @@ namespace Assets.Scripts.Blocks.components
 
         private void HandleChildBlockGravityUpdate(bool isFloating)
         {
-            if (isFloating)
+
+            var groupIsFloating = (this as IGravity).CheckIfFloating();
+
+            if (groupIsFloating)
             {
-                var groupIsFloating = (this as IGravity).CheckIfFloating();
-                if (groupIsFloating)
-                {
-                    (this as IGravity).SetEnable(true);
-                }
+                (this as IGravity).SetEnable(true);
             }
+            else
+            {
+                (this as IGravity).SetEnable(false);
+            }
+            
         }
+
     }
 }

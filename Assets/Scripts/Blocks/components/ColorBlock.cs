@@ -1,6 +1,7 @@
 ﻿using Assets.Scripts.Blocks.commands;
 using Assets.Scripts.Blocks.components.colors;
 using Assets.Scripts.Blocks.interfaces;
+using Assets.Scripts.General.interfaces;
 using Assets.Scripts.Grid.components;
 using Assets.Scripts.Grid.interfaces;
 using Assets.Scripts.Player.Interfaces;
@@ -8,6 +9,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
@@ -20,6 +22,7 @@ namespace Assets.Scripts.Blocks.components
         //Events
         private event Action<GridPosition> _onMoveDirection;
         private event Action<bool> _onEnableGravity;
+        private event Action _onTriggerGravity;
         private event Action<IBlockColor> _onColorUpdated;
         private event Action _onTriggerSpawn;
 
@@ -68,7 +71,7 @@ namespace Assets.Scripts.Blocks.components
             return gridPosition;
         }
 
-        
+
 
         /////////////////////////////////////////////////////////////////
         /// IGravity Interface
@@ -86,14 +89,26 @@ namespace Assets.Scripts.Blocks.components
                 _onEnableGravity -= value;
             }
         }
-        
+
+        event Action IGravity.OnTriggerGravity
+        {
+            add
+            {
+                _onTriggerGravity += value;
+            }
+            remove
+            {
+                _onTriggerGravity -= value;
+            }
+        }
+
         //Functions
         bool IGravity.CheckIfFloating()
         {
             var isSoutherNodeOccupied = node.IsNeighborOccupied(GridPosition.Down);
             return !isSoutherNodeOccupied;
         }
-        
+
         void IGravity.SetEnable(bool state)
         {
             if (state == false)
@@ -104,9 +119,14 @@ namespace Assets.Scripts.Blocks.components
             else
             {
                 _onEnableGravity?.Invoke(true);
-                
+
             }
 
+        }
+
+        void IGravity.Trigger()
+        {
+            _onTriggerGravity?.Invoke();
         }
 
         /////////////////////////////////////////////////////////////////
@@ -129,6 +149,7 @@ namespace Assets.Scripts.Blocks.components
         //Functions
         void IBlock.SetParent(IBlockGroup parent)
         {
+            this.parent = parent;
         }
         IBlockGroup IBlock.GetParent()
         {
@@ -273,8 +294,13 @@ namespace Assets.Scripts.Blocks.components
 
         void INodeData.HandleNodeEvent(INodeEvent nodeEvent)
         {
-            if(nodeEvent is NodeDataRemoved)
+            if (nodeEvent is NodeDataRemoved removedDataEvent)
             {
+
+                if(removedDataEvent.RemovedData is IBlock blockData)
+                    if(parent.DoesContainBlock(blockData))
+                        return;
+
                 var sender = nodeEvent.GetSender() as INode;
 
                 var vectorTo = Node.VectorTo(node, sender);
@@ -325,6 +351,27 @@ namespace Assets.Scripts.Blocks.components
             }
         }
 
+        ///////////////////////////////////////////////////////////////////
+        /// ITick Interface
+        ///////////////////////////////////////////////////////////////////
+        void ITick.Tick()
+        {
+            var isFloating = (this as IGravity).CheckIfFloating();
+
+            if (isFloating)
+            {
+                (this as IGravity).SetEnable(true);
+                (this as IGravity).Trigger();
+            }
+            else
+            {
+                (this as IGravity).SetEnable(false);
+
+            }
+
+
+        }
+
 
 
 
@@ -332,5 +379,10 @@ namespace Assets.Scripts.Blocks.components
         /// Private Helpers
         ///////////////////////////////////////////////////////////////////
 
+
+        public override string ToString()
+        {
+            return $"ColorBlock[{Color.GetColorRank()}] at ({gridPosition.x}, {gridPosition.y})";
+        }
     }
 }

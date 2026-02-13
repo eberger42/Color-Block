@@ -79,7 +79,6 @@ namespace Assets.Scripts.Player
                 }
                 return;
             }
-            Debug.Log($"Moving target entity with direction: {gridDirection}");
             var moveBlockCommandConfigurer = new MoveBlockCommandConfigurer(gridDirection);
             var command = new CommandManager.CommandBuilder().AddCommand<MoveBlockCommand>(_target, moveBlockCommandConfigurer).Build();
             await commandManager.ExecuteCommands(command, () => _isMovingExecutionFlag, (isMoving) => _isMovingExecutionFlag = isMoving);
@@ -88,7 +87,6 @@ namespace Assets.Scripts.Player
         private async void RotateTargetEntity(int direction)
         {
 
-            Debug.Log($"Rotating target entity with direction: {direction}");
             var gridDirection = new GridPosition(-1 * direction, 1 * direction);
             var rotateBlockCommandConfigurer = new RotateBlockCommandConfigurer(gridDirection);
             var command = new CommandManager.CommandBuilder().AddCommand<RotateBlockCommand>(_target, rotateBlockCommandConfigurer).Build();

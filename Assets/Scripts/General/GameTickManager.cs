@@ -1,12 +1,18 @@
-﻿using System;
+﻿using Assets.Scripts.General.interfaces;
+using System;
 using System.Collections;
 using UnityEngine;
 
 namespace Assets.Scripts.General
 {
-    public class GameTickManager : MonoBehaviour
+    public class GameTickManager : MonoBehaviour, ITickManager
     {
+
         public static GameTickManager Instance { get; private set; }
+
+
+        [SerializeField] private float gameTickInterval = 1.0f;
+        private float currentTime = 0f;
 
         public event Action OnTick;
 
@@ -23,8 +29,6 @@ namespace Assets.Scripts.General
             }
         }
 
-        private float gameTickInterval = 1.0f;
-        private float currentTime = 0f;
 
         private void FixedUpdate()
         {
@@ -39,8 +43,6 @@ namespace Assets.Scripts.General
 
         private void OnGameTick()
         {
-            // Implement the logic that should happen on each game tick
-            Debug.Log("Game tick occurred at: " + Time.time);
             OnTick?.Invoke();
         }
 

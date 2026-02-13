@@ -1,5 +1,6 @@
 ﻿using Assets.Scripts.Blocks.interfaces;
 using Assets.Scripts.Blocks.scriptable_objects;
+using Assets.Scripts.General.interfaces;
 using Assets.Scripts.Grid.interfaces;
 using System;
 using System.Collections;
@@ -18,7 +19,12 @@ namespace Assets.Scripts.Grid.components
         private float cellSize = 1f; // Assuming each cell is 1 unit in size
         private Vector2 offset;
 
+        private ITickManager tickManager;
         private T[,] gridArray;
+        private bool disposedValue;
+    
+        private IGridTickStrategy<T> tickStrategy = new DefaultTickStrategy();
+
 
         public Grid(int width, int height, float cellSize, Vector2 offset)
         {
@@ -29,10 +35,20 @@ namespace Assets.Scripts.Grid.components
 
             this.gridArray = new T[width, height];
 
+
         }
 
-        public void GenerateGrid(NodeConfiguration config)
+        public Grid(int width, int height, float cellSize, Vector2 offset, IGridTickStrategy<T> gridTickStrategy) : this(width, height, cellSize, offset)
         {
+           this.tickStrategy = gridTickStrategy;
+        }
+
+        public void GenerateGrid(NodeConfiguration config, ITickManager tickManager)
+        {
+            Debug.Log(tickManager);
+            this.tickManager = tickManager;
+            tickManager.OnTick += (this as ITick).Tick;
+
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
@@ -103,11 +119,93 @@ namespace Assets.Scripts.Grid.components
 
             
         }
-   
+
+
+
+        ///////////////////////////////////////////////////////////
+        /// ITick Interface
+        ///////////////////////////////////////////////////////////
+        void ITick.Tick()
+        {
+            this.tickStrategy.Tick(gridArray);
+        }
+
+
+
         private void TriggerNodeEvent(INodeEvent nodeEvent)
         {
             OnNodeEvent?.Invoke(nodeEvent);
         }
-    
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    if (gridArray != null)
+                    {
+                           foreach (var node in gridArray)
+                        {
+                            if (node != null)
+                            {
+                                node.OnNodeEvent -= TriggerNodeEvent;
+                                tickManager.OnTick -= node.Tick;
+                            }
+                        }
+                        gridArray = null;
+                    }
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                disposedValue = true;
+            }
+        }
+
+        // // TODO: override finalizer only if 'Dispose(bool disposing)' h
+        // managed resources
+        // ~Grid()
+        // {
+        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        //     Dispose(disposing: false);
+        // }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        public interface IGridTickStrategy<K>
+        {
+
+            public void Tick(K[,] gridArray);
+        }
+
+        private class DefaultTickStrategy : IGridTickStrategy<T>
+        {
+            void IGridTickStrategy<T>.Tick(T[,] gridArray)
+            {
+                var width = gridArray.GetLength(0);
+                var height = gridArray.GetLength(1);
+
+                for (int x = 0; x < width; x++)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        var node = gridArray[x, y];
+                        if (node != null)
+                        {
+                            node.Tick();
+                        }
+                    }
+                }
+            }
+        
+        }
     }
+
+    
 }

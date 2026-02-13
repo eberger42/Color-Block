@@ -32,6 +32,7 @@ namespace Assets.Scripts.Blocks.commands
                     return;
 
                 _target.Move(_direction);
+                Debug.Log(_direction);
                 await Task.Delay(5);
             };
             

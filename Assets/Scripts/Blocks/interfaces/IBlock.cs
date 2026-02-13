@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Assets.Scripts.General.interfaces;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Scripts.Blocks.interfaces
 {
-    public interface IBlock : IEntity
+    public interface IBlock : IEntity, ITick
     {
 
         public event Action<IBlockColor> OnColorUpdated;

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.Blocks.components
 {
-    public class LBarConfigurationStrategy : IBlockGroupConfigurationStrategy
+    /*public class LBarConfigurationStrategy : IBlockGroupConfigurationStrategy
     {
         //Stored As Deltas from GridPosition
         private readonly List<GridPosition> _positions = new List<GridPosition>
@@ -31,7 +31,7 @@ namespace Assets.Scripts.Blocks.components
         }
 
      
-    }
+    }*/
 
     public class TBarConfigurationStrategy : IBlockGroupConfigurationStrategy
     {
@@ -60,7 +60,7 @@ namespace Assets.Scripts.Blocks.components
 
     }
 
-   public class OBarConfigurationStrategy : IBlockGroupConfigurationStrategy
+    /*public class OBarConfigurationStrategy : IBlockGroupConfigurationStrategy
     {
         //Stored As Deltas from GridPosition
         private readonly List<GridPosition> _positions = new List<GridPosition>
@@ -91,5 +91,5 @@ namespace Assets.Scripts.Blocks.components
         }
 
     }
-    
+    */
 }

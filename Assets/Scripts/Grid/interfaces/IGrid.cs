@@ -1,5 +1,8 @@
 using Assets.Scripts.Blocks.scriptable_objects;
+using Assets.Scripts.General;
+using Assets.Scripts.General.interfaces;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -58,10 +61,10 @@ public struct GridPosition
 /// out T provides covariance, allowing the interface to be used with a more derived type.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public interface IGrid<out T>
+public interface IGrid<out T> : ITick, IDisposable
 {
 
-    public void GenerateGrid(NodeConfiguration config);
+    public void GenerateGrid(NodeConfiguration config, ITickManager tickManager);
 
     public T GetNode(int x, int y);
 

@@ -32,7 +32,6 @@ namespace Assets.Scripts.Blocks.commands
 
             try
             {
-                Debug.Log($"Executing {commands.Count} commands with cancellation support");
                 IsExecuting = true;
                 await _commandInvoker.ExecuteCommannd(commands, _cts.Token);
             }
@@ -43,10 +42,13 @@ namespace Assets.Scripts.Blocks.commands
             }
             finally
             {
-                Debug.Log("Command execution completed.");
                 IsExecuting = false;
-                _cts.Dispose();
-                _cts = null;
+
+                if (_cts != null)
+                {
+                    _cts.Dispose();
+                    _cts = null;
+                }
             }
 
         }

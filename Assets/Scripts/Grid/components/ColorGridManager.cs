@@ -2,12 +2,12 @@
 using Assets.Scripts.Blocks.components;
 using Assets.Scripts.Blocks.interfaces;
 using Assets.Scripts.Blocks.scriptable_objects;
+using Assets.Scripts.General;
+using Assets.Scripts.General.interfaces;
 using Assets.Scripts.Grid.interfaces;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 namespace Assets.Scripts.Grid.components
 {
     public class ColorGridManager : MonoBehaviour
@@ -57,8 +57,8 @@ namespace Assets.Scripts.Grid.components
 
         private void Start()
         {
-            colorBlockGrid.GenerateGrid(config);
-
+            colorBlockGrid.GenerateGrid(config, (GameTickManager.Instance as ITickManager));
+                
             BlockManager.Instance.OnTargetCreated += PlaceBlock;
         }
 
@@ -98,6 +98,31 @@ namespace Assets.Scripts.Grid.components
             OnNodeEvent?.Invoke(nodeEvent);
         }
 
+        private class ColorGridTickStrategy : Grid<BlockNode>.IGridTickStrategy<BlockNode>
+        {
+            void Grid<BlockNode>.IGridTickStrategy<BlockNode>.Tick(BlockNode[,] gridArray)
+            {
+                var width = gridArray.GetLength(0);
+                var height = gridArray.GetLength(1);
+
+                for (int x = 0; x < width; x++)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        var node = gridArray[x, y];
+                        if (node != null)
+                        {
+                            node.Tick();
+                        }
+                    }
+                }
+            }
+
+            private void LoopLogic(BlockNode[,] gridArray, Action acton)
+            {
+                
+            }
+        }
 
     }
 }

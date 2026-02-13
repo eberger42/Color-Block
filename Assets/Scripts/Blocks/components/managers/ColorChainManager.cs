@@ -52,15 +52,17 @@ namespace Assets.Scripts.Blocks.components.managers
 
                 var doColorsMatch = block.DoColorsMatch(neighborBlock);
 
-                if(doColorsMatch && blockChainListMapping.ContainsKey(neighborBlock))
+                if (doColorsMatch)
                 {
                     var neighborsColorChain = blockChainListMapping[neighborBlock];
                     newColorChain.AddRange(neighborsColorChain);
 
                     colorChainList.Remove(neighborsColorChain);
-                    blockChainListMapping[block] = newColorChain;
+                    blockChainListMapping[neighborBlock] = newColorChain;
                 }
             };
+            Debug.Log($"Block: {block}");
+            Debug.Log($"Color chain size: {newColorChain.Count}");
             if(newColorChain.Count > 5)
             {
                 foreach (var chainBlock in newColorChain)
@@ -78,6 +80,22 @@ namespace Assets.Scripts.Blocks.components.managers
             if (nodeEvent is NodeDataColorChanged colorChangedEvent)
             {
                 AddBlockToColorChain(colorChangedEvent);
+            }
+            else if (nodeEvent is NodeDataRemoved removedEvent)
+            {
+                var node = removedEvent.GetSender();
+                var block = removedEvent.RemovedData as IBlock;
+
+                if (blockChainListMapping.TryGetValue(block, out var colorChain))
+                {
+                    Debug.Log($"Removing block from chain: {block}");
+                    colorChainList.Remove(colorChain);
+                    blockChainListMapping.Remove(block);
+                }
+            }
+            else if (nodeEvent is NodeDataLanded landedEvent)
+            {
+                AddBlockToColorChain(landedEvent);
             }
         }
         
