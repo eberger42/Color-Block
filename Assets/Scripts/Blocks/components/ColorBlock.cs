@@ -13,6 +13,7 @@ namespace Assets.Scripts.Blocks.components
 {
     public class ColorBlock : TakeBlockCommandMonobehaviour, IBlock, IGravity, ITriggerSpawn, IPlayerControlled
     {
+        public bool DebugFlag = false;
         //Events
         private event Action<GridPosition> _onMoveDirection;
         private event Action<bool> _onEnableGravity;
@@ -23,6 +24,7 @@ namespace Assets.Scripts.Blocks.components
 
         //Fields
         private GridPosition gridPosition;
+        [SerializeReference]
         private INode node;
         private IBlockGroup parent;
 
@@ -121,6 +123,8 @@ namespace Assets.Scripts.Blocks.components
 
         void IGravity.Trigger()
         {
+            if(DebugFlag)
+                Debug.Log($"Gravity Triggered for {this}");
             _onTriggerGravity?.Invoke();
         }
 
@@ -223,16 +227,17 @@ namespace Assets.Scripts.Blocks.components
                 return;
 
             var neigborNode = node.GetNeighbor(direction);
-            node.ClearNodeData(this);
+            
 
             if(neigborNode.GetData() is ColorBlock block && parent.DoesContainBlock(block) == false)
             {
-                Debug.Log(block);
+
                 var didMerge = AttemptMerge(block);
-                Debug.Log($"DidMerge {block}:{didMerge}");
+
 
                 if (didMerge)
                 {
+                    node.ClearNodeData(this);
                     (block as IEntity).Destroy();
                     neigborNode.SetNodeData(this);
                     (neigborNode as BlockNode).ReportColorChange();
@@ -241,6 +246,7 @@ namespace Assets.Scripts.Blocks.components
             }
             else
             {
+                node.ClearNodeData(this);
                 neigborNode.SetNodeData(this);
 
             }
@@ -364,20 +370,7 @@ namespace Assets.Scripts.Blocks.components
         ///////////////////////////////////////////////////////////////////
         void ITick.Tick()
         {
-
-            var isFloating = (this as IGravity).CheckIfFloating();
-            if (isFloating)
-            {
-                (this as IGravity).SetEnable(true);
-                (this as IGravity).Trigger();
-            }
-            else
-            {
-                (this as IGravity).SetEnable(false);
-
-            }
-
-
+            (this as IGravity).Trigger();
         }
 
 

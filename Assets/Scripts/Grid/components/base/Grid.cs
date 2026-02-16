@@ -45,7 +45,6 @@ namespace Assets.Scripts.Grid.components
 
         public void GenerateGrid(NodeConfiguration config, ITickManager tickManager)
         {
-            Debug.Log(tickManager);
             this.tickManager = tickManager;
             tickManager.OnTick += (this as ITick).Tick;
 

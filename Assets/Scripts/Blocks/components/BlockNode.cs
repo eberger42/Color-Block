@@ -17,7 +17,7 @@ namespace Assets.Scripts.Blocks.components
 {
     public class BlockNode : Node
     {
-
+        public bool DebugFlag = false;
         public BlockNode()
         {
             
@@ -62,8 +62,15 @@ namespace Assets.Scripts.Blocks.components
 
         public override void Tick()
         {
+            if(DebugFlag)
+            {
+                Debug.Log($"Ticking node at position {gridPosition}");
+            }
             if (this._data is ITick tickable)
             {
+                if (DebugFlag)
+                {Debug.Log($"Node at position {gridPosition} is tickable");
+                }
                 tickable.Tick();
             }
             else

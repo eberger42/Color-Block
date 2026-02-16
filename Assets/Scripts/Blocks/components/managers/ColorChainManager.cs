@@ -45,8 +45,6 @@ namespace Assets.Scripts.Blocks.components.managers
 
             var neighborChain = SearchNode(node, new List<INode>());
 
-            Debug.Log($"Node: [{node.GetData()}]");
-            Debug.Log($"Chain Size: [{neighborChain.Count}]");
             newColorChain.AddRange(neighborChain);
 
             if (newColorChain.Count > 5)

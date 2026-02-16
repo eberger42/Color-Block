@@ -5,6 +5,7 @@ using Assets.Scripts.Player.Interfaces;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -19,6 +20,8 @@ namespace Assets.Scripts.Blocks.components
     /// </summary>
     public class ColorBlockGroupController : TakeBlockCommandMonobehaviour, IBlockGroup, IGravity, ITriggerSpawn, IPlayerControlled
     {
+
+        public bool DebugFlag = false;  
         private event Action<bool> _onEnableGravity;
         private event Action _onTriggerGravity;
         private event Action _onMergeCheckTriggered;
@@ -60,14 +63,6 @@ namespace Assets.Scripts.Blocks.components
             }
             waitForInit = false;
             canTriggeredSpawn = false;
-
-            var isFloating = (this as IGravity).CheckIfFloating(); //Check if the group is floating and set the gravity accordingly
-
-            if (!isFloating)
-            {
-                (this as IGravity).SetEnable(false);
-                return;
-            }
 
             (this as IGravity).SetEnable(true); //Enable gravity if the group is floating
 
@@ -203,37 +198,23 @@ namespace Assets.Scripts.Blocks.components
                 
             }
 
-
-            if(direction != GridPosition.Down) //If the direction is not down, we don't need to check for floating blocks
-                return;
-
-            var isGroupFloating = true;
-            foreach(var block in blocks)
-            {
-                var isFloating = CheckSingleBlockIfFloating(block);
-
-                if (!isFloating)
-                {
-                    isGroupFloating = false;
-                }
-            }
-            (this as IGravity).SetEnable(isGroupFloating);
         }
         public override void Gravity()
         {
             var direction = GridPosition.Down;
             var canFall = CanTakeCommand(typeof(GravityBlockCommand));
-
-            var tempBlockList = new List<IBlock>(blocks);
+            
 
             if (canFall == false)
                 return;
 
-            foreach (var block in tempBlockList)
-            {
-                (block as ITakeBlockCommand).Move(direction);
 
-            }
+            var isValidMove = CheckForValidMove(direction);
+
+            if (isValidMove == false) return;
+
+            this.Move(direction);
+
         }
         public override void Rotate(GridPosition delta)
         {
@@ -375,6 +356,8 @@ namespace Assets.Scripts.Blocks.components
 
         void IGravity.Trigger()
         {
+            if(DebugFlag)
+                Debug.Log("Gravity Triggered for Group");
             _onTriggerGravity?.Invoke();
         }
 
@@ -444,6 +427,9 @@ namespace Assets.Scripts.Blocks.components
 
             var groupIsFloating = (this as IGravity).CheckIfFloating();
 
+
+            if(DebugFlag)
+                Debug.Log($"Received Gravity Update from Child Block. Is Floating: {isFloating}. Group Is Floating: {groupIsFloating}");
             if (groupIsFloating)
             {
                 (this as IGravity).SetEnable(true);
@@ -464,6 +450,9 @@ namespace Assets.Scripts.Blocks.components
         }
         private void HandleChildBlockDestroyed(IEntity entity)
         {
+            if(blocks.Contains(entity as IBlock) == true)
+                blocks.Remove(entity as IBlock);
+
             (this as IBlockGroup).Disband();
         }
 

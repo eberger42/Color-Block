@@ -67,7 +67,6 @@ namespace Assets.Scripts.Blocks.components
             (_currentEntity as ITriggerSpawn).OnTriggerSpawn += CreateNewBlock;
             (_currentEntity as ITriggerSpawn).SetEnabled(true);
 
-            Debug.Log("New Block Created");
             OnTargetCreated?.Invoke(target);
         }
 

@@ -19,10 +19,8 @@ namespace Assets.Scripts.Blocks.components
         public bool Enabled { get; private set; } = false;
 
         private CommandManager commandManager;
-        private GameTickManager gameTickManager;
         private ITakeBlockCommand _targetEntity;
 
-        private List<ICommand> _commandBuffer = new List<ICommand>(); 
         private CancellationTokenSource gravityTokenSource;
 
 
@@ -74,17 +72,11 @@ namespace Assets.Scripts.Blocks.components
                 return;
             }
             this.Enabled = state;
-/*
-            if (this.Enabled)
-                (this as ITick).Tick();*/
-
             
         }
         
         private async void GravityCalculation()
-        {/*
-            if (gravityTokenSource.IsCancellationRequested)
-                return;*/
+        {
 
             if (!Enabled)
                 return;

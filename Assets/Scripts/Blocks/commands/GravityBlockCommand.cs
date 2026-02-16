@@ -28,19 +28,7 @@ namespace Assets.Scripts.Blocks.commands
                 if (_target.CanTakeCommand(this) == false)
                     return;
 
-                var isFloating = (_target as IGravity).CheckIfFloating();
-                
-                if(isFloating)
-                {
-                    if(_target != null)
-                        _target.Gravity();
-                    return;
-                }
-                else
-                {
-                    Debug.Log("Disabling Gravity");
-                    (_target as IGravity).SetEnable(false);
-                }
+                _target.Gravity();
 
                 await Task.Delay(00);
             };
