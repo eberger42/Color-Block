@@ -15,6 +15,7 @@ namespace Assets.Scripts.Player
 
         private CommandManager commandManager;
         private BlockManager blockManager;
+        private PlayerInputManager playerInputManager;
 
         private bool _isMovingExecutionFlag = false;
 
@@ -29,43 +30,37 @@ namespace Assets.Scripts.Player
         private void Start()
         {
             blockManager = BlockManager.Instance;
+            playerInputManager = PlayerInputManager.Instance;
+
             blockManager.OnTargetCreated += OnBlockCreated;
+
+            playerInputManager.OnRotateRightPressed += RotateTargetEntity;
+            playerInputManager.OnMovementPressed += MoveTargetEntity;
         }
+
 
         private void OnDestroy()
         {
             blockManager.OnTargetCreated -= OnBlockCreated;
+
+            playerInputManager.OnRotateRightPressed -= RotateTargetEntity;
+            playerInputManager.OnMovementPressed -= MoveTargetEntity;
         }
 
-        private void Update()
+        private void RotateTargetEntity()
         {
-
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                RotateTargetEntity(1);
-                return;
-            }
-            if (commandManager.IsExecuting)
-                return;
-
-            float vertical = Mathf.Round(Input.GetAxisRaw("Vertical"));
-            float horizontal = Mathf.Round(Input.GetAxisRaw("Horizontal"));
-
-
-            if (vertical == -1)
-            {
-                MoveTargetEntity(new Vector2(0, vertical));
-            }
-
-            if(horizontal != 0)
-            {
-                MoveTargetEntity(new Vector2(horizontal, 0));
-            }
-
+            Debug.Log("Rotatin");
+            RotateTargetEntity(1);
+            return;
         }
 
         private async void MoveTargetEntity(Vector2 direction)
         {
+            if (commandManager.IsExecuting)
+                return;
+
+            if (direction.y > 0)
+                return;
 
             var gridDirection = new GridPosition((int)direction.x, (int)direction.y);
             var isValidMove = _target.CheckForValidMove(gridDirection);
@@ -86,6 +81,8 @@ namespace Assets.Scripts.Player
 
         private async void RotateTargetEntity(int direction)
         {
+            if (commandManager.IsExecuting)
+                return;
 
             var gridDirection = new GridPosition(-1 * direction, 1 * direction);
             var rotateBlockCommandConfigurer = new RotateBlockCommandConfigurer(gridDirection);

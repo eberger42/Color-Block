@@ -240,6 +240,7 @@ namespace Assets.Scripts.Blocks.components
                     node.ClearNodeData(this);
                     (block as IEntity).Destroy();
                     neigborNode.SetNodeData(this);
+                    _onMoveDirection?.Invoke(direction);
                     (neigborNode as BlockNode).ReportColorChange();
 
                 }
@@ -248,6 +249,7 @@ namespace Assets.Scripts.Blocks.components
             {
                 node.ClearNodeData(this);
                 neigborNode.SetNodeData(this);
+                _onMoveDirection?.Invoke(direction);
 
             }
 

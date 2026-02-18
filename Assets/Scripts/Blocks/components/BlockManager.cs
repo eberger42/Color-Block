@@ -26,10 +26,13 @@ namespace Assets.Scripts.Blocks.components
 
         private void Awake()
         {
+
+
             if (Instance == null)
             {
                 Instance = this;
-                DontDestroyOnLoad(gameObject);
+                DontDestroyOnLoad(gameObject); 
+
             }
             else
             {

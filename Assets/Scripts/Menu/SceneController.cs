@@ -1,14 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public enum Scenes
 {
-    MainMenu = 0, Tutorial = 1,
-    Level_1 = 11, Level_2 = 12, Level_3 = 13, Level_4 = 14, Level_5 = 15,
+    MainMenu = 0, Level_1 = 1
 }
 
 

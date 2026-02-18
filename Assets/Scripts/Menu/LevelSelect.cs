@@ -16,7 +16,7 @@ public class LevelSelect : MonoBehaviour
 
     private void Start()
     {
-        sceneController = FindObjectOfType<SceneController>();
+        sceneController = FindFirstObjectByType<SceneController>();
         SaveManager.instance.OnLoadGame += LoadLevelData;
         SaveManager.instance.Load();
     }

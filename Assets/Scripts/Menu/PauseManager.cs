@@ -1,7 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -9,8 +7,6 @@ public class PauseManager : MonoBehaviour
 {
 
 
-    private PlayerInput playerInput;
-    private PlayerInputManager playerInputManager;
 
 
     public delegate void PauseEvent(bool isPaused);
@@ -18,20 +14,13 @@ public class PauseManager : MonoBehaviour
     
     private bool gamePaused = false;
 
-    private void Start()
+    private void Update()
     {
-        playerInputManager = PlayerInputManager.instance;
-        playerInput = playerInputManager.PlayerInput;
-
-        playerInputManager.OnEscape += PauseGame;
-
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            PauseGame();
+        }
     }
-
-    private void OnDestroy()
-    {
-        playerInputManager.OnEscape -= PauseGame;
-    }
-
     public void PauseGame()
     {
         if (SceneManager.GetActiveScene().name == "MainMenu")
@@ -45,12 +34,10 @@ public class PauseManager : MonoBehaviour
 
         if (gamePaused)
         {
-            playerInput.SwitchCurrentActionMap("UI");
             Time.timeScale = 0;
         }
         else
         {
-            playerInput.SwitchCurrentActionMap("Player");
             Time.timeScale = 1;
         }
     

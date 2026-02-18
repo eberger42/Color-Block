@@ -43,9 +43,6 @@ namespace Assets.Scripts.Blocks.components.colors
             if (PurpleBlockSprite == null)
                 PurpleBlockSprite = Resources.Load<Sprite>("Sprites/PurpleBlock");
 
-
-            Debug.Log($"RedBlockSprite: {RedBlockSprite}");
-            Debug.Log($"BlueBlockSprite: {BlueBlockSprite}");
         }
     }
 }

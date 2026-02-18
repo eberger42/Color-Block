@@ -3,15 +3,8 @@ using Assets.Scripts.Blocks.interfaces;
 using Assets.Scripts.Grid.components;
 using Assets.Scripts.Player.Interfaces;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static Unity.Collections.AllocatorManager;
-using static UnityEngine.GraphicsBuffer;
 
 namespace Assets.Scripts.Blocks.components
 {
@@ -36,7 +29,6 @@ namespace Assets.Scripts.Blocks.components
 
         //Flags
         private bool canTriggeredSpawn = false;
-        private bool isGrounded = false;
         private bool waitForInit = true;
 
         public void Initialize(IBlockGroupConfigurationStrategy configurationStrategy, BlockFactory factory, IBlockColor color)
@@ -248,8 +240,6 @@ namespace Assets.Scripts.Blocks.components
 
                 if (!isValid)
                 {
-                    Debug.Log($"Grid Position: {block.GetGridPosition()}");
-                    Debug.Log($"TargetPositon: {targetPosition}");
                     Debug.Log($"Invalid Move for Block: {block}");
                     return false;
                 }
@@ -324,7 +314,6 @@ namespace Assets.Scripts.Blocks.components
 
                 RemoveCommandFromFilter(typeof(GravityBlockCommand));
 
-                isGrounded = true;
                 _onEnableGravity?.Invoke(false);
 
             }
@@ -332,7 +321,6 @@ namespace Assets.Scripts.Blocks.components
             {
                 AddCommandToFilter(typeof(GravityBlockCommand));
                 _onEnableGravity?.Invoke(true);
-                isGrounded = false;
             }
 
         }

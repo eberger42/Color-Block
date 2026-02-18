@@ -36,7 +36,7 @@ namespace Assets.Scripts.Blocks.commands
 
             _target.AddActionCommand(task);
 
-            await Task.Delay(55);
+            await Task.Delay(155);
         }
     }
 
