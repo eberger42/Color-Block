@@ -16,6 +16,7 @@ namespace Assets.Scripts.Player
         private CommandManager commandManager;
         private BlockManager blockManager;
         private PlayerInputManager playerInputManager;
+        private Score score;
 
         private bool _isMovingExecutionFlag = false;
 
@@ -25,6 +26,10 @@ namespace Assets.Scripts.Player
         private void Awake()
         {
             commandManager = new CommandManager();
+            score = GetComponent<Score>();
+            
+            var scoreUI = GetComponent<ScoreUI>();
+            scoreUI.ConnectScoreUI(score);
         }
 
         private void Start()
@@ -67,11 +72,6 @@ namespace Assets.Scripts.Player
 
             if(!isValidMove)
             {
-                Debug.Log("Invalid move");
-                if(gridDirection.y == -1)
-                {
-                    (_target as IGravity).SetEnable(false);
-                }
                 return;
             }
             var moveBlockCommandConfigurer = new MoveBlockCommandConfigurer(gridDirection);
@@ -93,6 +93,7 @@ namespace Assets.Scripts.Player
         private void OnBlockCreated(ITakeBlockCommand target)
         {
             Debug.Log($"Setting Target Entity");
+            score.AddToScore(100);
             SetTargetEntity(target);
         }
 

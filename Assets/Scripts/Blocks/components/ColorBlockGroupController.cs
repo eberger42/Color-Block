@@ -203,8 +203,10 @@ namespace Assets.Scripts.Blocks.components
 
             var isValidMove = CheckForValidMove(direction);
 
-            if (isValidMove == false) return;
-
+            if (isValidMove == false)
+            {
+                return;
+            }
             this.Move(direction);
 
         }
@@ -240,7 +242,8 @@ namespace Assets.Scripts.Blocks.components
 
                 if (!isValid)
                 {
-                    Debug.Log($"Invalid Move for Block: {block}");
+                    if(direction == GridPosition.Down)
+                        SpawnCheck();
                     return false;
                 }
             }
