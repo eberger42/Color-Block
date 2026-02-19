@@ -21,7 +21,6 @@ namespace Assets.Scripts.Blocks.components.colors
             if (Instance == null)
             {
                 Instance = this;
-                DontDestroyOnLoad(gameObject);
             }
             else
             {
@@ -44,5 +43,10 @@ namespace Assets.Scripts.Blocks.components.colors
                 PurpleBlockSprite = Resources.Load<Sprite>("Sprites/PurpleBlock");
 
         }
+        private void OnDestroy()
+        {
+            Instance = null;
+        }
+
     }
 }

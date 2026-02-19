@@ -31,7 +31,6 @@ namespace Assets.Scripts.Blocks.components
             if (Instance == null)
             {
                 Instance = this;
-                DontDestroyOnLoad(gameObject); 
 
             }
             else
@@ -43,8 +42,13 @@ namespace Assets.Scripts.Blocks.components
 
         private void Start()
         {
-            CreateNewBlock();
+            StartCoroutine(SpawnNextFrame());
         }
+        private void OnDestroy()
+        {
+            Instance = null;
+        }
+
 
 
         private void CreateNewBlock()
@@ -69,6 +73,7 @@ namespace Assets.Scripts.Blocks.components
             _currentEntity = target;
             (_currentEntity as ITriggerSpawn).OnTriggerSpawn += CreateNewBlock;
             (_currentEntity as ITriggerSpawn).SetEnabled(true);
+            Debug.Log($"Block Created");
 
             OnTargetCreated?.Invoke(target);
         }
@@ -80,6 +85,14 @@ namespace Assets.Scripts.Blocks.components
             blockGroup.Initialize(blocks);
 
         }
+
+
+        private IEnumerator SpawnNextFrame()
+        {
+            yield return null;
+            CreateNewBlock();
+        }
+
 
     }
 }

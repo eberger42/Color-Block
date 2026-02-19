@@ -55,7 +55,6 @@ namespace Assets.Scripts.Grid.components
                     T node = new T();
                     var origin = new Vector2(x * cellSize, y * cellSize) + offset;
                     node.Configure(config, new GridPosition(x,y));
-                    Debug.Log($"Grid: {this}");
                     node.SetGridListener(this as IGrid<INode>);
                     node.GenerateNode();
                     node.OnNodeEvent += TriggerNodeEvent;

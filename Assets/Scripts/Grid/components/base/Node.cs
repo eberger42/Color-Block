@@ -58,6 +58,9 @@ namespace Assets.Scripts.Grid.components
             var color = config.Color;
             var texture = config.Texture;
 
+            if(collection == null)
+                collection = new GameObject($"Grid Node Collection");
+
             gameObject = new GameObject($"BlockNode[{gridPosition.x},{gridPosition.y}]");
             gameObject.transform.parent = collection.transform;
             gameObject.transform.position = new Vector2(gridPosition.x * size + origin.x, gridPosition.y * size + origin.y);
@@ -180,6 +183,14 @@ namespace Assets.Scripts.Grid.components
                     neighbor.OnNodeEvent -= OnNodeDataEvent;
             }
 
+        }
+
+        public static void Dispose()
+        {
+            if (collection != null)
+            {
+                collection = null;
+            }
         }
 
     }

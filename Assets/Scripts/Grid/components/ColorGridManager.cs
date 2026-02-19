@@ -67,6 +67,8 @@ namespace Assets.Scripts.Grid.components
             BlockManager.Instance.OnTargetCreated -= PlaceBlock;
             colorBlockGrid.OnNodeEvent -= TriggerNodeEvent;
 
+            Node.Dispose();
+
         }
 
         public Vector2 GetWorldPosition(GridPosition gridPosition)
@@ -88,6 +90,7 @@ namespace Assets.Scripts.Grid.components
 
         private async void PlaceBlock(ITakeBlockCommand target)
         {
+            Debug.Log($"ColorGrid BlockPlaced");
             var placeBlockCommandConfigurer = new PlaceBlockCommandConfigurer(colorBlockGrid, placementPosition);
             var command = new CommandManager.CommandBuilder().AddCommand<PlaceBlockCommand>(target, placeBlockCommandConfigurer).Build();
             await commandManager.ExecuteCommands(command);

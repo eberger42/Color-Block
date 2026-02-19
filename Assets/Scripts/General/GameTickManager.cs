@@ -21,12 +21,16 @@ namespace Assets.Scripts.General
             if (Instance == null)
             {
                 Instance = this;
-                DontDestroyOnLoad(gameObject);
             }
             else
             {
                 Destroy(gameObject);
             }
+        }
+
+        private void OnDestroy()
+        {
+            Instance = null;
         }
 
 
@@ -36,6 +40,7 @@ namespace Assets.Scripts.General
 
             if (currentTime >= gameTickInterval)
             {
+                Debug.Log("Tick");
                 OnGameTick();
                 currentTime = 0f;
             }

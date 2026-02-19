@@ -5,14 +5,15 @@ using UnityEngine.UI;
 
 public class PauseManager : MonoBehaviour
 {
-
-
-
-
     public delegate void PauseEvent(bool isPaused);
     public PauseEvent OnPause;
     
     private bool gamePaused = false;
+
+    private void Start()
+    {
+        Time.timeScale = 1;
+    }
 
     private void Update()
     {

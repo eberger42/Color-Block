@@ -30,7 +30,7 @@ public class MainMenu : MonoBehaviour
 
     public void LoadGame()
     {
-        SceneController.instance.LoadScene(Scenes.Level_1);
+        SceneController.instance.LoadScene(Scenes.SampleScene);
     }
 
     public void GoToSetttings()

@@ -92,6 +92,7 @@ namespace Assets.Scripts.Player
 
         private void OnBlockCreated(ITakeBlockCommand target)
         {
+            Debug.Log($"Setting Target Entity");
             SetTargetEntity(target);
         }
 
