@@ -48,7 +48,7 @@ namespace Assets.Scripts.Blocks.ux
             }
             else if (newColorType == ColorType.Green || newColorType == ColorType.Orange || newColorType == ColorType.Purple)
             {
-                _spriteRenderer.material.SetColor("_FillColor", incomingColor.Color);
+                _spriteRenderer.material.SetColor("_FillColor", newColor.Color);
                 _spriteRenderer.material.SetVector("_Direction", incomingDirection.ToVector2());
                 _colorChangeAnimation.SetTrigger("Fill");
             }
