@@ -1,6 +1,7 @@
 ﻿using Assets.Scripts.Blocks.interfaces;
 using Assets.Scripts.Grid.components;
 using Assets.Scripts.Grid.interfaces;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -50,7 +51,7 @@ namespace Assets.Scripts.Blocks.components.managers
             {
                 foreach (var chainBlock in newColorChain)
                 {
-                    (chainBlock as IEntity).Destroy();
+                    chainBlock.Remove();
                 }
                 _scoreTarget.AddToScore(newColorChain.Count);
             }
@@ -91,7 +92,8 @@ namespace Assets.Scripts.Blocks.components.managers
         {
             if (nodeEvent is NodeDataColorChanged colorChangedEvent)
             {
-                CheckForColorChain(nodeEvent);
+                StartCoroutine(DeferredColorChainCheck(colorChangedEvent));
+
                 //AddBlockToColorChain(colorChangedEvent);
             }
             else if (nodeEvent is NodeDataRemoved removedEvent)
@@ -111,7 +113,13 @@ namespace Assets.Scripts.Blocks.components.managers
                 CheckForColorChain(nodeEvent);
             }
         }
-        
+        private IEnumerator DeferredColorChainCheck(NodeDataColorChanged evt)
+        {
+            yield return null; // wait 1 frame
+            CheckForColorChain(evt);
+        }
+
+
 
     }
 

@@ -13,10 +13,14 @@ namespace Assets.Scripts.Blocks.ux
     public class ColorBlockUX : MonoBehaviour
     {
 
+        //evnets
+
+        public event Action OnRemovalAnimationComplete;
 
         private SpriteRenderer _spriteRenderer;
         private ColorBlock _colorBlock;
         private Animator _colorChangeAnimation;
+
 
         private void Awake()
         {
@@ -25,7 +29,23 @@ namespace Assets.Scripts.Blocks.ux
             _colorChangeAnimation = GetComponent<Animator>();
 
             (_colorBlock as IBlock).OnColorUpdated += UpdateColor;
+            (_colorBlock as IBlock).OnBlockRemoved += ColorBlockUX_OnBlockRemoved;
 
+        }
+
+        private void OnDestroy()
+        {
+            if(_colorBlock != null)
+            {
+                (_colorBlock as IBlock).OnColorUpdated -= UpdateColor;
+                (_colorBlock as IBlock).OnBlockRemoved -= ColorBlockUX_OnBlockRemoved;
+            }
+        }
+
+        private void ColorBlockUX_OnBlockRemoved()
+        {
+            Debug.Log("Destroyed");
+            _colorChangeAnimation.SetTrigger("Destroy");
         }
 
         private void UpdateColor(BlockColorUpdateEventArgs color)
@@ -34,7 +54,6 @@ namespace Assets.Scripts.Blocks.ux
             var newColor = color.NewColor;    
             var incomingColor = color.IncomingColor;
             var incomingDirection = color.IncomingDirection;
-
 
 
             var newColorType = newColor.GetColorType();
@@ -55,5 +74,10 @@ namespace Assets.Scripts.Blocks.ux
 
         }
 
+        //To Be called as an event at the end of the removal animation
+        private void TriggerRemovalAnimationComplete()
+        {
+            OnRemovalAnimationComplete?.Invoke();
+        }
     }
 }

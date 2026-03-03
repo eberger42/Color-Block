@@ -11,6 +11,7 @@ namespace Assets.Scripts.Blocks.interfaces
     {
 
         public event Action<BlockColorUpdateEventArgs> OnColorUpdated;
+        public event Action OnBlockRemoved;
 
         public IBlockColor CurrentColor { get; }
 
@@ -21,5 +22,7 @@ namespace Assets.Scripts.Blocks.interfaces
         public IBlockGroup GetParent();
         public bool DoColorsMatch(IBlock block);
         public bool CheckMergeCompatability(IBlock block);
+
+        public void Remove();
     }
 }

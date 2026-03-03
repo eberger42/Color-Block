@@ -7,6 +7,7 @@ using Assets.Scripts.Grid.components;
 using Assets.Scripts.Grid.interfaces;
 using Assets.Scripts.Player.Interfaces;
 using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,6 +17,7 @@ namespace Assets.Scripts.Blocks.components
     public class ColorBlock : TakeBlockCommandMonobehaviour, IBlock, IGravity, ITriggerSpawn, IPlayerControlled
     {
         public bool DebugFlag = false;
+
         //Events
         private event Action<GridPosition> _onMoveDirection;
         private event Action<bool> _onEnableGravity;
@@ -23,18 +25,37 @@ namespace Assets.Scripts.Blocks.components
         private event Action<BlockColorUpdateEventArgs> _onColorUpdated;
         private event Action<IEntity> _onEntityDestroyed;
         private event Action _onTriggerSpawn;
+        private event Action _onBlockRemoved;
 
         //Fields
         private GridPosition gridPosition;
-        [SerializeReference]
-        private INode node;
+        [SerializeReference] private INode node;
         private IBlockGroup parent;
+        private ColorBlockUX _colorBlockUX;
 
         //Flags
         private bool canTriggerSpawn = false;
 
         //Properties
         public IBlockColor CurrentColor { get; private set; }
+
+
+        //Unity Lifecycle
+        private void Awake()
+        {
+
+            _colorBlockUX = GetComponent<ColorBlockUX>();
+
+            _colorBlockUX.OnRemovalAnimationComplete += ColorBlockUX_OnRemovalAnimationComplete;
+
+        }
+
+        private void OnDestroy()
+        {
+            if(_colorBlockUX != null)
+                _colorBlockUX.OnRemovalAnimationComplete -= ColorBlockUX_OnRemovalAnimationComplete;
+        }
+
 
         public bool AttemptMerge(ColorBlock colorBlock, GridPosition direction)
         {
@@ -146,6 +167,17 @@ namespace Assets.Scripts.Blocks.components
             }
         }
 
+        event Action IBlock.OnBlockRemoved
+        {
+            add
+            {
+                _onBlockRemoved += value;
+            }
+            remove
+            {
+                _onBlockRemoved -= value;
+            }
+        }
 
         //Functions
         void IBlock.SetParent(IBlockGroup parent)
@@ -163,7 +195,6 @@ namespace Assets.Scripts.Blocks.components
             _onColorUpdated?.Invoke(updateColorEventArgs);
 
         }
-
         void IBlock.MergeColor(IBlockColor incomingColor, GridPosition direction)
         {
 
@@ -174,7 +205,6 @@ namespace Assets.Scripts.Blocks.components
             Debug.Log($"Merged color to {newColor.GetColorType()}");
             _onColorUpdated?.Invoke(updateColorEventArgs);
         }
-
         bool IBlock.DoColorsMatch(IBlock block)
         {
             var blockColor = (block as ColorBlock).CurrentColor;
@@ -183,6 +213,11 @@ namespace Assets.Scripts.Blocks.components
         bool IBlock.CheckMergeCompatability(IBlock block)
         {
             return CurrentColor.CanCombine(block.CurrentColor);
+        }
+
+        void IBlock.Remove()
+        {
+            _onBlockRemoved?.Invoke();
         }
 
         /////////////////////////////////////////////////////////////////
@@ -400,5 +435,13 @@ namespace Assets.Scripts.Blocks.components
         {
             return $"ColorBlock[{CurrentColor.GetColorRank()}] at ({gridPosition.x}, {gridPosition.y})";
         }
+
+        //Event Callbacks
+
+        private void ColorBlockUX_OnRemovalAnimationComplete()
+        {
+            (this as IEntity).Destroy();
+        }
+
     }
 }
