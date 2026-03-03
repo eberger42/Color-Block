@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.Blocks.interfaces;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,7 +12,7 @@ namespace Assets.Scripts.Blocks.components.colors
 
         private static ColorConfiguration BuildRedConfig()
         {
-            return new ColorConfiguration.Builder(ColorRank.Primary, ColorType.Red)
+            return new ColorConfiguration.Builder(ColorRank.Primary, ColorType.Red, Color.red)
                 .AddCombination(ColorType.Yellow, ColorType.Orange)
                 .AddCombination(ColorType.Blue, ColorType.Purple)
                 .Build();
@@ -19,7 +20,7 @@ namespace Assets.Scripts.Blocks.components.colors
 
         private static ColorConfiguration BuildBlueConfig()
         {
-            return new ColorConfiguration.Builder(ColorRank.Primary, ColorType.Blue)
+            return new ColorConfiguration.Builder(ColorRank.Primary, ColorType.Blue, Color.blue)
                 .AddCombination(ColorType.Yellow, ColorType.Green)
                 .AddCombination(ColorType.Red, ColorType.Purple)
                 .Build();
@@ -27,7 +28,7 @@ namespace Assets.Scripts.Blocks.components.colors
 
         private static ColorConfiguration BuildYellowConfig()
         {
-            return new ColorConfiguration.Builder(ColorRank.Primary, ColorType.Yellow)
+            return new ColorConfiguration.Builder(ColorRank.Primary, ColorType.Yellow, Color.yellow)
                 .AddCombination(ColorType.Red, ColorType.Orange)
                 .AddCombination(ColorType.Blue, ColorType.Green)
                 .Build();
@@ -35,19 +36,19 @@ namespace Assets.Scripts.Blocks.components.colors
 
         private static ColorConfiguration BuildOrangeConfig()
         {
-            return new ColorConfiguration.Builder(ColorRank.Secondary, ColorType.Orange)
+            return new ColorConfiguration.Builder(ColorRank.Secondary, ColorType.Orange, new Color32(232, 97, 0, 255))
                 .Build();
         }
 
         private static ColorConfiguration BuildPurpleConfig()
         {
-            return new ColorConfiguration.Builder(ColorRank.Secondary, ColorType.Purple)
+            return new ColorConfiguration.Builder(ColorRank.Secondary, ColorType.Purple, Color.magenta)
                 .Build();
         }
         
         private static ColorConfiguration BuildGreenConfig()
         {
-            return new ColorConfiguration.Builder(ColorRank.Secondary, ColorType.Green)
+            return new ColorConfiguration.Builder(ColorRank.Secondary, ColorType.Green, Color.green)
                 .Build();
         }
 
@@ -78,6 +79,7 @@ namespace Assets.Scripts.Blocks.components.colors
         //Color Class Fields
         protected ColorRank _colorRank = ColorRank.Primary;
         protected ColorType _colorType;
+        protected Color _color;
         protected Dictionary<ColorType, ColorType> _combinations = new Dictionary<ColorType, ColorType>();
 
 
@@ -85,6 +87,7 @@ namespace Assets.Scripts.Blocks.components.colors
         {
             this._colorRank = config.Rank;
             this._colorType = config.Type;
+            this._color = config.Color;
             this._combinations = config.Combinations;
 
             if(config.Rank == ColorRank.Primary)
@@ -97,6 +100,7 @@ namespace Assets.Scripts.Blocks.components.colors
             }
         }
 
+        Color IBlockColor.Color { get => _color; }
 
         ColorRank IBlockColor.GetColorRank()
         {
@@ -139,13 +143,15 @@ namespace Assets.Scripts.Blocks.components.colors
         {
             public ColorRank Rank { get; set; }
             public ColorType Type { get; set; }
+            public Color Color { get; set; }
 
             public Dictionary<ColorType, ColorType> Combinations { get; private set; }
 
-            public ColorConfiguration(ColorRank rank, ColorType type)
+            public ColorConfiguration(ColorRank rank, ColorType type, Color color)
             {
                 Rank = rank;
                 Type = type;
+                Color = color;
             }
 
 
@@ -153,9 +159,9 @@ namespace Assets.Scripts.Blocks.components.colors
             {
                 private ColorConfiguration _config;
 
-                public Builder(ColorRank rank, ColorType type)
+                public Builder(ColorRank rank, ColorType type, Color color)
                 {
-                    _config = new ColorConfiguration(rank, type);
+                    _config = new ColorConfiguration(rank, type, color);
                 }
 
                 public Builder AddCombination(ColorType otherColor, ColorType resultColor)
@@ -175,4 +181,20 @@ namespace Assets.Scripts.Blocks.components.colors
             }
         }
     }
+
+    public class BlockColorUpdateEventArgs : EventArgs
+    {
+        public IBlockColor NewColor { get; private set; }
+        public IBlockColor IncomingColor { get; private set; }
+        public GridPosition IncomingDirection { get; private set; }
+
+        public BlockColorUpdateEventArgs(IBlockColor newColor, IBlockColor incomingColor, GridPosition incomingDirection)
+        {
+            NewColor = newColor;
+            IncomingColor = incomingColor;
+            IncomingDirection = incomingDirection;
+        }
+    }
+
+
 }

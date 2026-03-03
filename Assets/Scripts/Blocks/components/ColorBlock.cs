@@ -1,11 +1,13 @@
 ﻿using Assets.Scripts.Blocks.commands;
 using Assets.Scripts.Blocks.components.colors;
 using Assets.Scripts.Blocks.interfaces;
+using Assets.Scripts.Blocks.ux;
 using Assets.Scripts.General.interfaces;
 using Assets.Scripts.Grid.components;
 using Assets.Scripts.Grid.interfaces;
 using Assets.Scripts.Player.Interfaces;
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,7 +20,7 @@ namespace Assets.Scripts.Blocks.components
         private event Action<GridPosition> _onMoveDirection;
         private event Action<bool> _onEnableGravity;
         private event Action _onTriggerGravity;
-        private event Action<IBlockColor> _onColorUpdated;
+        private event Action<BlockColorUpdateEventArgs> _onColorUpdated;
         private event Action<IEntity> _onEntityDestroyed;
         private event Action _onTriggerSpawn;
 
@@ -32,16 +34,15 @@ namespace Assets.Scripts.Blocks.components
         private bool canTriggerSpawn = false;
 
         //Properties
-        public IBlockColor Color { get; private set; }
+        public IBlockColor CurrentColor { get; private set; }
 
-        public bool AttemptMerge(ColorBlock colorBlock)
+        public bool AttemptMerge(ColorBlock colorBlock, GridPosition direction)
         {
-            if (!Color.CanCombine(colorBlock.Color))
+            if (!CurrentColor.CanCombine(colorBlock.CurrentColor))
                 return false;
 
-            var newColor = Color.GetCombineColor(colorBlock.Color);
 
-            (this as IBlock).SetColor(newColor);
+            (this as IBlock).MergeColor(colorBlock.CurrentColor, direction);
 
 
             return true;
@@ -49,7 +50,7 @@ namespace Assets.Scripts.Blocks.components
 
         public ColorRank GetColorRank()
         {
-            return Color.GetColorRank();
+            return CurrentColor.GetColorRank();
         }
 
         public void SetWorldPosition(Vector2 position)
@@ -133,7 +134,7 @@ namespace Assets.Scripts.Blocks.components
         /////////////////////////////////////////////////////////////////
 
         //Events
-        event Action<IBlockColor> IBlock.OnColorUpdated
+        event Action<BlockColorUpdateEventArgs> IBlock.OnColorUpdated
         {
             add
             {
@@ -155,20 +156,33 @@ namespace Assets.Scripts.Blocks.components
         {
             return parent;
         }
-        void IBlock.SetColor(IBlockColor color)
+        void IBlock.SetColor(IBlockColor newColor)
         {
-            this.Color = color;
-            _onColorUpdated?.Invoke(color);
+            var updateColorEventArgs = new BlockColorUpdateEventArgs(newColor, newColor, GridPosition.Zero);
+            this.CurrentColor = newColor;
+            _onColorUpdated?.Invoke(updateColorEventArgs);
 
         }
+
+        void IBlock.MergeColor(IBlockColor incomingColor, GridPosition direction)
+        {
+
+            var newColor = CurrentColor.GetCombineColor(incomingColor);
+            var updateColorEventArgs = new BlockColorUpdateEventArgs(newColor, incomingColor, direction);
+
+            this.CurrentColor = newColor;
+            Debug.Log($"Merged color to {newColor.GetColorType()}");
+            _onColorUpdated?.Invoke(updateColorEventArgs);
+        }
+
         bool IBlock.DoColorsMatch(IBlock block)
         {
-            var blockColor = (block as ColorBlock).Color;
-            return this.Color.Equals(blockColor);
+            var blockColor = (block as ColorBlock).CurrentColor;
+            return this.CurrentColor.Equals(blockColor);
         }
         bool IBlock.CheckMergeCompatability(IBlock block)
         {
-            return Color.CanCombine(block.Color);
+            return CurrentColor.CanCombine(block.CurrentColor);
         }
 
         /////////////////////////////////////////////////////////////////
@@ -200,7 +214,6 @@ namespace Assets.Scripts.Blocks.components
 
         void IEntity.Destroy()
         {
-            Debug.Log($"Destroyed: {this}");
             node.ClearNodeData(this);
             _onEntityDestroyed?.Invoke(this);
             Destroy(this.gameObject);
@@ -232,7 +245,7 @@ namespace Assets.Scripts.Blocks.components
             if(neigborNode.GetData() is ColorBlock block && parent.DoesContainBlock(block) == false)
             {
 
-                var didMerge = AttemptMerge(block);
+                var didMerge = AttemptMerge(block, direction);
 
 
                 if (didMerge)
@@ -385,7 +398,7 @@ namespace Assets.Scripts.Blocks.components
 
         public override string ToString()
         {
-            return $"ColorBlock[{Color.GetColorRank()}] at ({gridPosition.x}, {gridPosition.y})";
+            return $"ColorBlock[{CurrentColor.GetColorRank()}] at ({gridPosition.x}, {gridPosition.y})";
         }
     }
 }

@@ -16,35 +16,44 @@ namespace Assets.Scripts.Blocks.ux
 
         private SpriteRenderer _spriteRenderer;
         private ColorBlock _colorBlock;
+        private Animator _colorChangeAnimation;
+
         private void Awake()
         {
             _spriteRenderer = GetComponent<SpriteRenderer>();
             _colorBlock = GetComponent<ColorBlock>();
+            _colorChangeAnimation = GetComponent<Animator>();
 
             (_colorBlock as IBlock).OnColorUpdated += UpdateColor;
 
         }
 
-        private void UpdateColor(IBlockColor color)
+        private void UpdateColor(BlockColorUpdateEventArgs color)
         {
 
-            var colorType = color.GetColorType();
-
-            if(colorType == ColorType.Red)
-                _spriteRenderer.sprite = BlockSpriteCache.Instance.RedBlockSprite;
-            else if (colorType == ColorType.Blue)
-                _spriteRenderer.sprite = BlockSpriteCache.Instance.BlueBlockSprite;
-            else if (colorType == ColorType.Yellow)
-                _spriteRenderer.sprite = BlockSpriteCache.Instance.YellowBlockSprite;
-            else if (colorType == ColorType.Green)
-                _spriteRenderer.sprite = BlockSpriteCache.Instance.GreenBlockSprite;
-            else if (colorType == ColorType.Orange)
-                _spriteRenderer.sprite = BlockSpriteCache.Instance.OrangeBlockSprite;
-            else if (colorType == ColorType.Purple)
-                _spriteRenderer.sprite = BlockSpriteCache.Instance.PurpleBlockSprite;
+            var newColor = color.NewColor;    
+            var incomingColor = color.IncomingColor;
+            var incomingDirection = color.IncomingDirection;
 
 
+
+            var newColorType = newColor.GetColorType();
+
+            if(newColorType == ColorType.Red || newColorType == ColorType.Blue || newColorType == ColorType.Yellow)
+            {
+                _spriteRenderer.sprite = BlockSpriteCache.Instance.ColorBlockSprite;
+                _spriteRenderer.material.SetColor("_BaseColor", incomingColor.Color);
+                _spriteRenderer.material.SetColor("_FillColor", incomingColor.Color);
+
+            }
+            else if (newColorType == ColorType.Green || newColorType == ColorType.Orange || newColorType == ColorType.Purple)
+            {
+                _spriteRenderer.material.SetColor("_FillColor", incomingColor.Color);
+                _spriteRenderer.material.SetVector("_Direction", incomingDirection.ToVector2());
+                _colorChangeAnimation.SetTrigger("Fill");
+            }
 
         }
+
     }
 }

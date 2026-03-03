@@ -8,6 +8,8 @@ namespace Assets.Scripts.Blocks.interfaces
     public interface IBlockColor
     {
 
+        public Color Color { get; }
+
         public ColorRank GetColorRank();
         public ColorType GetColorType();
         public bool CanCombine(IBlockColor other);

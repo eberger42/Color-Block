@@ -9,12 +9,7 @@ namespace Assets.Scripts.Blocks.components.colors
         public static BlockSpriteCache Instance { get; private set; }
 
 
-        public Sprite RedBlockSprite { get; private set; }
-        public Sprite BlueBlockSprite { get; private set; }
-        public Sprite YellowBlockSprite { get; private set; }
-        public Sprite GreenBlockSprite { get; private set; }
-        public Sprite OrangeBlockSprite { get; private set; }
-        public Sprite PurpleBlockSprite { get; private set; }
+        public Sprite ColorBlockSprite { get; private set; }
 
         private void Awake()
         {
@@ -29,18 +24,8 @@ namespace Assets.Scripts.Blocks.components.colors
             }
 
 
-            if (RedBlockSprite == null)
-                RedBlockSprite = Resources.Load<Sprite>("Sprites/RedBlock");
-            if (BlueBlockSprite == null)
-                BlueBlockSprite = Resources.Load<Sprite>("Sprites/BlueBlock");
-            if (YellowBlockSprite == null)
-                YellowBlockSprite = Resources.Load<Sprite>("Sprites/YellowBlock");
-            if (GreenBlockSprite == null)
-                GreenBlockSprite = Resources.Load<Sprite>("Sprites/GreenBlock");
-            if (OrangeBlockSprite == null)
-                OrangeBlockSprite = Resources.Load<Sprite>("Sprites/OrangeBlock");
-            if (PurpleBlockSprite == null)
-                PurpleBlockSprite = Resources.Load<Sprite>("Sprites/PurpleBlock");
+            if (ColorBlockSprite == null)
+                ColorBlockSprite = Resources.Load<Sprite>("Sprites/ColorBlock");
 
         }
         private void OnDestroy()

@@ -64,8 +64,12 @@ namespace Assets.Scripts.Grid.components
 
         private void OnDestroy()
         {
-            BlockManager.Instance.OnTargetCreated -= PlaceBlock;
-            colorBlockGrid.OnNodeEvent -= TriggerNodeEvent;
+
+            if(BlockManager.Instance != null)
+                BlockManager.Instance.OnTargetCreated -= PlaceBlock;
+
+            if(colorBlockGrid != null)
+                colorBlockGrid.OnNodeEvent -= TriggerNodeEvent;
 
             Node.Dispose();
 

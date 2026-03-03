@@ -39,6 +39,8 @@ public struct GridPosition
     public static bool operator !=(GridPosition a, GridPosition b) => (a.x != b.x && a.y != b.y);
     
 
+    public Vector2 ToVector2() => new Vector2(x, y);
+
     public override bool Equals(object obj)
     {
         return obj is GridPosition position &&
@@ -55,6 +57,7 @@ public struct GridPosition
     {
         return $"[{x}, {y}]";
     }
+
 }
 
 /// <summary>

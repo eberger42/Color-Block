@@ -1,9 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class ScoreManager : MonoBehaviour
 {
+
+    private Score _playerScore;
 
     private List<Score> scores = new List<Score>();
 
@@ -16,6 +19,8 @@ public class ScoreManager : MonoBehaviour
     private void Start()
     {
         //ToggleAllScoresVisible();
+
+        scores = FindObjectsByType<Score>(FindObjectsSortMode.None).ToList();
     }
 
     private void CreateScoreUI(Score score)
@@ -40,5 +45,6 @@ public class ScoreManager : MonoBehaviour
     {
         scoreUIParent.gameObject.SetActive(!scoreUIParent.gameObject.activeSelf);
     }
+
 
 }

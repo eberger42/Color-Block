@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2187372020479753059}
   - component: {fileID: 5733810604531909538}
   - component: {fileID: 4418689403752349065}
+  - component: {fileID: 5970265377526850809}
   m_Layer: 0
   m_Name: ColorBlock Group
   m_TagString: Untagged
@@ -45,6 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57f2941a39eac6b4a8fb223b5424123f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DebugFlag: 0
 --- !u!114 &4418689403752349065
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57,3 +59,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0511e81495d67234eaf1d4272331cde5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!95 &5970265377526850809
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4889093092540818832}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0

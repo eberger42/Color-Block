@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.Blocks.commands;
+using Assets.Scripts.Blocks.components.colors;
 using Assets.Scripts.Blocks.interfaces;
 using Assets.Scripts.Grid.components;
 using Assets.Scripts.Player.Interfaces;
@@ -432,7 +433,7 @@ namespace Assets.Scripts.Blocks.components
             
         }
 
-        private void HandleChildBlockColorUpdated(IBlockColor blockColor)
+        private void HandleChildBlockColorUpdated(BlockColorUpdateEventArgs blockColor)
         {
             if(blocks.Count > 1)
             {
