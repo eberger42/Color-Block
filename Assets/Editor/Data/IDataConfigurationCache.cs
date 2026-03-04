@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace Assets.Editor.Data
 {
-    public interface IDataConfigurationCache<T>
+    public interface IDataConfigurationCache
     {
-            
-            void UpdateConfiguration(T configuration);
+            void UpdateConfiguration(IDataConfiguration configuration);
             void SaveToDisk();
             void LoadFromDisk();
     }

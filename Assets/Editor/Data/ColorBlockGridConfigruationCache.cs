@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.Blocks.components;
+﻿using Assets.Editor.Data;
+using Assets.Scripts.Blocks.components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace Assets.Scripts.Data
     [Serializable]
     public class ColorBlockGridConfigurationCollection
     {
-        public List<ColorBlockGridConfigurationData> configurations = new();
+        public List<IDataConfiguration> configurations = new();
     }
 
     public static class ColorBlockGridConfigruationCache
@@ -36,29 +37,6 @@ namespace Assets.Scripts.Data
             }
         }
 
-        public static void SaveToDisk()
-        {
-            _collection.configurations = Configurations;
-
-            string json = JsonUtility.ToJson(_collection, true);
-            System.IO.File.WriteAllText(DATABASEPATH, json);
-            AssetDatabase.Refresh();
-        }
-
-        public static void LoadFromDisk()
-        {
-            if (!System.IO.File.Exists(DATABASEPATH))
-            {
-                Configurations = new List<ColorBlockGridConfigurationData>();
-                _collection = new ColorBlockGridConfigurationCollection();
-                return;
-            }
-
-            string json = System.IO.File.ReadAllText(DATABASEPATH);
-            _collection = JsonUtility.FromJson<ColorBlockGridConfigurationCollection>(json);
-
-            Configurations = _collection.configurations ?? new List<ColorBlockGridConfigurationData>();
-        }
     }
 
 }

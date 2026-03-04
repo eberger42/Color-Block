@@ -1,5 +1,6 @@
 ﻿
 
+using Assets.Editor.Data;
 using Assets.Scripts.Blocks.components.colors;
 using Assets.Scripts.Data;
 using System;
@@ -10,22 +11,19 @@ using static Assets.Editor.ColorBlockConfigurationEditor;
 
 namespace Assets.Editor
 {
-    internal class SaveAndLoadEditorComponent
+    public abstract class SaveAndLoadEditorComponent
     {
-
         public event Action OnSaveAllPressed;
         public event Action OnLoadPressed;
+        public event Action<IDataConfiguration> OnConfigurationSelected;
 
-        private readonly string TARGETNAME = "";
-
+        protected IDataConfigurationCache _configurationCache;
+        protected IDataConfiguration _currentConfigurationGroup;
         public Vector2 scrollPos;
 
-
-        public SaveAndLoadEditorComponent(string targetName)
+        public virtual void Refresh()
         {
-            TARGETNAME = targetName;
         }
-
         public void OnGUI()
         {
             GUILayout.BeginVertical(GUILayout.Width(250));
@@ -36,132 +34,35 @@ namespace Assets.Editor
             GUILayout.EndVertical();
         }
 
+        public abstract void OnEnable();
+
         ///////////////////////////////////////////////////////////////////
         /// Private Methods
         ///////////////////////////////////////////////////////////////////
-        private void DrawSaveAndLoadToDiskButtons()
+        protected void DrawSaveAndLoadToDiskButtons()
         {
             if (GUILayout.Button("Save All To Disk"))
             {
+                _configurationCache.SaveToDisk();
                 OnSaveAllPressed?.Invoke();
-                ColorBlockConfigruationCache.SaveToDisk();
             }
             if (GUILayout.Button("Load From Disk"))
             {
+                _configurationCache.LoadFromDisk();
+                Debug.Log("Loaded From Disk");
                 OnLoadPressed?.Invoke();
+                _currentConfigurationGroup = (_configurationCache as ColorBlockConfigurationCache).Configurations.Count > 0 ? (_configurationCache as ColorBlockConfigurationCache).Configurations[0] : null;
+                
+                if(_currentConfigurationGroup != null)
+                    OnConfigurationSelected?.Invoke(_currentConfigurationGroup);
             }
         }
 
-        private void DrawSavedList()
+        protected abstract void DrawSavedList();
+
+        protected void TriggerConfigurationSelected(IDataConfiguration config)
         {
-            GUILayout.Label($"Saved {TARGETNAME}", EditorStyles.boldLabel);
-            GUILayout.Label($"Currently Editing: {_currentConfigurationGroup.name}", EditorStyles.boldLabel);
-
-            scrollPos = GUILayout.BeginScrollView(scrollPos, GUILayout.Width(250), GUILayout.Height(400));
-
-            foreach (var config in ColorBlockConfigruationCache.Configurations)
-            {
-                GUILayout.BeginHorizontal();
-
-                var loadButton = new ColorBlockConfigurationLoadButton(config);
-                var pressed = loadButton.Draw(_currentConfigurationGroup);
-                if (pressed)
-                {
-                    LoadConfigurationIntoGrid(config);
-                    _currentConfigurationGroup = config;
-                }
-
-                GUILayout.EndHorizontal();
-
-            }
-
-            GUILayout.EndScrollView();
-        }
-
-
-
-        private class ColorBlockConfigurationLoadButton
-        {
-
-            private static Dictionary<string, Texture2D> _previewCache = new Dictionary<string, Texture2D>();
-
-            private Texture2D _preview;
-            private readonly ColorBlockGroupConfigurationData config;
-
-            public ColorBlockConfigurationLoadButton(ColorBlockGroupConfigurationData config)
-            {
-                this.config = config;
-
-                if (_previewCache.ContainsKey(config.id))
-                    _preview = _previewCache[config.id];
-                else
-                    SetPreview(config);
-            }
-
-            private Texture2D SetPreview(ColorBlockGroupConfigurationData config)
-            {
-
-                const int size = 64; // preview size
-                const int cell = size / GridSize;
-
-                _preview = new Texture2D(size, size);
-                var clear = new Color(0, 0, 0, 0);
-
-                // Fill transparent
-                for (int y = 0; y < size; y++)
-                    for (int x = 0; x < size; x++)
-                        _preview.SetPixel(x, y, clear);
-
-                // Draw blocks
-                foreach (var block in config.blocks)
-                {
-                    var c = BlockColor.ColorTypeToColorMap[block.color];
-
-                    for (int py = 0; py < cell; py++)
-                    {
-                        for (int px = 0; px < cell; px++)
-                        {
-                            int tx = block.x * cell + px;
-                            int ty = (GridSize - 1 - block.y) * cell + py; // flip Y for UI
-                            _preview.SetPixel(tx, ty, c);
-                        }
-                    }
-                }
-
-                _preview.Apply();
-
-                _previewCache[config.id] = _preview;
-                return _preview;
-            }
-
-            public bool Draw(ColorBlockGroupConfigurationData selected, int xOffset = 15, int yOffset = 10)
-            {
-
-                var rect = GUILayoutUtility.GetRect(64 + xOffset, 64 + yOffset, GUILayout.Width(64 + xOffset), GUILayout.Height(64 + yOffset));
-
-                //Setting rect to be the size of the button with offset
-                rect = new Rect(rect.x + xOffset * .5f, rect.y + yOffset * .5f, 64, 64);
-
-                if (selected == config)
-                {
-                    var outline = new Rect(rect.x - 2, rect.y - 2, rect.width + 4, rect.height + 4);
-                    EditorUtility.DrawOutline(outline, Color.white, 2);
-                }
-
-                GUI.DrawTexture(rect, _preview, ScaleMode.StretchToFill);
-
-                GUILayout.BeginVertical();
-                bool pressed = GUILayout.Button(config.name, GUILayout.Height(64));
-                GUILayout.EndVertical();
-
-
-                return pressed;
-            }
-
-            public static void Refresh()
-            {
-                _previewCache.Clear();
-            }
+            OnConfigurationSelected?.Invoke(config);
         }
 
     }

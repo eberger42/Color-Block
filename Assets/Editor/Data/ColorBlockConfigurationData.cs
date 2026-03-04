@@ -1,5 +1,6 @@
 ﻿using Assets.Scripts.Blocks.components.colors;
 using Assets.Scripts.Blocks.interfaces;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,15 +11,15 @@ using UnityEditor.UI;
 namespace Assets.Editor.Data
 {
     [Serializable]
-    public class ColorBlockGroupConfigurationData
+    public class ColorBlockGroupConfigurationData : IDataConfiguration
     {
+        public ColorBlockGroupConfigurationData() { }
 
-        public string name;
-        public string id;
+        public string id { get; set; }
+        public string name { get; set; }
         public List<ColorBlockConfigurationData> blocks;
         public GridPosition pivotPosition;
 
-      
     }
 
     [Serializable]
