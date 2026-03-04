@@ -216,13 +216,14 @@ GameObject:
   m_Component:
   - component: {fileID: 9088627770247219476}
   - component: {fileID: 4540821238023649744}
+  - component: {fileID: 2347172098363997007}
   - component: {fileID: 7273803926316651778}
   - component: {fileID: 7461914841246418267}
   - component: {fileID: 710724154611966438}
   - component: {fileID: 8581142814300265416}
   - component: {fileID: 3356988680738005749}
   m_Layer: 0
-  m_Name: Color Grid Components
+  m_Name: Puzzle Components
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -259,6 +260,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockFactory: {fileID: 7273803926316651778}
+--- !u!114 &2347172098363997007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1153000691447761888}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d36a2e985b58c3145956df2d74bbc601, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  blockFactory: {fileID: 0}
 --- !u!114 &7273803926316651778
 MonoBehaviour:
   m_ObjectHideFlags: 0

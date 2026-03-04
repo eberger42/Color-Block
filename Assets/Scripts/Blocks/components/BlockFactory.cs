@@ -9,7 +9,8 @@ using static Unity.Collections.AllocatorManager;
 
 namespace Assets.Scripts.Blocks.components
 {
-    public class BlockFactory : MonoBehaviour
+   
+    public class BlockFactory : MonoBehaviour, IBlockFactory
     {
         private static int _blockCount = 0;
         private static int _groupCount = 0;
@@ -28,7 +29,7 @@ namespace Assets.Scripts.Blocks.components
 
         public ITakeBlockCommand CreateBlock(IBlockColor blockColor)
         {
-            ColorBlock block = Instantiate(blockPrefab, new Vector2(0,0), Quaternion.identity).GetComponent<ColorBlock>();
+            ColorBlock block = Instantiate(blockPrefab, new Vector2(0, 0), Quaternion.identity).GetComponent<ColorBlock>();
             block.transform.name = $"ColorBlock: {_blockCount}";
             (block as IBlock).SetColor(blockColor);
 

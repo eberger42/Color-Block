@@ -1,5 +1,6 @@
 ﻿using Assets.Scripts.Blocks.components.colors;
 using Assets.Scripts.Blocks.interfaces;
+using Assets.Scripts.Player.Interfaces;
 using NUnit.Framework;
 using System;
 using System.Collections;
@@ -8,16 +9,19 @@ using UnityEngine;
 
 namespace Assets.Scripts.Blocks.components
 {
-    public class BlockManager : MonoBehaviour
+    public class BlockManager : MonoBehaviour, ISpawningStrategyListener
     {
         public static BlockManager Instance { get; private set; }
-        public BlockFactory BlockFactory { get => blockFactory; }
+        public IBlockFactory BlockFactory { get => blockFactory; }
 
         ITakeBlockCommand _currentEntity;
 
         [SerializeField]
-        private BlockFactory blockFactory; 
-        
+        private BlockFactory blockFactory;
+
+        [SerializeReference]
+        private ISpawningStrategy spawningStrategy;
+
         //Events
         public event Action<ITakeBlockCommand> OnTargetCreated;
 
@@ -54,29 +58,23 @@ namespace Assets.Scripts.Blocks.components
         private void CreateNewBlock()
         {
             callCount++;
-            if (callCount > 100)
-            {
-                Debug.LogWarning("Handler called too many times — breaking loop.");
-                return;
-            }
 
 
-            if (_currentEntity is ITriggerSpawn gravityBlock)
+            if (_currentEntity is IPlayerControlled gravityBlock)
             {
-                gravityBlock.OnTriggerSpawn -= CreateNewBlock;
+                gravityBlock.OnPlayerControlCompleted -= BlockManager_OnPlayerControlCompleted;
             }
 
             var blockColor = BlockColor.GenerateRandomPrimaryColor();
             var target = blockFactory.CreateBlockGroup(blockColor);
-            //var target = blockFactory.CreateBlock(blockColor);
 
             _currentEntity = target;
-            (_currentEntity as ITriggerSpawn).OnTriggerSpawn += CreateNewBlock;
-            (_currentEntity as ITriggerSpawn).SetEnabled(true);
-            Debug.Log($"Block Created");
+            (_currentEntity as IPlayerControlled).OnPlayerControlCompleted += BlockManager_OnPlayerControlCompleted;
+            (_currentEntity as IPlayerControlled).SetEnabled(true);
 
             OnTargetCreated?.Invoke(target);
         }
+
 
         public void AssignBlockGroupToBlocks(List<IBlock> blocks)
         {
@@ -87,12 +85,28 @@ namespace Assets.Scripts.Blocks.components
         }
 
 
+        ///////////////////////////////////////////////////////////////////
+        /// ISpawningStrategyListener Implementation
+        ///////////////////////////////////////////////////////////////////
+        void ISpawningStrategyListener.CreateNewBlock()
+        {
+            CreateNewBlock();
+        }
+
+        ///////////////////////////////////////////////////////////////////
+        /// Private Helpers
+        ///////////////////////////////////////////////////////////////////
+
+        private void BlockManager_OnPlayerControlCompleted()
+        {
+            spawningStrategy.HandlePlayerControlCompleted(this);
+        }
+
         private IEnumerator SpawnNextFrame()
         {
             yield return null;
             CreateNewBlock();
         }
-
 
     }
 }

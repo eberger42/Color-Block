@@ -19,7 +19,7 @@ namespace Assets.Scripts.Blocks.components
         private event Action<bool> _onEnableGravity;
         private event Action _onTriggerGravity;
         private event Action _onMergeCheckTriggered;
-        private event Action _onTriggerSpawn;
+        private event Action _onPlayerControlCompleted;
         private event Action<GridPosition> _onPositionUpdated;
 
         //Block Positioning Helpers
@@ -97,7 +97,7 @@ namespace Assets.Scripts.Blocks.components
             while(blocks.Count > 0)
                 (this as IBlockGroup).ReleaseBlock(blocks[0]);
 
-
+            
             SpawnCheck();
             Destroy(this.gameObject);
 
@@ -358,15 +358,15 @@ namespace Assets.Scripts.Blocks.components
         ///////////////////////////////////////////////////////////////////
 
         //Events
-        event Action ITriggerSpawn.OnTriggerSpawn
+        event Action ITriggerSpawn.OnPlayerContrtolCompleted
         {
             add
             {
-                _onTriggerSpawn += value;
+                _onPlayerControlCompleted += value;
             }
             remove
             {
-                _onTriggerSpawn -= value;
+                _onPlayerControlCompleted -= value;
             }
         }
 
@@ -385,13 +385,16 @@ namespace Assets.Scripts.Blocks.components
                 PlayerCommands.ForEach(commandType => RemoveCommandFromFilter(commandType));
             }
         }
-
-        ///////////////////////////////////////////////////////////////////
-        /// ITriggerSpawn Interface
-        ///////////////////////////////////////////////////////////////////
-        void ITriggerSpawn.SetEnabled(bool state)
+        event Action IPlayerControlled.OnPlayerControlCompleted
         {
-            canTriggeredSpawn = state;
+            add
+            {
+                _onPlayerControlCompleted += value;
+            }
+            remove
+            {
+                _onPlayerControlCompleted -= value;
+            }
         }
 
         ///////////////////////////////////////////////////////////////////
@@ -452,9 +455,8 @@ namespace Assets.Scripts.Blocks.components
         {
             if (canTriggeredSpawn)
             {
-                Debug.LogWarning("Spawning Blocks.");
                 (this as ITriggerSpawn).SetEnabled(false);
-                _onTriggerSpawn?.Invoke();
+                _onPlayerControlCompleted?.Invoke();
             }
         }
     }

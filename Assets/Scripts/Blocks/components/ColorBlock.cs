@@ -14,7 +14,7 @@ using UnityEngine.UI;
 
 namespace Assets.Scripts.Blocks.components
 {
-    public class ColorBlock : TakeBlockCommandMonobehaviour, IBlock, IGravity, ITriggerSpawn, IPlayerControlled
+    public class ColorBlock : TakeBlockCommandMonobehaviour, IBlock, IGravity, IPlayerControlled
     {
         public bool DebugFlag = false;
 
@@ -24,7 +24,7 @@ namespace Assets.Scripts.Blocks.components
         private event Action _onTriggerGravity;
         private event Action<BlockColorUpdateEventArgs> _onColorUpdated;
         private event Action<IEntity> _onEntityDestroyed;
-        private event Action _onTriggerSpawn;
+        private event Action _onPlayerControlCompleted;
         private event Action _onBlockRemoved;
 
         //Fields
@@ -377,32 +377,22 @@ namespace Assets.Scripts.Blocks.components
         }
 
         ///////////////////////////////////////////////////////////////////
-        /// ITriggerSpawn Interface
+        /// IPlayerControlled Interface
         ///////////////////////////////////////////////////////////////////
 
-        //Events
-        event Action ITriggerSpawn.OnTriggerSpawn
+
+        event Action IPlayerControlled.OnPlayerControlCompleted
         {
             add
             {
-                _onTriggerSpawn += value;
+                _onPlayerControlCompleted += value;
             }
             remove
             {
-                _onTriggerSpawn -= value;
+                _onPlayerControlCompleted -= value;
             }
         }
 
-        //Functions
-        void ITriggerSpawn.SetEnabled(bool state)
-        {
-            canTriggerSpawn = state;
-        }
-
-
-        ///////////////////////////////////////////////////////////////////
-        /// IPlayerControlled Interface
-        ///////////////////////////////////////////////////////////////////
         void IPlayerControlled.SetEnabled(bool state)
         {
             if (state)
