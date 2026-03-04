@@ -12,7 +12,7 @@ namespace Assets.Scripts.Blocks.components
     /// <summary>
     /// The task Queue is used to execute the commands in order, one at a time. Preventing blocks phasing through each other
     /// </summary>
-    public class ColorBlockGroupController : TakeBlockCommandMonobehaviour, IBlockGroup, IGravity, ITriggerSpawn, IPlayerControlled
+    public class ColorBlockGroupController : TakeBlockCommandMonobehaviour, IBlockGroup, IGravity, IPlayerControlled
     {
 
         public bool DebugFlag = false;  
@@ -29,7 +29,7 @@ namespace Assets.Scripts.Blocks.components
         private List<IBlock> blocks = new List<IBlock>();
 
         //Flags
-        private bool canTriggeredSpawn = false;
+        private bool isPlayerControlled = false;
         private bool waitForInit = true;
 
         public void Initialize(IBlockGroupConfigurationStrategy configurationStrategy, BlockFactory factory, IBlockColor color)
@@ -55,7 +55,7 @@ namespace Assets.Scripts.Blocks.components
                 (this as IBlockGroup).AddBlock(block, delta); //Add the block to the group
             }
             waitForInit = false;
-            canTriggeredSpawn = false;
+            isPlayerControlled = false;
 
             (this as IGravity).SetEnable(true); //Enable gravity if the group is floating
 
@@ -98,7 +98,7 @@ namespace Assets.Scripts.Blocks.components
                 (this as IBlockGroup).ReleaseBlock(blocks[0]);
 
             
-            SpawnCheck();
+            IsPlayerControllingCheck();
             Destroy(this.gameObject);
 
         }
@@ -244,7 +244,7 @@ namespace Assets.Scripts.Blocks.components
                 if (!isValid)
                 {
                     if(direction == GridPosition.Down)
-                        SpawnCheck();
+                        IsPlayerControllingCheck();
                     return false;
                 }
             }
@@ -314,7 +314,7 @@ namespace Assets.Scripts.Blocks.components
             if(state == false)
             {
 
-                SpawnCheck();
+                IsPlayerControllingCheck();
 
                 RemoveCommandFromFilter(typeof(GravityBlockCommand));
 
@@ -353,29 +353,13 @@ namespace Assets.Scripts.Blocks.components
             _onTriggerGravity?.Invoke();
         }
 
-        ///////////////////////////////////////////////////////////////////
-        /// IGravity Interface
-        ///////////////////////////////////////////////////////////////////
-
-        //Events
-        event Action ITriggerSpawn.OnPlayerContrtolCompleted
-        {
-            add
-            {
-                _onPlayerControlCompleted += value;
-            }
-            remove
-            {
-                _onPlayerControlCompleted -= value;
-            }
-        }
-
 
         ///////////////////////////////////////////////////////////////////
         /// IPlayerControlled Interface
         ///////////////////////////////////////////////////////////////////
         void IPlayerControlled.SetEnabled(bool state)
         {
+
             if (state)
             {
                 PlayerCommands.ForEach(commandType => AddCommandToFilter(commandType));
@@ -384,6 +368,8 @@ namespace Assets.Scripts.Blocks.components
             {
                 PlayerCommands.ForEach(commandType => RemoveCommandFromFilter(commandType));
             }
+
+            isPlayerControlled = state;
         }
         event Action IPlayerControlled.OnPlayerControlCompleted
         {
@@ -451,11 +437,11 @@ namespace Assets.Scripts.Blocks.components
             (this as IBlockGroup).Disband();
         }
 
-        private void SpawnCheck()
+        private void IsPlayerControllingCheck()
         {
-            if (canTriggeredSpawn)
+            if (isPlayerControlled)
             {
-                (this as ITriggerSpawn).SetEnabled(false);
+                (this as IPlayerControlled).SetEnabled(false);
                 _onPlayerControlCompleted?.Invoke();
             }
         }

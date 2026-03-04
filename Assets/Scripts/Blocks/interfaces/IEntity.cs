@@ -7,6 +7,13 @@ using UnityEngine;
 
 namespace Assets.Scripts.Blocks.interfaces
 {
+
+    public enum EntityType
+    {
+        Block,
+        Obstacle,
+    }
+
     public interface IEntity : INodeData
     {
         public event Action<GridPosition> OnMoveDirection;

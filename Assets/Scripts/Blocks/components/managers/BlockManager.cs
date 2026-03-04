@@ -19,7 +19,6 @@ namespace Assets.Scripts.Blocks.components
         [SerializeField]
         private BlockFactory blockFactory;
 
-        [SerializeReference]
         private ISpawningStrategy spawningStrategy;
 
         //Events
@@ -41,38 +40,28 @@ namespace Assets.Scripts.Blocks.components
             {
                 Destroy(gameObject);
             }
+       
+           
+
         }
 
 
         private void Start()
         {
-            StartCoroutine(SpawnNextFrame());
+            if (SceneController.instance.GetCurrentScene() == Scenes.FreePlay)
+            {
+                spawningStrategy = new FreePlaySpawningStrategy();
+            }
+            else
+            {
+                spawningStrategy = new PuzzleSpawningStrategy();
+            }
+
+            spawningStrategy.SpawningSetup(this);
         }
         private void OnDestroy()
         {
             Instance = null;
-        }
-
-
-
-        private void CreateNewBlock()
-        {
-            callCount++;
-
-
-            if (_currentEntity is IPlayerControlled gravityBlock)
-            {
-                gravityBlock.OnPlayerControlCompleted -= BlockManager_OnPlayerControlCompleted;
-            }
-
-            var blockColor = BlockColor.GenerateRandomPrimaryColor();
-            var target = blockFactory.CreateBlockGroup(blockColor);
-
-            _currentEntity = target;
-            (_currentEntity as IPlayerControlled).OnPlayerControlCompleted += BlockManager_OnPlayerControlCompleted;
-            (_currentEntity as IPlayerControlled).SetEnabled(true);
-
-            OnTargetCreated?.Invoke(target);
         }
 
 
@@ -90,7 +79,29 @@ namespace Assets.Scripts.Blocks.components
         ///////////////////////////////////////////////////////////////////
         void ISpawningStrategyListener.CreateNewBlock()
         {
-            CreateNewBlock();
+
+            Debug.Log("CreateNewBlock called " + callCount);
+            callCount++;
+
+            if(callCount > 200)
+                {
+                Debug.LogError("CreateNewBlock called too many times, possible infinite loop");
+                return;
+            }
+
+
+            if (_currentEntity is IPlayerControlled gravityBlock)
+            {
+                gravityBlock.OnPlayerControlCompleted -= BlockManager_OnPlayerControlCompleted;
+            }
+
+            var target = spawningStrategy.SpawnBlock(this);
+
+            _currentEntity = target;
+            (_currentEntity as IPlayerControlled).OnPlayerControlCompleted += BlockManager_OnPlayerControlCompleted;
+            (_currentEntity as IPlayerControlled).SetEnabled(true);
+
+            OnTargetCreated?.Invoke(target);
         }
 
         ///////////////////////////////////////////////////////////////////
@@ -102,11 +113,6 @@ namespace Assets.Scripts.Blocks.components
             spawningStrategy.HandlePlayerControlCompleted(this);
         }
 
-        private IEnumerator SpawnNextFrame()
-        {
-            yield return null;
-            CreateNewBlock();
-        }
 
     }
 }

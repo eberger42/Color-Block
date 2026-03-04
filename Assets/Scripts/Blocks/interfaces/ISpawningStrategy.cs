@@ -8,7 +8,9 @@ namespace Assets.Scripts.Blocks.interfaces
 {
     internal interface ISpawningStrategy
     {
+
+        void SpawningSetup(ISpawningStrategyListener listener);
         void HandlePlayerControlCompleted(ISpawningStrategyListener listener);
-        void SpawnBlock(ISpawningStrategyListener listener);
+        ITakeBlockCommand SpawnBlock(ISpawningStrategyListener listener);
     }
 }

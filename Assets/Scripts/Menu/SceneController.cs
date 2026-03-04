@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public enum Scenes
 {
-    MainMenu = 0, Level_1 = 1, SampleScene = 2,
+    MainMenu = 0, DailyPuzzle = 1, SampleScene = 2, FreePlay = 3
 }
 
 

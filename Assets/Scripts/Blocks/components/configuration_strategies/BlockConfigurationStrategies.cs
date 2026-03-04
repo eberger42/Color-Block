@@ -5,6 +5,34 @@ using UnityEngine;
 
 namespace Assets.Scripts.Blocks.components
 {
+
+    public class CustomConfigurationStrategy : IBlockGroupConfigurationStrategy
+    {
+
+        public CustomConfigurationStrategy(List<GridPosition> positions, GridPosition pivotPosition)
+        {
+            _positions = positions;
+            _pivotPosition = pivotPosition;
+        }
+
+        //Stored As Deltas from GridPosition
+        private readonly List<GridPosition> _positions;
+        private readonly GridPosition _pivotPosition;
+
+        List<GridPosition> IBlockGroupConfigurationStrategy.GetPositions()
+        {
+            return _positions;
+        }
+
+        GridPosition IBlockGroupConfigurationStrategy.GetPivotPosition()
+        {
+            return _pivotPosition;
+        }
+
+
+    }
+
+
     public class LBarConfigurationStrategy : IBlockGroupConfigurationStrategy
     {
         //Stored As Deltas from GridPosition

@@ -10,9 +10,19 @@ namespace Assets.Scripts.Blocks.components.colors
     public class BlockColor : IBlockColor
     {
 
+        public static readonly Dictionary<ColorType, Color> ColorTypeToColorMap = new Dictionary<ColorType, Color>
+        {
+            { ColorType.Red, Color.red },
+            { ColorType.Blue, Color.blue },
+            { ColorType.Yellow, Color.yellow },
+            { ColorType.Orange, new Color32(232, 97, 0, 255) },
+            { ColorType.Purple, Color.magenta },
+            { ColorType.Green, Color.green }
+        };
+
         private static ColorConfiguration BuildRedConfig()
         {
-            return new ColorConfiguration.Builder(ColorRank.Primary, ColorType.Red, Color.red)
+            return new ColorConfiguration.Builder(ColorRank.Primary, ColorType.Red)
                 .AddCombination(ColorType.Yellow, ColorType.Orange)
                 .AddCombination(ColorType.Blue, ColorType.Purple)
                 .Build();
@@ -20,7 +30,7 @@ namespace Assets.Scripts.Blocks.components.colors
 
         private static ColorConfiguration BuildBlueConfig()
         {
-            return new ColorConfiguration.Builder(ColorRank.Primary, ColorType.Blue, Color.blue)
+            return new ColorConfiguration.Builder(ColorRank.Primary, ColorType.Blue)
                 .AddCombination(ColorType.Yellow, ColorType.Green)
                 .AddCombination(ColorType.Red, ColorType.Purple)
                 .Build();
@@ -28,7 +38,7 @@ namespace Assets.Scripts.Blocks.components.colors
 
         private static ColorConfiguration BuildYellowConfig()
         {
-            return new ColorConfiguration.Builder(ColorRank.Primary, ColorType.Yellow, Color.yellow)
+            return new ColorConfiguration.Builder(ColorRank.Primary, ColorType.Yellow)
                 .AddCombination(ColorType.Red, ColorType.Orange)
                 .AddCombination(ColorType.Blue, ColorType.Green)
                 .Build();
@@ -36,19 +46,19 @@ namespace Assets.Scripts.Blocks.components.colors
 
         private static ColorConfiguration BuildOrangeConfig()
         {
-            return new ColorConfiguration.Builder(ColorRank.Secondary, ColorType.Orange, new Color32(232, 97, 0, 255))
+            return new ColorConfiguration.Builder(ColorRank.Secondary, ColorType.Orange)
                 .Build();
         }
 
         private static ColorConfiguration BuildPurpleConfig()
         {
-            return new ColorConfiguration.Builder(ColorRank.Secondary, ColorType.Purple, Color.magenta)
+            return new ColorConfiguration.Builder(ColorRank.Secondary, ColorType.Purple)
                 .Build();
         }
         
         private static ColorConfiguration BuildGreenConfig()
         {
-            return new ColorConfiguration.Builder(ColorRank.Secondary, ColorType.Green, Color.green)
+            return new ColorConfiguration.Builder(ColorRank.Secondary, ColorType.Green)
                 .Build();
         }
 
@@ -62,8 +72,6 @@ namespace Assets.Scripts.Blocks.components.colors
         public static BlockColor Orange { get; } = new BlockColor(BuildOrangeConfig());
         public static BlockColor Purple { get; } = new BlockColor(BuildPurpleConfig());
         public static BlockColor Green { get; } = new BlockColor(BuildGreenConfig());
-
-
 
         public static IBlockColor GenerateRandomPrimaryColor()
         {
@@ -159,8 +167,9 @@ namespace Assets.Scripts.Blocks.components.colors
             {
                 private ColorConfiguration _config;
 
-                public Builder(ColorRank rank, ColorType type, Color color)
+                public Builder(ColorRank rank, ColorType type)
                 {
+                    var color = ColorTypeToColorMap[type];
                     _config = new ColorConfiguration(rank, type, color);
                 }
 
