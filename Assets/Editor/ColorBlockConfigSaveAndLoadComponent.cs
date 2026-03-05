@@ -20,7 +20,7 @@ namespace Assets.Editor
             GRIDSIZE = gridsize;
             _configurationCache = new ColorBlockConfigurationCache();
             _currentConfigurationGroup = new ColorBlockGroupConfigurationData();
-            (_currentConfigurationGroup as IDataConfiguration).id = GUID.Generate().ToString();
+            _currentConfigurationGroup.id = GUID.Generate().ToString();
         }
 
         public override void OnEnable()
@@ -47,6 +47,7 @@ namespace Assets.Editor
             (_currentConfigurationGroup as ColorBlockGroupConfigurationData).blocks = configBlocks;
             _currentConfigurationGroup.name = name;
             _configurationCache.UpdateConfiguration(_currentConfigurationGroup);
+            ColorBlockConfigurationLoadButton.Refresh();
         }
         
         public void CreateNewConfiguration()
@@ -170,6 +171,7 @@ namespace Assets.Editor
 
             public static void Refresh()
             {
+                Debug.Log("Refreshing previews...");
                 _previewCache.Clear();
             }
         }

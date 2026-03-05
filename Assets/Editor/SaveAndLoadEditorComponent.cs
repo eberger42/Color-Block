@@ -55,6 +55,7 @@ namespace Assets.Editor
                 
                 if(_currentConfigurationGroup != null)
                     OnConfigurationSelected?.Invoke(_currentConfigurationGroup);
+                Refresh();  
             }
         }
 

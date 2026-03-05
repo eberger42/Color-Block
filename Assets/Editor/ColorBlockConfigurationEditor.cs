@@ -36,8 +36,6 @@ namespace Assets.Editor
         public static void Open()
         {
             GetWindow<ColorBlockConfigurationEditor>("Color Block Configuration Editor");
-
-            
         }
 
         private void OnEnable()
