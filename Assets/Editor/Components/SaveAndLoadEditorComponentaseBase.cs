@@ -9,9 +9,9 @@ using UnityEditor;
 using UnityEngine;
 using static Assets.Editor.ColorBlockConfigurationEditor;
 
-namespace Assets.Editor
+namespace Assets.Editor.Components
 {
-    public abstract class SaveAndLoadEditorComponent
+    public abstract class SaveAndLoadEditorComponentaseBase
     {
         public event Action OnSaveAllPressed;
         public event Action OnLoadPressed;
@@ -49,17 +49,18 @@ namespace Assets.Editor
             if (GUILayout.Button("Load From Disk"))
             {
                 _configurationCache.LoadFromDisk();
-                Debug.Log("Loaded From Disk");
                 OnLoadPressed?.Invoke();
-                _currentConfigurationGroup = (_configurationCache as ColorBlockConfigurationCache).Configurations.Count > 0 ? (_configurationCache as ColorBlockConfigurationCache).Configurations[0] : null;
-                
-                if(_currentConfigurationGroup != null)
-                    OnConfigurationSelected?.Invoke(_currentConfigurationGroup);
+                PostDataLoad();
                 Refresh();  
             }
         }
 
         protected abstract void DrawSavedList();
+
+        /// <summary>
+        /// Used to run code after data is loaded from disk, such as setting the current configuration group and triggering events to load that data into the editor.
+        /// </summary>
+        protected abstract void PostDataLoad();
 
         protected void TriggerConfigurationSelected(IDataConfiguration config)
         {

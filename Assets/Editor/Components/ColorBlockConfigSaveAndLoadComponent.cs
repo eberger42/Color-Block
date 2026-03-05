@@ -1,17 +1,13 @@
 ﻿using Assets.Editor.Data;
 using Assets.Scripts.Blocks.components.colors;
-using System;
+using Assets.Scripts.Data;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
-using static Assets.Editor.ColorBlockConfigurationEditor;
 
-namespace Assets.Editor
+namespace Assets.Editor.Components
 {
-    public class ColorBlockConfigSaveAndLoadComponent : SaveAndLoadEditorComponent
+    public class ColorBlockConfigSaveAndLoadComponent : SaveAndLoadEditorComponentaseBase
     {
 
         private readonly int GRIDSIZE = 4;
@@ -69,7 +65,6 @@ namespace Assets.Editor
 
             foreach (var config in (_configurationCache as ColorBlockConfigurationCache).Configurations)
             {
-                Debug.Log($"Drawing config: {(config as IDataConfiguration).name}");
                 GUILayout.BeginHorizontal();
 
                 var loadButton = new ColorBlockConfigurationLoadButton(config, GRIDSIZE);
@@ -86,7 +81,13 @@ namespace Assets.Editor
 
             GUILayout.EndScrollView();
         }
+        protected override void PostDataLoad()
+        {
+            _currentConfigurationGroup = (_configurationCache as ColorBlockConfigurationCache).Configurations.Count > 0 ? (_configurationCache as ColorBlockConfigurationCache).Configurations[0] : null;
 
+            if (_currentConfigurationGroup != null)
+                TriggerConfigurationSelected(_currentConfigurationGroup);
+        }
 
         private class ColorBlockConfigurationLoadButton
         {
@@ -171,7 +172,6 @@ namespace Assets.Editor
 
             public static void Refresh()
             {
-                Debug.Log("Refreshing previews...");
                 _previewCache.Clear();
             }
         }

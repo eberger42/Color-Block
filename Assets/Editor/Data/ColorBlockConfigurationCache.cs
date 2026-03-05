@@ -41,7 +41,6 @@ namespace Assets.Editor.Data
         {
             _collection.configurations = Configurations;
             SaveAndLoadEditorFiles.SaveToDisk(_collection, DATABASEPATH);
-
         }
 
         void IDataConfigurationCache.LoadFromDisk()

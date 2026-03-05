@@ -1,4 +1,5 @@
-﻿using Assets.Editor.Data;
+﻿using Assets.Editor.Components;
+using Assets.Editor.Data;
 using Assets.Scripts.Blocks.components.colors;
 using Assets.Scripts.Blocks.interfaces;
 using System.Collections.Generic;
@@ -25,11 +26,11 @@ namespace Assets.Editor
         private string _colorBlockName;
 
         private List<ColorPaletteButton> _paletteButtons = new List<ColorPaletteButton>();
-        private ColorType selectedColor = ColorType.Red;
 
 
         //EditorComponents
         private ColorBlockConfigSaveAndLoadComponent _saveLoadComponent;
+        private ColorPaletteComponent _colorPaletteComponent;
 
 
         [MenuItem("Tools/Color Block Configuration Editor")]
@@ -42,16 +43,12 @@ namespace Assets.Editor
         {
             _saveLoadComponent = new ColorBlockConfigSaveAndLoadComponent(GRIDSIZE);
             _saveLoadComponent.OnConfigurationSelected += LoadConfigurationIntoGrid;
-
-
             _saveLoadComponent.OnEnable();
 
-            foreach (var colorType in PaletteOrder)
-            {
-                var color = BlockColor.ColorTypeToColorMap[colorType];
-                _paletteButtons.Add(new ColorPaletteButton(colorType, color));
-            }
-            
+
+            _colorPaletteComponent = new ColorPaletteComponent();
+            _colorPaletteComponent.OnEnable();
+
         }
 
         private void OnDisable()
@@ -70,7 +67,7 @@ namespace Assets.Editor
             GUILayout.BeginVertical();
 
             DrawGrid();
-            DrawPalette();
+            _colorPaletteComponent.OnGUI();
             DrawSaveLoadNew();
             GUILayout.EndVertical();
 
@@ -93,9 +90,13 @@ namespace Assets.Editor
 
                     if (GUILayout.Button("", GUILayout.Width(40), GUILayout.Height(40)))
                     {
-                        if (grid[x, y] == null || grid[x, y].color != selectedColor)
+                        if (grid[x, y] == null)
                         {
-                            grid[x, y] = new ColorBlockConfigurationData { x = x, y = y, color = selectedColor };
+                            grid[x, y] = new ColorBlockConfigurationData { x = x, y = y, color = _colorPaletteComponent.SelectedColor };
+                        }
+                        else if (grid[x, y].color != _colorPaletteComponent.SelectedColor)
+                        {
+                            grid[x, y].color = _colorPaletteComponent.SelectedColor;
                         }
                         else
                         {
@@ -108,23 +109,6 @@ namespace Assets.Editor
                 }
                 EditorGUILayout.EndHorizontal();
             }
-        }
-
-        private void DrawPalette()
-        {
-            GUILayout.Space(10);
-
-            GUILayout.Label("Color Palette");
-
-            GUILayout.BeginHorizontal();
-
-            foreach (var btn in _paletteButtons)
-            {
-                if (btn.Draw(selectedColor))
-                    selectedColor = btn.ColorType;
-            }
-
-            GUILayout.EndHorizontal();
         }
 
         private void DrawSaveLoadNew()

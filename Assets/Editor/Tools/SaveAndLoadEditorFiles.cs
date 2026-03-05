@@ -24,7 +24,6 @@ namespace Assets.Editor.Tools
 
         public static T LoadFromDisk<T>(string path) where T : new()
         {
-            Debug.Log($"Attempting to load data from {path}...");
             if (!File.Exists(path))
             {
                 return new T();

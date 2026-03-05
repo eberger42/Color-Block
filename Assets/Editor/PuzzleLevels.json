@@ -1,0 +1,20 @@
+{
+  "configurations": [
+    {
+      "puzzleOverlay": [],
+      "gridNodes": [],
+      "id": "41ecfd9f7207df745afe2902c8496693",
+      "name": "Test2",
+      "width": 4,
+      "height": 10
+    },
+    {
+      "puzzleOverlay": [],
+      "gridNodes": [],
+      "id": "4515bf43164f67647bef3dc2df000ba6",
+      "name": "Test1",
+      "width": 4,
+      "height": 4
+    }
+  ]
+}

@@ -10,13 +10,16 @@ using UnityEditor.UI;
 namespace Assets.Editor.Data
 {
     [Serializable]
-    public class ColorBlockGridConfigurationData
+    public class ColorBlockGridConfigurationData : IDataConfiguration
     {
 
-        public string name;
-        public string id;
-        public List<ColorBlockConfigurationData> puzzleOverlay;
-        public List<ColorBLockGridNodeConfigurationData> gridNodes;
+        public string id { get; set; }
+        public string name { get; set; }
+        public int width { get; set; }
+        public int height { get; set; }
+
+        public List<ColorBlockConfigurationData> puzzleOverlay =new();
+        public List<ColorBLockGridNodeConfigurationData> gridNodes =new();
 
     }
 
