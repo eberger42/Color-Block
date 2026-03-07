@@ -20,6 +20,7 @@ namespace Assets.Editor.Data
 
         public List<ColorBlockConfigurationData> puzzleOverlay =new();
         public List<ColorBLockGridNodeConfigurationData> gridNodes =new();
+        public List<string> queue = new();
 
     }
 

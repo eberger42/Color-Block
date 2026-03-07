@@ -10,7 +10,12 @@ namespace Assets.Scripts.Blocks.interfaces
 
     public enum EntityType
     {
-        Block,
+        RedBlock,
+        BlueBlock,
+        YellowBlock,
+        PurpleBlock,
+        OrangeBlock,
+        GreenBlock,
         Obstacle,
     }
 

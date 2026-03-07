@@ -57,5 +57,44 @@ namespace Assets.Editor.Components
 
             GUILayout.EndHorizontal();
         }
+
+        //////////////////////////////////////////////////////////////////
+        /// Helper Classes
+        //////////////////////////////////////////////////////////////////
+        public class ColorPaletteButton
+        {
+            public ColorType ColorType { get; }
+            public Color Color { get; }
+
+            private bool _isSelected = false;
+
+            public ColorPaletteButton(ColorType colorType, Color color)
+            {
+                ColorType = colorType;
+                Color = color;
+            }
+
+            public bool Draw(ColorType selected, int size = 30, float xOffset = 3, float yOffset = 0)
+            {
+
+                //Reserve space for button with offset
+                var rect = GUILayoutUtility.GetRect(size + xOffset, size + yOffset, GUILayout.Width(size + xOffset), GUILayout.Height(size + yOffset));
+
+                //Setting rect to be the size of the button with offset
+                rect = new Rect(rect.x + xOffset * .5f, rect.y + yOffset * .5f, size, size);
+
+                if (selected == ColorType)
+                {
+                    var outline = new Rect(rect.x - 2, rect.y - 2, rect.width + 4, rect.height + 4);
+                    EditorGUI.DrawRect(outline, Color.white);
+                }
+
+                EditorGUI.DrawRect(rect, Color);
+                return GUI.Button(rect, GUIContent.none, GUIStyle.none);
+            }
+
+
+        }
+
     }
 }

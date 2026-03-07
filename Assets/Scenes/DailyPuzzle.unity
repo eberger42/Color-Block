@@ -180,17 +180,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 169767176}
   m_CullTransparentMesh: 1
---- !u!114 &339252900 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5472744275395267668, guid: aa09655e3fcea494db1a62a6834f9004, type: 3}
-  m_PrefabInstance: {fileID: 791981515}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -480,7 +469,7 @@ PrefabInstance:
     - target: {fileID: 43675488346380134, guid: 3f7288929f334d846a93971afa0ec8f6, type: 3}
       propertyPath: totalScore
       value: 
-      objectReference: {fileID: 339252900}
+      objectReference: {fileID: 0}
     - target: {fileID: 1153000691447761888, guid: 3f7288929f334d846a93971afa0ec8f6, type: 3}
       propertyPath: m_Name
       value: Color Grid Components

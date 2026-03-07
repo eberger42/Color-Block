@@ -7,18 +7,22 @@ using UnityEngine;
 
 namespace Assets.Editor.Components
 {
-    public class PuzzleConfigSaveAndLoadComponent : SaveAndLoadEditorComponentaseBase
+    internal class PuzzleConfigSaveAndLoadComponent : SaveAndLoadEditorComponentaseBase
     {
 
         private readonly int _width;
         private readonly int _height;
-        public PuzzleConfigSaveAndLoadComponent(int width, int height)
+        internal PuzzleConfigSaveAndLoadComponent(IUseSaveAndLoadEditorComponent listener, int width, int height) : base(listener)
         {
             _width = width;
             _height = height;
             _configurationCache = new ColorBlockGridConfigruationCache();
             _currentConfigurationGroup = new ColorBlockGridConfigurationData();
             _currentConfigurationGroup.id = GUID.Generate().ToString();
+        }
+
+        internal PuzzleConfigSaveAndLoadComponent(IUseSaveAndLoadEditorComponent listener) : base(listener)
+        {
         }
 
         public override void OnEnable()
@@ -40,17 +44,19 @@ namespace Assets.Editor.Components
             PuzzleConfigurationLoadButton.Refresh();
         }
 
-        public void UpdateConfiguration(List<ColorBLockGridNodeConfigurationData> configBlocks, string name, int width, int height)
+        public void UpdateConfiguration(List<ColorBLockGridNodeConfigurationData> configBlocks, List<ColorBlockConfigurationData> overlay, List<string> queue,  string name, int width, int height)
         {
             _currentConfigurationGroup.name = name;
             (_currentConfigurationGroup as ColorBlockGridConfigurationData).gridNodes = configBlocks;
+            (_currentConfigurationGroup as ColorBlockGridConfigurationData).puzzleOverlay = overlay;
+            (_currentConfigurationGroup as ColorBlockGridConfigurationData).queue = queue;
             (_currentConfigurationGroup as ColorBlockGridConfigurationData).width = width;
             (_currentConfigurationGroup as ColorBlockGridConfigurationData).height = height;
             _configurationCache.UpdateConfiguration(_currentConfigurationGroup);
             PuzzleConfigurationLoadButton.Refresh();
         }
         
-        public void CreateNewConfiguration()
+        public override void CreateNewConfiguration()
         {
             var newConfig = new ColorBlockGridConfigurationData();
             (newConfig as IDataConfiguration).id = GUID.Generate().ToString();

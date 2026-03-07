@@ -7,11 +7,11 @@ using UnityEngine;
 
 namespace Assets.Editor.Components
 {
-    public class ColorBlockConfigSaveAndLoadComponent : SaveAndLoadEditorComponentaseBase
+    internal class ColorBlockConfigSaveAndLoadComponent : SaveAndLoadEditorComponentaseBase
     {
 
         private readonly int GRIDSIZE = 4;
-        public ColorBlockConfigSaveAndLoadComponent(int gridsize)
+        internal ColorBlockConfigSaveAndLoadComponent(IUseSaveAndLoadEditorComponent listener, int gridsize) : base(listener)
         {
             GRIDSIZE = gridsize;
             _configurationCache = new ColorBlockConfigurationCache();
@@ -46,7 +46,7 @@ namespace Assets.Editor.Components
             ColorBlockConfigurationLoadButton.Refresh();
         }
         
-        public void CreateNewConfiguration()
+        public override void CreateNewConfiguration()
         {
             var newConfig = new ColorBlockGroupConfigurationData { blocks = new List<ColorBlockConfigurationData>() };
             (newConfig as IDataConfiguration).id = GUID.Generate().ToString();

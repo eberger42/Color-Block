@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Assets.Editor
 {
-    internal class ColorBlockConfigurationEditor : EditorWindow
+    internal class ColorBlockConfigurationEditor : EditorWindow, IUseSaveAndLoadEditorComponent
     {
 
         //Static Members
@@ -25,8 +25,6 @@ namespace Assets.Editor
 
         private string _colorBlockName;
 
-        private List<ColorPaletteButton> _paletteButtons = new List<ColorPaletteButton>();
-
 
         //EditorComponents
         private ColorBlockConfigSaveAndLoadComponent _saveLoadComponent;
@@ -41,7 +39,7 @@ namespace Assets.Editor
 
         private void OnEnable()
         {
-            _saveLoadComponent = new ColorBlockConfigSaveAndLoadComponent(GRIDSIZE);
+            _saveLoadComponent = new ColorBlockConfigSaveAndLoadComponent(this, GRIDSIZE);
             _saveLoadComponent.OnConfigurationSelected += LoadConfigurationIntoGrid;
             _saveLoadComponent.OnEnable();
 
@@ -68,7 +66,6 @@ namespace Assets.Editor
 
             DrawGrid();
             _colorPaletteComponent.OnGUI();
-            DrawSaveLoadNew();
             GUILayout.EndVertical();
 
             GUILayout.EndHorizontal();
@@ -111,21 +108,6 @@ namespace Assets.Editor
             }
         }
 
-        private void DrawSaveLoadNew()
-        {
-            GUILayout.Space(10);
-            _colorBlockName = EditorGUILayout.TextField("Color Block Name", _colorBlockName);
-
-            if (GUILayout.Button("Save Configuration"))
-            {
-                SaveCurrentColorBlockConfiguration();
-            }
-            if (GUILayout.Button("New Configuration"))
-            {
-                _saveLoadComponent.CreateNewConfiguration();
-            }
-        }
-
 
         private void LoadConfigurationIntoGrid(IDataConfiguration config)
         {
@@ -141,7 +123,7 @@ namespace Assets.Editor
 
         }
 
-        private void SaveCurrentColorBlockConfiguration()
+        void IUseSaveAndLoadEditorComponent.SaveCurrentConfiguration()
         {
             var blocks = new List<ColorBlockConfigurationData>();
             for (int y = 0; y < GRIDSIZE; y++)
@@ -163,46 +145,6 @@ namespace Assets.Editor
         {
             ColorUtility.TryParseHtmlString(name, out var c);
             return c;
-        }
-
-
-
-        //////////////////////////////////////////////////////////////////
-        /// Helper Classes
-        //////////////////////////////////////////////////////////////////
-        public class ColorPaletteButton
-        {
-            public ColorType ColorType { get; }
-            public Color Color { get; }
-
-            private bool _isSelected = false;
-
-            public ColorPaletteButton(ColorType colorType, Color color)
-            {
-                ColorType = colorType;
-                Color = color;
-            }
-
-            public bool Draw(ColorType selected, int size = 30, float xOffset = 3, float yOffset = 0)
-            {
-
-                //Reserve space for button with offset
-                var rect = GUILayoutUtility.GetRect(size + xOffset, size + yOffset, GUILayout.Width(size + xOffset), GUILayout.Height(size + yOffset));
-
-                //Setting rect to be the size of the button with offset
-                rect = new Rect(rect.x + xOffset * .5f, rect.y + yOffset * .5f, size, size);
-
-                if (selected == ColorType)
-                {
-                    var outline = new Rect(rect.x - 2, rect.y - 2, rect.width + 4, rect.height + 4);
-                    EditorGUI.DrawRect(outline, Color.white);
-                }
-
-                EditorGUI.DrawRect(rect, Color);
-                return GUI.Button(rect, GUIContent.none, GUIStyle.none);
-            }
-
-
         }
 
     }

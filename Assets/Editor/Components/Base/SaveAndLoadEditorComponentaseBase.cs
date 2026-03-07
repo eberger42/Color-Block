@@ -11,8 +11,10 @@ using static Assets.Editor.ColorBlockConfigurationEditor;
 
 namespace Assets.Editor.Components
 {
-    public abstract class SaveAndLoadEditorComponentaseBase
+    internal abstract class SaveAndLoadEditorComponentaseBase
     {
+        private readonly IUseSaveAndLoadEditorComponent _listener;
+
         public event Action OnSaveAllPressed;
         public event Action OnLoadPressed;
         public event Action<IDataConfiguration> OnConfigurationSelected;
@@ -21,6 +23,11 @@ namespace Assets.Editor.Components
         protected IDataConfiguration _currentConfigurationGroup;
         public Vector2 scrollPos;
 
+        public SaveAndLoadEditorComponentaseBase(IUseSaveAndLoadEditorComponent listener)
+        {
+            _listener = listener;
+        }
+
         public virtual void Refresh()
         {
         }
@@ -28,7 +35,10 @@ namespace Assets.Editor.Components
         {
             GUILayout.BeginVertical(GUILayout.Width(250));
             GUILayout.BeginHorizontal();
+            GUILayout.BeginVertical();
             DrawSaveAndLoadToDiskButtons();
+            DrawSaveAndNew();
+            GUILayout.EndVertical();
             GUILayout.EndHorizontal();
             DrawSavedList();
             GUILayout.EndVertical();
@@ -36,11 +46,14 @@ namespace Assets.Editor.Components
 
         public abstract void OnEnable();
 
+        public abstract void CreateNewConfiguration();
+
         ///////////////////////////////////////////////////////////////////
         /// Private Methods
         ///////////////////////////////////////////////////////////////////
         protected void DrawSaveAndLoadToDiskButtons()
         {
+            GUILayout.BeginHorizontal();
             if (GUILayout.Button("Save All To Disk"))
             {
                 _configurationCache.SaveToDisk();
@@ -53,6 +66,25 @@ namespace Assets.Editor.Components
                 PostDataLoad();
                 Refresh();  
             }
+            GUILayout.EndHorizontal();
+        }
+
+        protected void DrawSaveAndNew()
+        {
+            GUILayout.Space(2);
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Save Configuration"))
+            {
+                _listener.SaveCurrentConfiguration();
+            }
+            if (GUILayout.Button("New Configuration"))
+            {
+                CreateNewConfiguration();
+            }
+            GUILayout.EndHorizontal();
+
+
         }
 
         protected abstract void DrawSavedList();
@@ -67,5 +99,10 @@ namespace Assets.Editor.Components
             OnConfigurationSelected?.Invoke(config);
         }
 
+    }
+
+    internal interface IUseSaveAndLoadEditorComponent
+    {
+        void SaveCurrentConfiguration();
     }
 }

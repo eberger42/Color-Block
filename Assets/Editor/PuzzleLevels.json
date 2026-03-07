@@ -1,8 +1,35 @@
 {
   "configurations": [
     {
-      "puzzleOverlay": [],
+      "puzzleOverlay": [
+        {
+          "x": 0,
+          "y": 8,
+          "color": 0
+        },
+        {
+          "x": 1,
+          "y": 8,
+          "color": 0
+        },
+        {
+          "x": 2,
+          "y": 8,
+          "color": 0
+        },
+        {
+          "x": 3,
+          "y": 8,
+          "color": 0
+        }
+      ],
       "gridNodes": [],
+      "queue": [
+        "74c2a8445fa16874d8717f86615e5b76",
+        "aa45b8482e2a2684d980f4748448aa47",
+        "a923209423a50e542a2ac317b8518473",
+        "85c343e8fb0d60240b8b5d5b4288ce18"
+      ],
       "id": "41ecfd9f7207df745afe2902c8496693",
       "name": "Test2",
       "width": 4,
@@ -11,6 +38,7 @@
     {
       "puzzleOverlay": [],
       "gridNodes": [],
+      "queue": [],
       "id": "4515bf43164f67647bef3dc2df000ba6",
       "name": "Test1",
       "width": 4,
