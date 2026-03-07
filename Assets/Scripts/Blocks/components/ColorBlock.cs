@@ -33,9 +33,6 @@ namespace Assets.Scripts.Blocks.components
         private IBlockGroup parent;
         private ColorBlockUX _colorBlockUX;
 
-        //Flags
-        private bool canTriggerSpawn = false;
-
         //Properties
         public IBlockColor CurrentColor { get; private set; }
 

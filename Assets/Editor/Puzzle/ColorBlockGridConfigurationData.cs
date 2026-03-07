@@ -10,7 +10,7 @@ using UnityEditor.UI;
 namespace Assets.Editor.Data
 {
     [Serializable]
-    public class ColorBlockGridConfigurationData : IDataConfiguration
+    internal class ColorBlockGridConfigurationData : IDataConfiguration
     {
 
         public string id { get; set; }
@@ -25,7 +25,7 @@ namespace Assets.Editor.Data
     }
 
     [Serializable]
-    public class ColorBLockGridNodeConfigurationData
+    internal class ColorBLockGridNodeConfigurationData
     {
         public int x;
         public int y;

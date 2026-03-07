@@ -9,12 +9,12 @@ using UnityEngine;
 namespace Assets.Editor.Data
 {
     [Serializable]
-    public class DataConfigurationCollection<T> where T : IDataConfiguration, new()
+    internal class DataConfigurationCollection<T> where T : IDataConfiguration, new()
     {
         public List<T> configurations = new();
     }
 
-    public class ColorBlockConfigurationCache : IDataConfigurationCache
+    internal class ColorBlockConfigurationCache : IDataConfigurationCache
     {
         private readonly string DATABASEPATH = "Assets/Editor/ColorBlockConfigurations.json";
 

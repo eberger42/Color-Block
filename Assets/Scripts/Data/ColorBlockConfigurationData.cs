@@ -11,7 +11,7 @@ using UnityEditor.UI;
 namespace Assets.Editor.Data
 {
     [Serializable]
-    internal class ColorBlockGroupConfigurationData : IDataConfiguration
+    internal class ColorBlockGroupConfigurationData
     {
         public ColorBlockGroupConfigurationData() { }
 

@@ -11,8 +11,8 @@ using UnityEngine;
 
 namespace Assets.Scripts.Data
 {
-   
-    public class ColorBlockGridConfigruationCache : IDataConfigurationCache
+
+    internal class ColorBlockGridConfigruationCache : IDataConfigurationCache
     {
         private readonly string DATABASEPATH = "Assets/Editor/PuzzleLevels.json";
 
