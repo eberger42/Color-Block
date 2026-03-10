@@ -33,7 +33,6 @@ public class LevelSelect : MonoBehaviour
         foreach(var level in levels)
         {
             var gameObject = Instantiate(levelButtonPrefab, levelParent);
-            gameObject.GetComponent<LevelButton>().Initialize(level, sceneController, i);
             i++;
         }
 

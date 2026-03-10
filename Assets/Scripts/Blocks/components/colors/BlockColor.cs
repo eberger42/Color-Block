@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Assets.Scripts.Blocks.components.colors
 {
     //OPTIMIZATION: Inherited colors can be made singletons and refrences as one, they are not going to change when on different blocks.
-    public class BlockColor : IBlockColor
+    public sealed class BlockColor : IBlockColor
     {
 
         public static readonly Dictionary<ColorType, Color> ColorTypeToColorMap = new Dictionary<ColorType, Color>
@@ -80,15 +80,23 @@ namespace Assets.Scripts.Blocks.components.colors
             return randomColor;
         }
 
-
+        public static Dictionary<ColorType, BlockColor> ColorTypeToBlockColorCache { get; } = new Dictionary<ColorType, BlockColor>
+        {
+            { ColorType.Red, Red },
+            { ColorType.Blue, Blue },
+            { ColorType.Yellow, Yellow },
+            { ColorType.Orange, Orange },
+            { ColorType.Purple, Purple },
+            { ColorType.Green, Green }
+        };
 
 
 
         //Color Class Fields
-        protected ColorRank _colorRank = ColorRank.Primary;
-        protected ColorType _colorType;
-        protected Color _color;
-        protected Dictionary<ColorType, ColorType> _combinations = new Dictionary<ColorType, ColorType>();
+        private ColorRank _colorRank = ColorRank.Primary;
+        private ColorType _colorType;
+        private Color _color;
+        private Dictionary<ColorType, ColorType> _combinations = new Dictionary<ColorType, ColorType>();
 
 
         private BlockColor(ColorConfiguration config)

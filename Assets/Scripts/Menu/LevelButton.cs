@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Assets.Scripts.Systems.LevelSelect;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -10,15 +11,10 @@ using UnityEngine.UI;
 public class LevelButton : MonoBehaviour
 {
 
-    [SerializeField]
-    private string levelName;
-    [SerializeField]
-    private bool unlocked;
-    [SerializeField]
-    private bool completionStatus;
+    private const Scenes SCENE_TO_LOAD = Scenes.DailyPuzzle;
 
-    private SceneController sceneController;
-    private int index;
+
+    private Level _level;
 
     public Button Button { get; set; }
 
@@ -28,25 +24,20 @@ public class LevelButton : MonoBehaviour
 
     }
 
-    public void Initialize(Level level, SceneController sceneController, int index)
+    public void Initialize(Level level)
     {
-        levelName = level.levelName;
-        unlocked = level.unlocked;
-        completionStatus = level.completionStatus;
-
-        this.sceneController = sceneController;
-        this.index = index;
+        _level = level;
 
         Button = GetComponent<Button>();
-        Button.GetComponentInChildren<TextMeshProUGUI>().text = index + "";
+        Button.GetComponentInChildren<TextMeshProUGUI>().text = _level.LevelName;
         Button.onClick.AddListener(LoadLevel);
-        Button.interactable = unlocked;
+        Button.interactable = _level.Unlocked;
     }
 
     public void LoadLevel()
     {
-
-        SceneController.instance.LoadScene(levelName);
+        LevelSelectManager.Instance.SelectLevel(_level);
+        SceneController.instance.LoadScene(SCENE_TO_LOAD);
     }
 
 }

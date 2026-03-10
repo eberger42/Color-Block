@@ -11,6 +11,6 @@ namespace Assets.Scripts.Blocks.interfaces
 
         void SpawningSetup(ISpawningStrategyListener listener);
         void HandlePlayerControlCompleted(ISpawningStrategyListener listener);
-        ITakeBlockCommand SpawnBlock(ISpawningStrategyListener listener);
+        ITakeBlockCommand SpawnBlock(ISpawningStrategyListener listener, string blockID);
     }
 }

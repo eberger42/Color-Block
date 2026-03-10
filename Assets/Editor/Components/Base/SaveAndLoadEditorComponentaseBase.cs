@@ -1,13 +1,7 @@
 ﻿
-
-using Assets.Editor.Data;
-using Assets.Scripts.Blocks.components.colors;
 using Assets.Scripts.Data;
 using System;
-using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
-using static Assets.Editor.ColorBlockConfigurationEditor;
 
 namespace Assets.Editor.Components
 {

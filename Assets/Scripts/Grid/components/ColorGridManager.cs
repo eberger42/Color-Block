@@ -5,6 +5,7 @@ using Assets.Scripts.Blocks.scriptable_objects;
 using Assets.Scripts.General;
 using Assets.Scripts.General.interfaces;
 using Assets.Scripts.Grid.interfaces;
+using Assets.Scripts.Systems.LevelSelect;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -38,11 +39,11 @@ namespace Assets.Scripts.Grid.components
         private readonly CommandManager commandManager = new CommandManager();
         private GridPosition placementPosition = new GridPosition(20, 18);
 
+        private SceneController sceneController;
+
 
         private void Awake()
         {
-            colorBlockGrid = new Grid<BlockNode>(gridWidth, gridHeight, 1, origin);
-            colorBlockGrid.OnNodeEvent += TriggerNodeEvent;
 
             if (Instance != null && Instance != this)
             {
@@ -52,13 +53,26 @@ namespace Assets.Scripts.Grid.components
             {
                 Instance = this;
             }
-            
+
+            sceneController = SceneController.instance;
+
+            sceneController.OnSceneLoaded += SceneController_OnSceneLoaded;
+
+        }
+
+        private void SceneController_OnSceneLoaded(Scenes scene)
+        {
+            var puzzleGridConfig = LevelSelectManager.Instance.GridConfiguration;
+            if (puzzleGridConfig != null)
+            {
+                InitializeGrid(puzzleGridConfig);
+            }
         }
 
         private void Start()
         {
-            colorBlockGrid.GenerateGrid(config, (GameTickManager.Instance as ITickManager));
-                
+           
+
             BlockManager.Instance.OnTargetCreated += PlaceBlock;
         }
 
@@ -73,6 +87,19 @@ namespace Assets.Scripts.Grid.components
 
             Node.Dispose();
 
+        }
+
+        public void InitializeGrid(PuzzleGridConfiguration puzzleGridConfiguration)
+        {
+
+            gridWidth = puzzleGridConfiguration.Width;
+            gridHeight = puzzleGridConfiguration.Height;
+
+            colorBlockGrid = new Grid<BlockNode>(gridWidth, gridHeight, 1, origin);
+            colorBlockGrid.OnNodeEvent += TriggerNodeEvent;
+
+
+            colorBlockGrid.GenerateGrid(config, (GameTickManager.Instance as ITickManager));
         }
 
         public Vector2 GetWorldPosition(GridPosition gridPosition)
@@ -125,10 +152,6 @@ namespace Assets.Scripts.Grid.components
                 }
             }
 
-            private void LoopLogic(BlockNode[,] gridArray, Action acton)
-            {
-                
-            }
         }
 
     }

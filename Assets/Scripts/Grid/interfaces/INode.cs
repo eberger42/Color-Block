@@ -1,10 +1,8 @@
 using Assets.Scripts.Blocks.scriptable_objects;
 using Assets.Scripts.General.interfaces;
-using Assets.Scripts.Grid.components;
 using Assets.Scripts.Grid.interfaces;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 public interface INode : ITick
 { 

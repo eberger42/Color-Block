@@ -1,16 +1,12 @@
-﻿using Assets.Scripts.Blocks.components.colors;
+﻿
 using Assets.Scripts.Blocks.interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEditor.UI;
 
-namespace Assets.Editor.Data
+namespace Assets.Scripts.Data
 {
     [Serializable]
-    internal class ColorBlockGridConfigurationData
+    public class ColorBlockGridConfigurationData : IDataConfiguration
     {
 
         public string id { get; set; }
@@ -25,7 +21,7 @@ namespace Assets.Editor.Data
     }
 
     [Serializable]
-    internal class ColorBLockGridNodeConfigurationData
+    public class ColorBLockGridNodeConfigurationData
     {
         public int x;
         public int y;

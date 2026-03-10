@@ -1,17 +1,10 @@
 ﻿
 
-using Assets.Scripts.Blocks.commands;
 using Assets.Scripts.Blocks.interfaces;
-using Assets.Scripts.Blocks.scriptable_objects;
 using Assets.Scripts.General.interfaces;
 using Assets.Scripts.Grid.components;
 using Assets.Scripts.Grid.interfaces;
-using NUnit.Framework;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.PackageManager;
 using UnityEngine;
-using static Unity.Collections.AllocatorManager;
 
 namespace Assets.Scripts.Blocks.components
 {

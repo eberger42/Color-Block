@@ -1886,6 +1886,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5616791062425984301, guid: aa09655e3fcea494db1a62a6834f9004, type: 3}
+      propertyPath: saveFiles.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5616791062425984301, guid: aa09655e3fcea494db1a62a6834f9004, type: 3}
+      propertyPath: 'saveFiles.Array.data[0]'
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 7145092596052567166, guid: aa09655e3fcea494db1a62a6834f9004, type: 3}
       propertyPath: m_Name
       value: Gamemanager
@@ -2142,7 +2150,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 16375
+    m_Bits: 4294967295
 --- !u!114 &963753103
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2356,6 +2364,7 @@ GameObject:
   - component: {fileID: 1187869745}
   - component: {fileID: 1187869747}
   - component: {fileID: 1187869746}
+  - component: {fileID: 1187869748}
   m_Layer: 5
   m_Name: Level Select
   m_TagString: Untagged
@@ -2423,6 +2432,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1187869744}
   m_CullTransparentMesh: 1
+--- !u!114 &1187869748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1187869744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7c65aec2dab85446a459771e74e72ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _buttonPrefab: {fileID: 4141137956425730501, guid: 9b07472c201299d47ab364aea199509a, type: 3}
+  _buttonContainer: {fileID: 1782909339}
 --- !u!1 &1277079632
 GameObject:
   m_ObjectHideFlags: 0
@@ -2937,7 +2960,7 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
-  m_ActiveFontFeatures: 00000000
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
@@ -3209,7 +3232,7 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
-  m_ActiveFontFeatures: 00000000
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1

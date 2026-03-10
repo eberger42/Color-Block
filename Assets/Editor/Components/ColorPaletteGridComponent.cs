@@ -1,9 +1,6 @@
-﻿using Assets.Editor.Data;
-using System;
+﻿
+using Assets.Scripts.Data;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Assets.Editor.Components

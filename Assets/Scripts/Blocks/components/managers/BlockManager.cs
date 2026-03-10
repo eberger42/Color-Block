@@ -1,6 +1,7 @@
 ﻿using Assets.Scripts.Blocks.components.colors;
 using Assets.Scripts.Blocks.interfaces;
 using Assets.Scripts.Player.Interfaces;
+using Assets.Scripts.Systems.LevelSelect;
 using NUnit.Framework;
 using System;
 using System.Collections;
@@ -54,7 +55,7 @@ namespace Assets.Scripts.Blocks.components
             }
             else
             {
-                spawningStrategy = new PuzzleSpawningStrategy();
+                spawningStrategy = new PuzzleSpawningStrategy(LevelSelectManager.Instance);
             }
 
             spawningStrategy.SpawningSetup(this);
@@ -95,7 +96,7 @@ namespace Assets.Scripts.Blocks.components
                 gravityBlock.OnPlayerControlCompleted -= BlockManager_OnPlayerControlCompleted;
             }
 
-            var target = spawningStrategy.SpawnBlock(this);
+            var target = spawningStrategy.SpawnBlock(this, "");
 
             _currentEntity = target;
             (_currentEntity as IPlayerControlled).OnPlayerControlCompleted += BlockManager_OnPlayerControlCompleted;

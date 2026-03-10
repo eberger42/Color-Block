@@ -1,5 +1,4 @@
-﻿using Assets.Editor.Data;
-using Assets.Scripts.Blocks.components.colors;
+﻿
 using Assets.Scripts.Data;
 using System.Collections.Generic;
 using UnityEditor;

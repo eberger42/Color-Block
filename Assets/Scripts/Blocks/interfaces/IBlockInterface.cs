@@ -11,6 +11,6 @@ namespace Assets.Scripts.Blocks.interfaces
     {
         ColorBlockGroupController AssignBlockGroup();
         ITakeBlockCommand CreateBlock(IBlockColor blockColor);
-        ITakeBlockCommand CreateBlockGroup(IBlockColor blockColor);
+        ITakeBlockCommand CreateBlockGroup();
     }
 }

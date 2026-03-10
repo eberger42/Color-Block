@@ -1,7 +1,6 @@
 ﻿using Assets.Editor.Components;
-using Assets.Editor.Data;
-using Assets.Scripts.Blocks.components.colors;
 using Assets.Scripts.Blocks.interfaces;
+using Assets.Scripts.Data;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;

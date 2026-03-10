@@ -32,19 +32,12 @@ namespace Assets.Scripts.Blocks.components
         private bool isPlayerControlled = false;
         private bool waitForInit = true;
 
-        public void Initialize(IBlockGroupConfigurationStrategy configurationStrategy, BlockFactory factory, IBlockColor color)
+        public void Initialize()
         {
-            var _positions = configurationStrategy.GetPositions();
-
-            foreach (var position in _positions)
-            {
-                var block = factory.CreateBlock(color) as IBlock;
-                (this as IBlockGroup).AddBlock(block, position); //Add the block to the group
-
-            }
             waitForInit = false;
         }
 
+        // Initialize non player Controlled group
         public void Initialize(List<IBlock> blocks)
         {
             var firstPosition = blocks[0].GetGridPosition();

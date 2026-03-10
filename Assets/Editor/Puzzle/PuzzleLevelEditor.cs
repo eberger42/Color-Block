@@ -1,12 +1,8 @@
 using Assets.Editor.Components;
-using Assets.Editor.Data;
 using Assets.Editor.Puzzle;
-using Assets.Scripts.Blocks.components.colors;
-using Assets.Scripts.Grid.components;
-using System.Collections.Generic;
+using Assets.Scripts.Data;
 using UnityEditor;
 using UnityEngine;
-using static Assets.Editor.ColorBlockConfigurationEditor;
 
 public class PuzzleLevelEditor : EditorWindow, IUseSaveAndLoadEditorComponent
 {

@@ -1,28 +1,33 @@
-﻿using Assets.Editor.Data;
+﻿
+using Assets.Scripts.Data;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections;
 using UnityEngine;
 
 namespace Assets.Scripts.Grid.components
 {
-    internal abstract class GridLoader : MonoBehaviour
+    public abstract class GridLoader : MonoBehaviour
     {
 
+
+
+        private IEnumerator 
 
 
     }
 
-    internal abstract class GridConfiguration
+    [Serializable]
+    public class GridConfiguration
     {
+        protected string _id;
+        protected string _name;
+        private int _width;
+        private int _height;
 
-        protected readonly string _id;
-        protected readonly string _name;
-        protected readonly int _width;
-        protected readonly int _height;
+        public int Width { get => _width; }
+        public int Height { get => _height; }
 
+        public GridConfiguration() { }
 
         public GridConfiguration(ColorBlockGridConfigurationData configurationData) 
         { 

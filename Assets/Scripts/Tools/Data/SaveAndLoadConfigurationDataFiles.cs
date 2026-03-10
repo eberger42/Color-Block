@@ -1,17 +1,13 @@
-﻿using Assets.Scripts.Data;
+﻿
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
-namespace Assets.Editor.Tools
+namespace Assets.Scripts.Tools.Data
 {
-    public static class SaveAndLoadEditorFiles
+    public static class SaveAndLoadConfigurationDataFiles
     {
 
         public static void SaveToDisk<T>(T saveData, string path)

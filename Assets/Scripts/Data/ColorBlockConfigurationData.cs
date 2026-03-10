@@ -1,17 +1,12 @@
-﻿using Assets.Scripts.Blocks.components.colors;
+﻿
 using Assets.Scripts.Blocks.interfaces;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEditor.UI;
 
-namespace Assets.Editor.Data
+namespace Assets.Scripts.Data
 {
     [Serializable]
-    internal class ColorBlockGroupConfigurationData
+    public class ColorBlockGroupConfigurationData : IDataConfiguration
     {
         public ColorBlockGroupConfigurationData() { }
 
@@ -23,7 +18,7 @@ namespace Assets.Editor.Data
     }
 
     [Serializable]
-    internal class ColorBlockConfigurationData
+    public class ColorBlockConfigurationData
     {
         public int x;
         public int y;

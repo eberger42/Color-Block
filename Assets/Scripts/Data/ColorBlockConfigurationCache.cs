@@ -1,20 +1,18 @@
-﻿using Assets.Editor.Tools;
-using Assets.Scripts.Blocks.components;
+﻿
+using Assets.Scripts.Tools.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
-using UnityEngine;
 
-namespace Assets.Editor.Data
+namespace Assets.Scripts.Data
 {
     [Serializable]
-    internal class DataConfigurationCollection<T> where T : IDataConfiguration, new()
+    public class DataConfigurationCollection<T> where T : IDataConfiguration, new()
     {
         public List<T> configurations = new();
     }
 
-    internal class ColorBlockConfigurationCache : IDataConfigurationCache
+    public class ColorBlockConfigurationCache : IDataConfigurationCache
     {
         private readonly string DATABASEPATH = "Assets/Editor/ColorBlockConfigurations.json";
 
@@ -40,12 +38,12 @@ namespace Assets.Editor.Data
         void IDataConfigurationCache.SaveToDisk()
         {
             _collection.configurations = Configurations;
-            SaveAndLoadEditorFiles.SaveToDisk(_collection, DATABASEPATH);
+            SaveAndLoadConfigurationDataFiles.SaveToDisk(_collection, DATABASEPATH);
         }
 
         void IDataConfigurationCache.LoadFromDisk()
         {
-            _collection = SaveAndLoadEditorFiles.LoadFromDisk<DataConfigurationCollection<ColorBlockGroupConfigurationData>>(DATABASEPATH);
+            _collection = SaveAndLoadConfigurationDataFiles.LoadFromDisk<DataConfigurationCollection<ColorBlockGroupConfigurationData>>(DATABASEPATH);
            
         }
 

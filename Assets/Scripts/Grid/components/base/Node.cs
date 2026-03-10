@@ -24,7 +24,7 @@ namespace Assets.Scripts.Grid.components
         //Events
         public event Action<INodeEvent> OnNodeEvent;
 
-        private static GameObject collection = new GameObject($"{typeof(INodeData)}NodeCollection");
+        private static GameObject collection;
 
         protected IGrid<INode> gridListener;
         protected INodeData _data;
@@ -189,6 +189,7 @@ namespace Assets.Scripts.Grid.components
         {
             if (collection != null)
             {
+                GameObject.Destroy(collection);
                 collection = null;
             }
         }

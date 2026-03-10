@@ -1,13 +1,14 @@
-﻿using NUnit.Framework;
+﻿using Assets.Scripts.Blocks.components;
+using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Scripts.Blocks.interfaces
 {
-    public interface IBlockGroupConfigurationStrategy
+    public interface IBlockGroupConfiguration
     {
-        List<GridPosition> GetPositions();
+        List<ColorBlockConfiguration> GetPositions();
 
         GridPosition GetPivotPosition();
         

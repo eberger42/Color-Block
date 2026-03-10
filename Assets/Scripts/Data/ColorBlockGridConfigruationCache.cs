@@ -1,18 +1,12 @@
-﻿using Assets.Editor.Data;
-using Assets.Editor.Tools;
-using Assets.Scripts.Blocks.components;
-using System;
+﻿
+using Assets.Scripts.Tools.Data;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEditor;
-using UnityEngine;
 
 namespace Assets.Scripts.Data
 {
 
-    internal class ColorBlockGridConfigruationCache : IDataConfigurationCache
+    public class ColorBlockGridConfigruationCache : IDataConfigurationCache
     {
         private readonly string DATABASEPATH = "Assets/Editor/PuzzleLevels.json";
 
@@ -49,12 +43,12 @@ namespace Assets.Scripts.Data
         void IDataConfigurationCache.SaveToDisk()
         {
             _collection.configurations = Configurations;
-            SaveAndLoadEditorFiles.SaveToDisk(_collection, DATABASEPATH);
+            SaveAndLoadConfigurationDataFiles.SaveToDisk(_collection, DATABASEPATH);
         }
 
         void IDataConfigurationCache.LoadFromDisk()
         {
-            _collection = SaveAndLoadEditorFiles.LoadFromDisk<DataConfigurationCollection<ColorBlockGridConfigurationData>>(DATABASEPATH);
+            _collection = SaveAndLoadConfigurationDataFiles.LoadFromDisk<DataConfigurationCollection<ColorBlockGridConfigurationData>>(DATABASEPATH);
         }
     }
 

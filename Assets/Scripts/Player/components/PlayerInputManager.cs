@@ -52,7 +52,6 @@ public class PlayerInputManager : MonoBehaviour
 
         if (Instance != null)
         {
-            Debug.LogWarning("PlayerInputManager already exists");
             Destroy(gameObject);
             return;
         }

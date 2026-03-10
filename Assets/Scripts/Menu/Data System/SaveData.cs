@@ -30,7 +30,7 @@ public class SaveData
     }
 
 
-    public LevelData levelData = new LevelData();
+    public LevelDataList levelData = new LevelDataList();
 
 
 }

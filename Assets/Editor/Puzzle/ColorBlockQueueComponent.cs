@@ -1,13 +1,10 @@
 ﻿using Assets.Editor.Components.Base;
-using Assets.Editor.Data;
 using Assets.Scripts.Blocks.components.colors;
+using Assets.Scripts.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEditor;
-using UnityEditorInternal;
 using UnityEngine;
 
 namespace Assets.Editor.Puzzle
