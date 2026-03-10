@@ -19,7 +19,7 @@ namespace Assets.Scripts.Blocks.scriptable_objects
 
         public float Size { get => size; }
         public Color Color { get => color; }
-        public Vector2 Origin { get => origin; }
+        public Vector2 Origin { get => origin; set => origin = value; }
         public Texture2D Texture { get => texture; }
     }
 }

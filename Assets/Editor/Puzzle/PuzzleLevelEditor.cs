@@ -153,12 +153,12 @@ public class PuzzleLevelEditor : EditorWindow, IUseSaveAndLoadEditorComponent
     void LoadConfigurationIntoGrid(IDataConfiguration config)
     {
         _puzzleName = config.name;
-        _width = (config as ColorBlockGridConfigurationData).width;
-        _height = (config as ColorBlockGridConfigurationData).height;
+        _width = (config as LevelConfigurationData).width;
+        _height = (config as LevelConfigurationData).height;
 
-        _entityGridComponent.LoadConfigurationIntoGrid(_width, _height, (config as ColorBlockGridConfigurationData).gridNodes);
-        _colorPaletteGridComponent.LoadConfigurationIntoGrid(_width, _height, (config as ColorBlockGridConfigurationData).puzzleOverlay);
-        _colorBlockQueueComponent.LoadConfigurationIntoQueue((config as ColorBlockGridConfigurationData).queue);
+        _entityGridComponent.LoadConfigurationIntoGrid(_width, _height, (config as LevelConfigurationData).gridNodes);
+        _colorPaletteGridComponent.LoadConfigurationIntoGrid(_width, _height, (config as LevelConfigurationData).puzzleOverlay);
+        _colorBlockQueueComponent.LoadConfigurationIntoQueue((config as LevelConfigurationData).queue);
 
     }
     void IUseSaveAndLoadEditorComponent.SaveCurrentConfiguration()

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Assets.Editor.Components
 {
-    internal class EntityGridComponent : GridEditorComponentBase<ColorBLockGridNodeConfigurationData>
+    internal class EntityGridComponent : GridEditorComponentBase<GridNodeConfigurationData>
     {
         //Const
         private const int CELL_WIDTH = 30;
@@ -18,14 +18,14 @@ namespace Assets.Editor.Components
         {
         }
 
-        public override void LoadConfigurationIntoGrid(int width, int height, List<ColorBLockGridNodeConfigurationData> config)
+        public override void LoadConfigurationIntoGrid(int width, int height, List<GridNodeConfigurationData> config)
         {
             base.LoadConfigurationIntoGrid(width, height, config);
 
             foreach (var block in config)
             {
                 if (block.x < _width && block.y < _height)
-                    _grid[block.x, block.y] = new ColorBLockGridNodeConfigurationData { x = block.x, y = block.y };
+                    _grid[block.x, block.y] = new GridNodeConfigurationData { x = block.x, y = block.y };
             }
         }
 
@@ -55,7 +55,7 @@ namespace Assets.Editor.Components
             {
                 if (_grid[x, y] == null)
                 {
-                    _grid[x, y] = new ColorBLockGridNodeConfigurationData
+                    _grid[x, y] = new GridNodeConfigurationData
                     {
                         x = x,
                         y = y,

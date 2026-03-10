@@ -12,7 +12,6 @@ namespace Assets.Scripts.Player
 {
     public class PlayerController : MonoBehaviour
     {
-
         private CommandManager commandManager;
         private BlockManager blockManager;
         private PlayerInputManager playerInputManager;

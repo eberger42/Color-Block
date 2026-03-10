@@ -838,9 +838,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3569fe28406bad448d81616eb74b242, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelParent: {fileID: 1782909339}
-  levelButtonPrefab: {fileID: 4141137956425730501, guid: 9b07472c201299d47ab364aea199509a, type: 3}
-  sceneController: {fileID: 0}
 --- !u!1 &387938119
 GameObject:
   m_ObjectHideFlags: 0
@@ -2444,8 +2441,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7c65aec2dab85446a459771e74e72ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _buttonPrefab: {fileID: 4141137956425730501, guid: 9b07472c201299d47ab364aea199509a, type: 3}
   _buttonContainer: {fileID: 1782909339}
+  _buttonPrefab: {fileID: 4141137956425730501, guid: 9b07472c201299d47ab364aea199509a, type: 3}
+  sceneController: {fileID: 0}
 --- !u!1 &1277079632
 GameObject:
   m_ObjectHideFlags: 0

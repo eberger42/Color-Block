@@ -1,3 +1,4 @@
+using Assets.Scripts.Systems.Data;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Collections;
@@ -30,7 +31,7 @@ public class SaveData
     }
 
 
-    public LevelDataList levelData = new LevelDataList();
+    public LevelStateData levelData = new LevelStateData();
 
 
 }

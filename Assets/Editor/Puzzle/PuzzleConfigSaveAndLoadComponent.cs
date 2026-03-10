@@ -16,7 +16,7 @@ namespace Assets.Editor.Components
             _width = width;
             _height = height;
             _configurationCache = new ColorBlockGridConfigruationCache();
-            _currentConfigurationGroup = new ColorBlockGridConfigurationData();
+            _currentConfigurationGroup = new LevelConfigurationData();
             _currentConfigurationGroup.id = GUID.Generate().ToString();
         }
 
@@ -43,21 +43,21 @@ namespace Assets.Editor.Components
             PuzzleConfigurationLoadButton.Refresh();
         }
 
-        public void UpdateConfiguration(List<ColorBLockGridNodeConfigurationData> configBlocks, List<ColorBlockConfigurationData> overlay, List<string> queue,  string name, int width, int height)
+        public void UpdateConfiguration(List<GridNodeConfigurationData> configBlocks, List<ColorBlockConfigurationData> overlay, List<string> queue,  string name, int width, int height)
         {
             _currentConfigurationGroup.name = name;
-            (_currentConfigurationGroup as ColorBlockGridConfigurationData).gridNodes = configBlocks;
-            (_currentConfigurationGroup as ColorBlockGridConfigurationData).puzzleOverlay = overlay;
-            (_currentConfigurationGroup as ColorBlockGridConfigurationData).queue = queue;
-            (_currentConfigurationGroup as ColorBlockGridConfigurationData).width = width;
-            (_currentConfigurationGroup as ColorBlockGridConfigurationData).height = height;
+            (_currentConfigurationGroup as LevelConfigurationData).gridNodes = configBlocks;
+            (_currentConfigurationGroup as LevelConfigurationData).puzzleOverlay = overlay;
+            (_currentConfigurationGroup as LevelConfigurationData).queue = queue;
+            (_currentConfigurationGroup as LevelConfigurationData).width = width;
+            (_currentConfigurationGroup as LevelConfigurationData).height = height;
             _configurationCache.UpdateConfiguration(_currentConfigurationGroup);
             PuzzleConfigurationLoadButton.Refresh();
         }
         
         public override void CreateNewConfiguration()
         {
-            var newConfig = new ColorBlockGridConfigurationData();
+            var newConfig = new LevelConfigurationData();
             (newConfig as IDataConfiguration).id = GUID.Generate().ToString();
 
             _currentConfigurationGroup = newConfig;

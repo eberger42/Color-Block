@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.Systems.LevelSelect;
+﻿using Assets.Scripts.Systems.Data;
+using Assets.Scripts.Systems.LevelSelect;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -12,7 +13,6 @@ public class LevelButton : MonoBehaviour
 {
 
     private const Scenes SCENE_TO_LOAD = Scenes.DailyPuzzle;
-
 
     private Level _level;
 
