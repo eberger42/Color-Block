@@ -1,5 +1,7 @@
 ﻿
 using Assets.Scripts.Data;
+using NUnit.Framework;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Scripts.Systems.Data
@@ -15,22 +17,26 @@ namespace Assets.Scripts.Systems.Data
         private void Awake()
         {
 
-            if(Instance != null)
+            if (Instance != null)
             {
                 Destroy(this.gameObject);
                 return;
             }
-            
+
             Instance = this;
 
             (COLOR_BLOCK_CONFIG_CACHE as IDataConfigurationCache).LoadFromDisk();
 
         }
 
-        public ColorBlockConfigurationData GetColorBlockConfigurationDataByID(string colorBlockId)
+        public ColorBlockGroupConfigurationData GetColorBlockConfigurationDataByID(string colorBlockId)
         {
-            return (COLOR_BLOCK_CONFIG_CACHE as IDataConfigurationCache).GetConfigurationDataByID(colorBlockId) as ColorBlockConfigurationData;
+            return (COLOR_BLOCK_CONFIG_CACHE as IDataConfigurationCache).GetConfigurationDataByID(colorBlockId) as ColorBlockGroupConfigurationData;
         }
 
+        public List<ColorBlockGroupConfigurationData> GetAllConfigurations()
+        {
+            return COLOR_BLOCK_CONFIG_CACHE.Configurations;
+        }
     }
 }

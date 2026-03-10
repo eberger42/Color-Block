@@ -26,12 +26,12 @@ namespace Assets.Scripts.Grid.components
         private NodeConfiguration config;
 
         private readonly CommandManager commandManager = new CommandManager();
-        private GridPosition placementPosition = new GridPosition(20, 18);
 
 
         //Properties
         public int GridWidth { get => colorBlockGrid.Width; }
         public int GridHeight { get => colorBlockGrid.Height; }
+        private Vector2 Offset => colorBlockGrid.Offset;
 
 
         private void Awake()
@@ -52,7 +52,6 @@ namespace Assets.Scripts.Grid.components
         {
             BlockManager.Instance.OnTargetCreated += PlaceBlock;
 
-            GenerateGrid(12, 12);
         }
 
         private void OnDestroy()
@@ -70,7 +69,6 @@ namespace Assets.Scripts.Grid.components
 
         public void InitializeGrid(PuzzleGridConfiguration puzzleGridConfiguration)
         {
-
             var width = puzzleGridConfiguration.Width;
             var height = puzzleGridConfiguration.Height;
             GenerateGrid(width, height);
@@ -80,7 +78,7 @@ namespace Assets.Scripts.Grid.components
         {
             float widthOffset, heightOffset;
             FindOriginOffset(width, height, out widthOffset, out heightOffset);
-            Debug.Log($"WidthOffset: {widthOffset}, HeightOffset: {heightOffset}");
+
             var offset = new Vector2(-widthOffset, -heightOffset);
             config.Origin = offset;
 
@@ -94,7 +92,7 @@ namespace Assets.Scripts.Grid.components
 
         public Vector2 GetWorldPosition(GridPosition gridPosition)
         {
-            return new Vector2(gridPosition.x, gridPosition.y);
+            return new Vector2(gridPosition.x, gridPosition.y) + Offset;
         }
 
         public bool CheckIfSpacesAreOccupied(List<GridPosition> positions)
@@ -112,7 +110,8 @@ namespace Assets.Scripts.Grid.components
         private async void PlaceBlock(ITakeBlockCommand target)
         {
             Debug.Log($"ColorGrid BlockPlaced");
-            var placeBlockCommandConfigurer = new PlaceBlockCommandConfigurer(colorBlockGrid, placementPosition);
+
+            var placeBlockCommandConfigurer = new PlaceBlockCommandConfigurer(colorBlockGrid, new GridPosition(GridWidth/2, GridHeight - 5));
             var command = new CommandManager.CommandBuilder().AddCommand<PlaceBlockCommand>(target, placeBlockCommandConfigurer).Build();
             await commandManager.ExecuteCommands(command);
         }

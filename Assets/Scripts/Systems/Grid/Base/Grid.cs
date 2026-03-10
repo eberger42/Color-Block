@@ -27,6 +27,7 @@ namespace Assets.Scripts.Grid.components
 
         public int Width { get => width; }
         public int Height { get => height; }
+        public Vector2 Offset { get => offset; }
 
         public Grid(int width, int height, float cellSize, Vector2 offset)
         {

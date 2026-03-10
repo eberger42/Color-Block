@@ -155,6 +155,9 @@ namespace Assets.Scripts.Blocks.components
             {
                 var delta = _positionsDeltaMap[block];
                 var newPosition = position + delta;
+
+                Debug.Log($"Placing Block: {block} at Position: {newPosition} with Delta: {delta}");
+
                 (block as ITakeBlockCommand).Place(colorGrid, newPosition);
 
                 var isFloating = CheckSingleBlockIfFloating(block);

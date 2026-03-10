@@ -375,9 +375,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe09bc00217126e47b924b3bf0f03025, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridWidth: 40
-  gridHeight: 22
-  origin: {x: 0, y: 0}
   config: {fileID: 11400000, guid: 0ce4fb80072063d4494a23dd7726c8be, type: 2}
 --- !u!222 &9063056390254034539
 CanvasRenderer:

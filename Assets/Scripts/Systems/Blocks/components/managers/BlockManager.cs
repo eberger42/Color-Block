@@ -1,6 +1,8 @@
 ﻿using Assets.Scripts.Blocks.components.colors;
 using Assets.Scripts.Blocks.interfaces;
+using Assets.Scripts.Data;
 using Assets.Scripts.Player.Interfaces;
+using Assets.Scripts.Systems.Data;
 using Assets.Scripts.Systems.LevelSelect;
 using NUnit.Framework;
 using System;
@@ -14,13 +16,14 @@ namespace Assets.Scripts.Blocks.components
     {
         public static BlockManager Instance { get; private set; }
         public IBlockFactory BlockFactory { get => blockFactory; }
+        public Dictionary<string, ColorBlockGroupConfiguration> ConfigurationCache { get => _configurationCache; }
 
         ITakeBlockCommand _currentEntity;
 
         [SerializeField]
         private BlockFactory blockFactory;
-
         private ISpawningStrategy spawningStrategy;
+        private Dictionary<string, ColorBlockGroupConfiguration> _configurationCache;
 
         //Events
         public event Action<ITakeBlockCommand> OnTargetCreated;
@@ -32,39 +35,41 @@ namespace Assets.Scripts.Blocks.components
         {
 
 
-            if (Instance == null)
-            {
-                Instance = this;
-
-            }
-            else
+            if (Instance != null)
             {
                 Destroy(gameObject);
             }
-       
-           
+
+
+           Instance = this;
+
+
+            _configurationCache = new Dictionary<string, ColorBlockGroupConfiguration>();
 
         }
 
 
         private void Start()
         {
-            if (SceneController.instance.GetCurrentScene() == Scenes.FreePlay)
-            {
-                spawningStrategy = new FreePlaySpawningStrategy();
-            }
-            else
-            {
-                spawningStrategy = new PuzzleSpawningStrategy(LevelSelectManager.Instance);
-            }
 
-            spawningStrategy.SpawningSetup(this);
+            foreach (var config in ColorBlockDataAccessor.Instance.GetAllConfigurations())
+            {
+                var key = config.id;
+                var value = new ColorBlockGroupConfiguration(config);
+                _configurationCache[key] = value;
+            }
         }
         private void OnDestroy()
         {
             Instance = null;
         }
 
+
+        public void SetSpawningStrategy(ISpawningStrategy strategy)
+        {
+            spawningStrategy = strategy;
+            spawningStrategy.SpawningSetup(this);
+        }
 
         public void AssignBlockGroupToBlocks(List<IBlock> blocks)
         {
@@ -74,11 +79,7 @@ namespace Assets.Scripts.Blocks.components
 
         }
 
-
-        ///////////////////////////////////////////////////////////////////
-        /// ISpawningStrategyListener Implementation
-        ///////////////////////////////////////////////////////////////////
-        void ISpawningStrategyListener.CreateNewBlock()
+        public void TriggerBlockCreation()
         {
 
             Debug.Log("CreateNewBlock called " + callCount);
@@ -90,13 +91,12 @@ namespace Assets.Scripts.Blocks.components
                 return;
             }
 
-
             if (_currentEntity is IPlayerControlled gravityBlock)
             {
                 gravityBlock.OnPlayerControlCompleted -= BlockManager_OnPlayerControlCompleted;
             }
 
-            var target = spawningStrategy.SpawnBlock(this, "");
+            var target = spawningStrategy.SpawnBlock(this);
 
             _currentEntity = target;
             (_currentEntity as IPlayerControlled).OnPlayerControlCompleted += BlockManager_OnPlayerControlCompleted;

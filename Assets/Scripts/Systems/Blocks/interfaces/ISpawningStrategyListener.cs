@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Assets.Scripts.Blocks.interfaces
 {
-    internal interface ISpawningStrategyListener
+    public interface ISpawningStrategyListener
     {
         public IBlockFactory BlockFactory { get; }
-        void CreateNewBlock();
     }
 }

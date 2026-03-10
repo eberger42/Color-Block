@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Assets.Scripts.Blocks.interfaces
 {
-    internal interface ISpawningStrategy
+    public interface ISpawningStrategy
     {
 
         void SpawningSetup(ISpawningStrategyListener listener);
         void HandlePlayerControlCompleted(ISpawningStrategyListener listener);
-        ITakeBlockCommand SpawnBlock(ISpawningStrategyListener listener, string blockID);
+        ITakeBlockCommand SpawnBlock(ISpawningStrategyListener listener);
     }
 }

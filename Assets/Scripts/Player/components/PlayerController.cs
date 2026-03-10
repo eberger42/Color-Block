@@ -40,6 +40,7 @@ namespace Assets.Scripts.Player
 
             playerInputManager.OnRotateRightPressed += RotateTargetEntity;
             playerInputManager.OnMovementPressed += MoveTargetEntity;
+            playerInputManager.OnFire1Pressed += SpawnBlock;
         }
 
 
@@ -49,6 +50,7 @@ namespace Assets.Scripts.Player
 
             playerInputManager.OnRotateRightPressed -= RotateTargetEntity;
             playerInputManager.OnMovementPressed -= MoveTargetEntity;
+            playerInputManager.OnFire1Pressed -= SpawnBlock;
         }
 
         private void RotateTargetEntity()
@@ -89,6 +91,10 @@ namespace Assets.Scripts.Player
             await commandManager.ExecuteCommands(command);
         }
 
+        private void SpawnBlock()
+        {
+            blockManager.TriggerBlockCreation();
+        }
         private void OnBlockCreated(ITakeBlockCommand target)
         {
             Debug.Log($"Setting Target Entity");

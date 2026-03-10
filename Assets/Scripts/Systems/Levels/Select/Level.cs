@@ -10,13 +10,15 @@ namespace Assets.Scripts.Systems.LevelSelect
     public class Level
     {
         private LevelStateData levelStateData;
-        private LevelConfigurationData? _levelConfigData;
+        private LevelConfigurationData _levelConfigData;
 
         //Properties
         public string LevelName => levelStateData.levelName;
         public string LevelID => levelStateData.levelId;
         public bool Unlocked => levelStateData.unlocked;
         public bool CompletionStatus => levelStateData.completionStatus;
+
+        public LevelConfigurationData LevelConfigData => _levelConfigData;
 
         public Level(LevelStateData levelData)
         {
@@ -28,15 +30,6 @@ namespace Assets.Scripts.Systems.LevelSelect
             _levelConfigData = configData;
         }
 
-        public PuzzleGridConfiguration GetGridConfiguration()
-        {
-            if(_levelConfigData == null)
-            {
-                throw new InvalidOperationException("Level configuration data has not been set for this level.");
-            }
-
-            return new PuzzleGridConfiguration(_levelConfigData);
-        }
 
     }
 }
