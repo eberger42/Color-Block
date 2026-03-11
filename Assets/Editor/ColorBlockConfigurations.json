@@ -269,6 +269,36 @@
       },
       "id": "f8b0282a558a63645a7d988b58a0dacd",
       "name": null
+    },
+    {
+      "blocks": [
+        {
+          "x": 0,
+          "y": 3,
+          "color": 2
+        },
+        {
+          "x": 1,
+          "y": 3,
+          "color": 2
+        },
+        {
+          "x": 2,
+          "y": 3,
+          "color": 2
+        },
+        {
+          "x": 3,
+          "y": 3,
+          "color": 2
+        }
+      ],
+      "pivotPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "id": "76df94229ec1987419ac537dbf5e89f3",
+      "name": null
     }
   ]
 }

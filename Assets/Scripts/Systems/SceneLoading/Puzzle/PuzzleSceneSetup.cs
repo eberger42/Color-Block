@@ -3,6 +3,7 @@ using Assets.Scripts.Blocks.components.managers;
 using Assets.Scripts.Data;
 using Assets.Scripts.Grid.components;
 using Assets.Scripts.Systems.Data;
+using Assets.Scripts.Systems.Goal;
 using Assets.Scripts.Systems.LevelSelect;
 using Assets.Scripts.Tools.Logic;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ namespace Assets.Scripts.Systems.SceneLoading.Puzzle
         private LevelSelectManager _levelSelectManager;
         private ColorGridManager _colorGridManager;
         private BlockManager _blockManager;
+        private GoalManager _goalManager;
 
         protected override void InitComponents()
         {
@@ -26,6 +28,7 @@ namespace Assets.Scripts.Systems.SceneLoading.Puzzle
             _levelSelectManager = LevelSelectManager.Instance;
             _colorGridManager = ColorGridManager.Instance;
             _blockManager = BlockManager.Instance;
+            _goalManager = GoalManager.Instance;
 
         }
 
@@ -35,6 +38,7 @@ namespace Assets.Scripts.Systems.SceneLoading.Puzzle
             _context.AddSingletonData(_levelSelectManager);
             _context.AddSingletonData(_colorGridManager);
             _context.AddSingletonData(_blockManager);
+            _context.AddSingletonData(_goalManager);
         }
 
         protected override void InitCORHandler()
@@ -42,7 +46,8 @@ namespace Assets.Scripts.Systems.SceneLoading.Puzzle
             _rootHandler = new SetupLevelHandler();
 
             _rootHandler.SetNext(new SetupGridHandler())
-                        .SetNext(new SetupQueueHandler());
+                        .SetNext(new SetupQueueHandler())
+                        .SetNext(new SetupGoalHandler());
         }
     }
 
@@ -81,7 +86,6 @@ namespace Assets.Scripts.Systems.SceneLoading.Puzzle
             base.Handle(context);
         }
     }
-
     class SetupLevelHandler : AbstractHandler
     {
         public override void Handle(CORContext context)
@@ -100,6 +104,21 @@ namespace Assets.Scripts.Systems.SceneLoading.Puzzle
             base.Handle(context);
         }
     }
+    class SetupGoalHandler : AbstractHandler
+    {
+        public override void Handle(CORContext context)
+        {
+            var goalManager = context.GetSingletonData<GoalManager>();
 
+            var level = context.GetSingletonData<Level>();
+
+            var goalConfig = level.LevelConfigData.puzzleOverlay;
+
+            goalManager.DrawOverlay(goalConfig);
+
+
+            base.Handle(context);
+        }
+    }
 
 }

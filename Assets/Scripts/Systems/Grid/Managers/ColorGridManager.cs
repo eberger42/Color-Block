@@ -25,6 +25,9 @@ namespace Assets.Scripts.Grid.components
         [SerializeField]
         private NodeConfiguration config;
 
+        [SerializeField]
+        Texture2D debugTexture;
+
         private readonly CommandManager commandManager = new CommandManager();
 
 
@@ -33,6 +36,7 @@ namespace Assets.Scripts.Grid.components
         public int GridHeight { get => colorBlockGrid.Height; }
         private Vector2 Offset => colorBlockGrid.Offset;
 
+      
 
         private void Awake()
         {

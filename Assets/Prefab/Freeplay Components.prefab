@@ -245,6 +245,7 @@ Transform:
   - {fileID: 3876770067944424581}
   - {fileID: 2229127611137575647}
   - {fileID: 9136424181326354176}
+  - {fileID: 6807539224463740736}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4540821238023649744
@@ -376,6 +377,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   config: {fileID: 11400000, guid: 0ce4fb80072063d4494a23dd7726c8be, type: 2}
+  debugTexture: {fileID: 0}
 --- !u!222 &9063056390254034539
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1141,6 +1143,52 @@ MonoBehaviour:
   pauseManager: {fileID: 400351763807818062}
   pauseMenu: {fileID: 9046951937904253276}
   defaultButton: {fileID: 5776562604211205994}
+--- !u!1 &7770794024625896536
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6807539224463740736}
+  - component: {fileID: 327490361356138826}
+  m_Layer: 0
+  m_Name: Goal
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6807539224463740736
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7770794024625896536}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 9088627770247219476}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &327490361356138826
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7770794024625896536}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b0b77a981d7d484eb335f44e0bc0e8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _colorOverLayPrefab: {fileID: 2187372020479753059, guid: 79f90e5f3e66c5e46a382fe19f4acadc, type: 3}
+  _location: {x: 25, y: 0}
 --- !u!1 &8177276331834320978
 GameObject:
   m_ObjectHideFlags: 0

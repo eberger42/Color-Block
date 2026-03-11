@@ -461,6 +461,10 @@ PrefabInstance:
       propertyPath: m_BlockingMask.m_Bits
       value: 4294967295
       objectReference: {fileID: 0}
+    - target: {fileID: 4140389959966159811, guid: 3f7288929f334d846a93971afa0ec8f6, type: 3}
+      propertyPath: spriteRenderer
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 9088627770247219476, guid: 3f7288929f334d846a93971afa0ec8f6, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -502,7 +506,7 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
-    - {fileID: 7544886801500544033, guid: 3f7288929f334d846a93971afa0ec8f6, type: 3}
+    - {fileID: 0}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

@@ -12,11 +12,12 @@ namespace Assets.Editor.Puzzle
     internal class ColorBlockQueueComponent : QueueEditorComponentBase<string>
     {
         private const int GRIDSIZE = 4;
-        private static Dictionary<string, Texture2D> _previewCache = new Dictionary<string, Texture2D>();
+        private static Dictionary<string, Texture2D> _previewCache;
         private readonly ColorBlockConfigurationCache _colorBlockConfigurationCache = new();
 
         public ColorBlockQueueComponent()
         {
+            _previewCache = new Dictionary<string, Texture2D>();
             (_colorBlockConfigurationCache as IDataConfigurationCache).LoadFromDisk();
             var _blockData = _colorBlockConfigurationCache.Configurations;
 
