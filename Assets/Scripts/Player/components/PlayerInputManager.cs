@@ -53,6 +53,7 @@ public class PlayerInputManager : MonoBehaviour
         if (Instance != null)
         {
             Destroy(gameObject);
+            Debug.LogWarning("Multiple instances of PlayerInputManager detected. Destroying duplicate.");
             return;
         }
         playerInput = GetComponent<PlayerInput>();
@@ -95,13 +96,14 @@ public class PlayerInputManager : MonoBehaviour
 
     public void Fire_1(InputAction.CallbackContext context)
     {
+        Debug.Log("Fire 1 Input Detected");
         if (EventSystem.current.IsPointerOverGameObject())
             return;
-
+        Debug.Log("Fire 1 Input Not Over UI");
         if (context.performed)
         {
             OnFire1Pressed?.Invoke();
-
+            Debug.Log("Fire 1 Pressed");
         }
     }
     public void Fire_2(InputAction.CallbackContext context)

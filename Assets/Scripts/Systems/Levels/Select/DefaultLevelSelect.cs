@@ -6,25 +6,15 @@ using static UnityEngine.Rendering.STP;
 
 namespace Assets.Scripts.Systems.Levels.Select
 {
-
-    [RequireComponent(typeof(LevelSelectManager))]
     public sealed class DefaultLevelSelect : MonoBehaviour
     {
 
         private LevelSelectManager _levelSelectManager;
         private ColorBlockGridDataAccessor _colorBlockGridDataAccessor;
 
-
-        private void Awake()
-        {
-            _levelSelectManager = GetComponent<LevelSelectManager>();
-
-
-          
-        }
-
         void Start()
         {
+            _levelSelectManager = LevelSelectManager.Instance;
             _colorBlockGridDataAccessor = ColorBlockGridDataAccessor.Instance;
 
             var config = _colorBlockGridDataAccessor.GetColorBlockConfigurationDataByID("__Default");

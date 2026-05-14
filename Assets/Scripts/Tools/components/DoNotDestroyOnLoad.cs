@@ -8,4 +8,10 @@ public class DoNotDestroyOnLoad : MonoBehaviour
     {
         DontDestroyOnLoad(gameObject);
     }
+
+    private void OnDestroy()
+    {
+        Debug.Log("Destroying " + gameObject.name);
+    
+    }
 }

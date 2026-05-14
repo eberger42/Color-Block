@@ -24,6 +24,7 @@ namespace Assets.Scripts.Systems.LevelSelect
             if (Instance != null)
             {
                 Destroy(this.gameObject);
+                Debug.LogWarning("Multiple instances of LevelSelectManager detected. Destroying duplicate.");
                 return;
             }
 

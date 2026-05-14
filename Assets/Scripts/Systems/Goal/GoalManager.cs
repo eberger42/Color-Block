@@ -30,7 +30,10 @@ namespace Assets.Scripts.Systems.Goal
             }
 
             Instance = this;
-            
+
+
+            _colorOverLayPrefab.position = _location;
+
         }
 
         public void DrawOverlay(List<ColorBlockConfigurationData> blocks)
@@ -42,7 +45,7 @@ namespace Assets.Scripts.Systems.Goal
                 colorOverlay.parent = transform;
 
 
-                colorOverlay.localPosition = new Vector2(-block.x, -block.y) + _location;
+                colorOverlay.localPosition = new Vector2(-block.x, -block.y);
                 var goalBlockUX = colorOverlay.GetComponent<GoalBlockUX>();
                 goalBlockUX.UpdateColor(block.color);
             }

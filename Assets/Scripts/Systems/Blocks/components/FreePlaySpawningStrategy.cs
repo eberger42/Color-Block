@@ -11,6 +11,7 @@ using System.Drawing;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static UnityEngine.GraphicsBuffer;
 
 [Serializable]
 public class FreePlaySpawningStrategy : ISpawningStrategy
@@ -24,6 +25,26 @@ public class FreePlaySpawningStrategy : ISpawningStrategy
     ITakeBlockCommand ISpawningStrategy.SpawnBlock(ISpawningStrategyListener listener)
     {
         //TODO: Implement a more complex spawning logic based on the blockID, for now we just spawn a random block
+
+        if(listener is BlockManager blockManager)
+        {
+            ColorBlockGroupConfiguration blockConfiguration = blockManager.ConfigurationCache.ElementAt(UnityEngine.Random.Range(0, blockManager.ConfigurationCache.Count)).Value;
+            ITakeBlockCommand blockGroup = blockManager.BlockFactory.CreateBlockGroup();
+
+            var blockDataSet = (blockConfiguration as IBlockGroupConfiguration).GetPositions();
+
+            foreach (var blockData in blockDataSet)
+            {
+                var block = listener.BlockFactory.CreateBlock(blockData.BlockColor) as IBlock;
+
+                Debug.Log($"Spawning block of color {blockData.BlockColor} at position {blockData.Position}");
+                (blockGroup as IBlockGroup).AddBlock(block, blockData.Position); //Add the block to the group
+
+            }
+
+            (blockGroup as ColorBlockGroupController).Initialize();
+            return blockGroup;
+        }
 
         return null;
     }

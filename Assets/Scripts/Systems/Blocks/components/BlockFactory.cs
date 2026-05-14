@@ -1,11 +1,7 @@
-﻿using Assets.Scripts.Blocks.components.colors;
+﻿
 using Assets.Scripts.Blocks.interfaces;
-using NUnit.Framework;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using static Unity.Collections.AllocatorManager;
 
 namespace Assets.Scripts.Blocks.components
 {
@@ -22,6 +18,7 @@ namespace Assets.Scripts.Blocks.components
         private Transform blockGroupPrefab;
 
         private readonly List<IBlockGroupConfiguration> configurationStrategies = new List<IBlockGroupConfiguration>();
+
         private void Awake()
         {
 

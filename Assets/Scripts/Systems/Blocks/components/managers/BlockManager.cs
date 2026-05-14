@@ -69,6 +69,7 @@ namespace Assets.Scripts.Blocks.components
         {
             spawningStrategy = strategy;
             spawningStrategy.SpawningSetup(this);
+            Debug.Log("Spawning strategy set: " + strategy.GetType().Name);
         }
 
         public void AssignBlockGroupToBlocks(List<IBlock> blocks)

@@ -149,10 +149,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe09bc00217126e47b924b3bf0f03025, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridWidth: 40
-  gridHeight: 22
-  origin: {x: 0, y: 0}
   config: {fileID: 11400000, guid: 0ce4fb80072063d4494a23dd7726c8be, type: 2}
+  debugTexture: {fileID: 0}
 --- !u!224 &169767178
 RectTransform:
   m_ObjectHideFlags: 0
@@ -180,17 +178,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 169767176}
   m_CullTransparentMesh: 1
---- !u!114 &339252900 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5472744275395267668, guid: aa09655e3fcea494db1a62a6834f9004, type: 3}
-  m_PrefabInstance: {fileID: 791981515}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -469,6 +456,50 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: aa09655e3fcea494db1a62a6834f9004, type: 3}
+--- !u!1 &2041199558
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2041199560}
+  - component: {fileID: 2041199559}
+  m_Layer: 0
+  m_Name: Scene Setup
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2041199559
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2041199558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f74f5ad8ac20ab4fbb5925630b8848e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &2041199560
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2041199558}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -269.2415, y: 64.63576, z: 2.7761705}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &4874104645240439029
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -480,7 +511,7 @@ PrefabInstance:
     - target: {fileID: 43675488346380134, guid: 3f7288929f334d846a93971afa0ec8f6, type: 3}
       propertyPath: totalScore
       value: 
-      objectReference: {fileID: 339252900}
+      objectReference: {fileID: 0}
     - target: {fileID: 1153000691447761888, guid: 3f7288929f334d846a93971afa0ec8f6, type: 3}
       propertyPath: m_Name
       value: Color Grid Components
@@ -543,3 +574,4 @@ SceneRoots:
   - {fileID: 169767178}
   - {fileID: 4874104645240439029}
   - {fileID: 791981515}
+  - {fileID: 2041199560}

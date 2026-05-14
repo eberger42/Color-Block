@@ -71,10 +71,10 @@ namespace Assets.Scripts.Grid.components
 
         }
 
-        public void InitializeGrid(PuzzleGridConfiguration puzzleGridConfiguration)
+        public void InitializeGrid(GridConfiguration gridConfig)
         {
-            var width = puzzleGridConfiguration.Width;
-            var height = puzzleGridConfiguration.Height;
+            var width = gridConfig.Width;
+            var height = gridConfig.Height;
             GenerateGrid(width, height);
         }
 
