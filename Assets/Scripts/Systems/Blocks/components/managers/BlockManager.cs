@@ -69,7 +69,6 @@ namespace Assets.Scripts.Blocks.components
         {
             spawningStrategy = strategy;
             spawningStrategy.SpawningSetup(this);
-            Debug.Log("Spawning strategy set: " + strategy.GetType().Name);
         }
 
         public void AssignBlockGroupToBlocks(List<IBlock> blocks)
@@ -82,8 +81,6 @@ namespace Assets.Scripts.Blocks.components
 
         public void TriggerBlockCreation()
         {
-
-            Debug.Log("CreateNewBlock called " + callCount);
             callCount++;
 
             if(callCount > 200)

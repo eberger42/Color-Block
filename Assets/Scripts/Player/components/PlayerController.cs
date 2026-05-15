@@ -55,7 +55,6 @@ namespace Assets.Scripts.Player
 
         private void RotateTargetEntity()
         {
-            Debug.Log("Rotatin");
             RotateTargetEntity(1);
             return;
         }

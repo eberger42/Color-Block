@@ -20,6 +20,8 @@ namespace Assets.Scripts.Blocks.components
 
             var blocksData = configurationData.blocks;
 
+            _pivotPosition = configurationData.pivotPosition;
+
             foreach (var blockData in blocksData)
             {
                 var gridPosition = new GridPosition(blockData.x, blockData.y);

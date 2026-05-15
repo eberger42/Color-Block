@@ -30,19 +30,17 @@ public class FreePlaySpawningStrategy : ISpawningStrategy
         {
             ColorBlockGroupConfiguration blockConfiguration = blockManager.ConfigurationCache.ElementAt(UnityEngine.Random.Range(0, blockManager.ConfigurationCache.Count)).Value;
             ITakeBlockCommand blockGroup = blockManager.BlockFactory.CreateBlockGroup();
+            (blockGroup as ColorBlockGroupController).Initialize((blockConfiguration as IBlockGroupConfiguration).GetPivotPosition());
 
             var blockDataSet = (blockConfiguration as IBlockGroupConfiguration).GetPositions();
 
             foreach (var blockData in blockDataSet)
             {
                 var block = listener.BlockFactory.CreateBlock(blockData.BlockColor) as IBlock;
-
-                Debug.Log($"Spawning block of color {blockData.BlockColor} at position {blockData.Position}");
                 (blockGroup as IBlockGroup).AddBlock(block, blockData.Position); //Add the block to the group
 
             }
 
-            (blockGroup as ColorBlockGroupController).Initialize();
             return blockGroup;
         }
 
@@ -89,7 +87,6 @@ public class PuzzleSpawningStrategy : ISpawningStrategy
             {
                 var block = listener.BlockFactory.CreateBlock(blockData.BlockColor) as IBlock;
 
-                Debug.Log($"Spawning block of color {blockData.BlockColor} at position {blockData.Position}");
                 (target as IBlockGroup).AddBlock(block, blockData.Position); //Add the block to the group
 
             }

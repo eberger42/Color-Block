@@ -24,6 +24,7 @@ namespace Assets.Scripts.Blocks.components
 
         //Block Positioning Helpers
         private Dictionary<IBlock,GridPosition> _positionsDeltaMap = new Dictionary<IBlock, GridPosition>();
+        private GridPosition _pivotPosition;
 
         //Grouped elements
         private List<IBlock> blocks = new List<IBlock>();
@@ -37,14 +38,19 @@ namespace Assets.Scripts.Blocks.components
             waitForInit = false;
         }
 
+        public void Initialize(GridPosition pivotPoint)
+        {
+            Initialize();
+            _pivotPosition = pivotPoint;
+        }
+
         // Initialize non player Controlled group
         public void Initialize(List<IBlock> blocks)
         {
-            var firstPosition = blocks[0].GetGridPosition();
 
             foreach (var block in blocks)
             {
-                var delta = block.GetGridPosition() - firstPosition;
+                var delta = block.GetGridPosition() - _pivotPosition;
                 (this as IBlockGroup).AddBlock(block, delta); //Add the block to the group
             }
             waitForInit = false;
@@ -124,7 +130,8 @@ namespace Assets.Scripts.Blocks.components
             (block as IBlock).OnColorUpdated += HandleChildBlockColorUpdated;
             (block as IEntity).OnEntityDestroyed += HandleChildBlockDestroyed;
             this.blocks.Add(block);
-            _positionsDeltaMap.Add(block, delta);
+
+            _positionsDeltaMap.Add(block, delta - _pivotPosition);
         }
         
         void IBlockGroup.SetColor(IBlockColor color)
@@ -155,8 +162,6 @@ namespace Assets.Scripts.Blocks.components
             {
                 var delta = _positionsDeltaMap[block];
                 var newPosition = position + delta;
-
-                Debug.Log($"Placing Block: {block} at Position: {newPosition} with Delta: {delta}");
 
                 (block as ITakeBlockCommand).Place(colorGrid, newPosition);
 
@@ -216,6 +221,9 @@ namespace Assets.Scripts.Blocks.components
             foreach (var block in blocks)
             {
                 var currentDelta = _positionsDeltaMap[block];
+
+                Debug.Log($"Rotating Block: {block} with Current Delta: {currentDelta}");
+
                 var targetDelta = GetDeltaPosition(currentDelta, delta);
 
                 var rotationPosition = targetDelta - currentDelta;
@@ -252,6 +260,7 @@ namespace Assets.Scripts.Blocks.components
             {
 
                 var currentDelta = _positionsDeltaMap[block];
+
                 var targetDelta = GetDeltaPosition(currentDelta, delta);
 
                 var rotationPosition = targetDelta - currentDelta;
@@ -384,7 +393,7 @@ namespace Assets.Scripts.Blocks.components
         ///////////////////////////////////////////////////////////////////
         private GridPosition GetDeltaPosition(GridPosition position, GridPosition deltaPosition)
         {
-            return new GridPosition(position.y * deltaPosition.y, position.x * deltaPosition.x);
+            return new GridPosition(position.y * deltaPosition.x, position.x * deltaPosition.y);
         }
 
         private bool CheckSingleBlockIfFloating(IBlock block)

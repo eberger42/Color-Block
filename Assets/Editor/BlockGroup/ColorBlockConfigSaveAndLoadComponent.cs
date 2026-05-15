@@ -2,6 +2,7 @@
 using Assets.Scripts.Blocks.components.colors;
 using Assets.Scripts.Data;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using UnityEditor;
 using UnityEngine;
 
@@ -38,9 +39,11 @@ namespace Assets.Editor.Components
             ColorBlockConfigurationLoadButton.Refresh();
         }
 
-        public void UpdateConfiguration(List<ColorBlockConfigurationData> configBlocks, string name)
+        public void UpdateConfiguration(List<ColorBlockConfigurationData> configBlocks, string name, GridPosition pivotPosition)
         {
             (_currentConfigurationGroup as ColorBlockGroupConfigurationData).blocks = configBlocks;
+            (_currentConfigurationGroup as ColorBlockGroupConfigurationData).pivotPosition = pivotPosition;
+
             _currentConfigurationGroup.name = name;
             _configurationCache.UpdateConfiguration(_currentConfigurationGroup);
             ColorBlockConfigurationLoadButton.Refresh();
@@ -134,7 +137,7 @@ namespace Assets.Editor.Components
                         for (int px = 0; px < cell; px++)
                         {
                             int tx = block.x * cell + px;
-                            int ty = (GRIDSIZE - 1 - block.y) * cell + py; // flip Y for UI
+                            int ty = block.y * cell + py; // flip Y for UI
                             _preview.SetPixel(tx, ty, c);
                         }
                     }
