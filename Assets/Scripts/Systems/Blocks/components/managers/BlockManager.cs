@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.Blocks.components
 {
-    public class BlockManager : MonoBehaviour, ISpawningStrategyListener
+    public class BlockManager : MonoBehaviour, ISpawningStrategyListener, ITakeFire1Input
     {
         public static BlockManager Instance { get; private set; }
         public IBlockFactory BlockFactory { get => blockFactory; }
@@ -29,8 +29,11 @@ namespace Assets.Scripts.Blocks.components
         public event Action<ITakeBlockCommand> OnTargetCreated;
 
         int callCount = 0;
-        
 
+        //////////////////////////////////////////////////////////////////
+        /// Unity Lifecycle
+        //////////////////////////////////////////////////////////////////
+        #region Unity Lifecycle 
         private void Awake()
         {
 
@@ -64,7 +67,14 @@ namespace Assets.Scripts.Blocks.components
             Instance = null;
         }
 
+        #endregion
 
+
+        //////////////////////////////////////////////////////////////////
+        /// Public Methods
+        ///////////////////////////////////////////////////////////////////
+
+        #region Public Methods
         public void SetSpawningStrategy(ISpawningStrategy strategy)
         {
             spawningStrategy = strategy;
@@ -81,27 +91,50 @@ namespace Assets.Scripts.Blocks.components
 
         public void TriggerBlockCreation()
         {
-            callCount++;
 
-            if(callCount > 200)
-                {
-                Debug.LogError("CreateNewBlock called too many times, possible infinite loop");
-                return;
-            }
-
-            if (_currentEntity is IPlayerControlled gravityBlock)
+            try
             {
-                gravityBlock.OnPlayerControlCompleted -= BlockManager_OnPlayerControlCompleted;
+
+                callCount++;
+
+                if (callCount > 200)
+                {
+                    Debug.LogError("CreateNewBlock called too many times, possible infinite loop");
+                    return;
+                }
+
+                if (_currentEntity is IPlayerControlled gravityBlock)
+                {
+                    gravityBlock.OnPlayerControlCompleted -= BlockManager_OnPlayerControlCompleted;
+                }
+
+                var target = spawningStrategy.SpawnBlock(this);
+
+                _currentEntity = target;
+                (_currentEntity as IPlayerControlled).OnPlayerControlCompleted += BlockManager_OnPlayerControlCompleted;
+                (_currentEntity as IPlayerControlled).SetEnabled(true);
+
+                OnTargetCreated?.Invoke(target);
+
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error in BlockManager.TriggerBlockCreation: {ex.Message}");
             }
 
-            var target = spawningStrategy.SpawnBlock(this);
+         }
+        #endregion
 
-            _currentEntity = target;
-            (_currentEntity as IPlayerControlled).OnPlayerControlCompleted += BlockManager_OnPlayerControlCompleted;
-            (_currentEntity as IPlayerControlled).SetEnabled(true);
+        //////////////////////////////////////////////////////////////////
+        /// ITakeFire1Input Implementation
+        //////////////////////////////////////////////////////////////////
 
-            OnTargetCreated?.Invoke(target);
+        #region ITakeFire1Input Implementation
+        void ITakeFire1Input.HandleFire1Logic(object listener)
+        {
+            spawningStrategy.HandleFire1Logic(this);
         }
+        #endregion
 
         ///////////////////////////////////////////////////////////////////
         /// Private Helpers
@@ -111,7 +144,6 @@ namespace Assets.Scripts.Blocks.components
         {
             spawningStrategy.HandlePlayerControlCompleted(this);
         }
-
 
     }
 }

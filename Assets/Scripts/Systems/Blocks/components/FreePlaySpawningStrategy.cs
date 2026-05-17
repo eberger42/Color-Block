@@ -3,6 +3,7 @@ using Assets.Scripts.Blocks.components.colors;
 using Assets.Scripts.Blocks.components.managers;
 using Assets.Scripts.Blocks.interfaces;
 using Assets.Scripts.Data;
+using Assets.Scripts.Player.Interfaces;
 using Assets.Scripts.Systems.LevelSelect;
 using System;
 using System.Collections;
@@ -17,9 +18,14 @@ using static UnityEngine.GraphicsBuffer;
 public class FreePlaySpawningStrategy : ISpawningStrategy
 {
 
+    ///////////////////////////////////////////////////////////
+    /// ISpawningStrategy implementation
+    ///////////////////////////////////////////////////////////
+    #region ISpawningStrategy implementation
 
     void ISpawningStrategy.HandlePlayerControlCompleted(ISpawningStrategyListener listener)
     {
+        (listener as BlockManager).TriggerBlockCreation();
     }
 
     ITakeBlockCommand ISpawningStrategy.SpawnBlock(ISpawningStrategyListener listener)
@@ -54,7 +60,12 @@ public class FreePlaySpawningStrategy : ISpawningStrategy
         (listener as MonoBehaviour).StartCoroutine(SpawnNextFrame(listener));
     }
 
+    #endregion
 
+    //////////////////////////////////////////////////////////
+    /// Private methods
+    //////////////////////////////////////////////////////////
+    #region Private methods
     private IEnumerator SpawnNextFrame(ISpawningStrategyListener listener)
     {
         yield return null;
@@ -65,6 +76,19 @@ public class FreePlaySpawningStrategy : ISpawningStrategy
         var primaryColors = BlockColor.PrimaryColors;
         return primaryColors[UnityEngine.Random.Range(0, primaryColors.Count)];
     }
+    #endregion
+
+    ////////////////////////////////////////////////////////////
+    /// ITakeFire1Input implementation
+    //////////////////////////////////////////////////////////
+    #region ITakeFire1Input
+
+    void ITakeFire1Input.HandleFire1Logic(object listener)
+    {
+
+    }
+
+    #endregion
 }
 
 
@@ -76,6 +100,10 @@ public class PuzzleSpawningStrategy : ISpawningStrategy
     {
         _puzzleBlockQueue = puzzleBlockQueue;
     }
+    ///////////////////////////////////////////////////////////
+    /// ISpawningStrategy implementation
+    ///////////////////////////////////////////////////////////
+    #region ISpawningStrategy implementation
 
     void ISpawningStrategy.HandlePlayerControlCompleted(ISpawningStrategyListener listener)
     {
@@ -89,6 +117,13 @@ public class PuzzleSpawningStrategy : ISpawningStrategy
             var target = listener.BlockFactory.CreateBlockGroup();
 
             var blockConfiguration = _puzzleBlockQueue.GetNextBlockGroup();
+
+            if(blockConfiguration == null)
+            {
+                throw new Exception("No more block groups available in the puzzle queue");
+            }
+
+
             var blockDataSet = (blockConfiguration as IBlockGroupConfiguration).GetPositions();
 
             foreach (var blockData in blockDataSet)
@@ -115,5 +150,27 @@ public class PuzzleSpawningStrategy : ISpawningStrategy
     {
 
     }
+    #endregion
+
+    ////////////////////////////////////////////////////////////
+    /// ITakeFire1Input implementation
+    //////////////////////////////////////////////////////////
+    #region ITakeFire1Input
+
+    void ITakeFire1Input.HandleFire1Logic(object listener)
+    {
+
+        if(listener is BlockManager blockManager)
+        {
+            blockManager.TriggerBlockCreation();
+        }
+        else
+        {
+            Debug.LogError("Listener is not of type BlockManager");
+        }
+
+    }
+
+    #endregion
 
 }

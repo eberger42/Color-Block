@@ -46,7 +46,8 @@ namespace Assets.Scripts.Systems.SceneLoading.FreePlay
             _rootHandler = new SetupLevelHandler();
 
             _rootHandler.SetNext(new SetupGridHandler())
-                        .SetNext(new SetupQueueHandler());
+                        .SetNext(new SetupQueueHandler())
+                        .SetNext(new GameStartHandler());
         }
     }
 
@@ -78,9 +79,18 @@ namespace Assets.Scripts.Systems.SceneLoading.FreePlay
     {
         public override void Handle(CORContext context)
         {
-            var gridDataAccessor = context.GetSingletonData<ColorBlockGridDataAccessor>();
-            var colorGridManager = context.GetSingletonData<ColorGridManager>();
 
+
+            base.Handle(context);
+        }
+    }
+    class GameStartHandler : AbstractHandler
+    {
+        public override void Handle(CORContext context)
+        {
+            var blockManager = context.GetSingletonData<BlockManager>();
+
+            blockManager.TriggerBlockCreation();
 
 
             base.Handle(context);

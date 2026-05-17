@@ -22,6 +22,12 @@ namespace Assets.Scripts.Player
 
         private ITakeBlockCommand _target;
 
+
+
+        //Events
+        public Action OnFirePressed;
+        public Action OnTargetBlockLanded;
+
         private void Awake()
         {
             commandManager = new CommandManager();
@@ -40,7 +46,7 @@ namespace Assets.Scripts.Player
 
             playerInputManager.OnRotateRightPressed += RotateTargetEntity;
             playerInputManager.OnMovementPressed += MoveTargetEntity;
-            playerInputManager.OnFire1Pressed += SpawnBlock;
+            playerInputManager.OnFire1Pressed += HandleFire1Input;
         }
 
 
@@ -50,7 +56,7 @@ namespace Assets.Scripts.Player
 
             playerInputManager.OnRotateRightPressed -= RotateTargetEntity;
             playerInputManager.OnMovementPressed -= MoveTargetEntity;
-            playerInputManager.OnFire1Pressed -= SpawnBlock;
+            playerInputManager.OnFire1Pressed -= HandleFire1Input;
         }
 
         private void RotateTargetEntity()
@@ -90,9 +96,9 @@ namespace Assets.Scripts.Player
             await commandManager.ExecuteCommands(command);
         }
 
-        private void SpawnBlock()
+        private void HandleFire1Input()
         {
-            blockManager.TriggerBlockCreation();
+            (blockManager as ITakeFire1Input).HandleFire1Logic(this);
         }
         private void OnBlockCreated(ITakeBlockCommand target)
         {
@@ -110,11 +116,22 @@ namespace Assets.Scripts.Player
             }
 
             _target = target;
+
             (_target as IPlayerControlled).SetEnabled(true);
             (_target as IGravity).SetEnable(true);
 
         }
 
+
+        private void FirePressedPassthrough()
+        {
+            OnFirePressed?.Invoke();
+        }
+
+        private void PlayerControlCompletedPassthrough()
+        {
+            OnTargetBlockLanded?.Invoke();
+        }
 
 
 
