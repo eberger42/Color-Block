@@ -1,13 +1,8 @@
 ﻿using Assets.Scripts.Blocks.components.colors;
 using Assets.Scripts.Blocks.interfaces;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
-using static Assets.Editor.ColorBlockConfigurationEditor;
 
 namespace Assets.Editor.Components
 {
@@ -17,7 +12,7 @@ namespace Assets.Editor.Components
         //Static Members
         private static readonly ColorType[] PaletteOrder = {
             ColorType.Red, ColorType.Blue, ColorType.Yellow,
-            ColorType.Purple, ColorType.Orange, ColorType.Green
+            ColorType.Purple, ColorType.Orange, ColorType.Green, ColorType.White
         };
 
 

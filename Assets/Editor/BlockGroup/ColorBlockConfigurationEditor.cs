@@ -13,10 +13,6 @@ namespace Assets.Editor
     {
 
         //Static Members
-        private static readonly ColorType[] PaletteOrder = {
-            ColorType.Red, ColorType.Blue, ColorType.Yellow,
-            ColorType.Purple, ColorType.Orange, ColorType.Green
-        };
 
         //Const Members
         private const int GRIDSIZE = 4;
@@ -83,7 +79,7 @@ namespace Assets.Editor
                 EditorGUILayout.BeginHorizontal();
                 for (int x = 0; x < GRIDSIZE; x++)
                 {
-                    Color cellColor = grid[x, flippedY] != null ? ColorFromName(grid[x, flippedY].color.ToString()) : Color.white;
+                    Color cellColor = grid[x, flippedY] != null ? ColorFromName(grid[x, flippedY].color.ToString()) : Color.black;
 
                     var oldColor = GUI.backgroundColor;
 

@@ -33,10 +33,12 @@ public class FreePlaySpawningStrategy : ISpawningStrategy
             (blockGroup as ColorBlockGroupController).Initialize((blockConfiguration as IBlockGroupConfiguration).GetPivotPosition());
 
             var blockDataSet = (blockConfiguration as IBlockGroupConfiguration).GetPositions();
+            var randomColor = GenerateRandomPrimaryColor();
 
             foreach (var blockData in blockDataSet)
             {
-                var block = listener.BlockFactory.CreateBlock(blockData.BlockColor) as IBlock;
+
+                var block = listener.BlockFactory.CreateBlock((blockData.BlockColor as IBlockColor).GetColorType() == ColorType.White ? randomColor : (blockData.BlockColor)) as IBlock;
                 (blockGroup as IBlockGroup).AddBlock(block, blockData.Position); //Add the block to the group
 
             }
@@ -56,6 +58,12 @@ public class FreePlaySpawningStrategy : ISpawningStrategy
     private IEnumerator SpawnNextFrame(ISpawningStrategyListener listener)
     {
         yield return null;
+    }
+
+    private BlockColor GenerateRandomPrimaryColor()
+    { //TODO: Potentially update so it is sudo random and not truly random to ensure a better distribution of colors
+        var primaryColors = BlockColor.PrimaryColors;
+        return primaryColors[UnityEngine.Random.Range(0, primaryColors.Count)];
     }
 }
 

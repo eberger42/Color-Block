@@ -17,7 +17,8 @@ namespace Assets.Scripts.Blocks.components.colors
             { ColorType.Yellow, Color.yellow },
             { ColorType.Orange, new Color32(232, 97, 0, 255) },
             { ColorType.Purple, Color.magenta },
-            { ColorType.Green, Color.green }
+            { ColorType.Green, Color.green },
+            { ColorType.White, new Color32(222,222,222,255) }
         };
 
         private static ColorConfiguration BuildRedConfig()
@@ -62,6 +63,12 @@ namespace Assets.Scripts.Blocks.components.colors
                 .Build();
         }
 
+        private static ColorConfiguration BuildWhiteConfig()
+        {
+            return new ColorConfiguration.Builder(ColorRank.Secondary, ColorType.White)
+                .Build();
+        }
+
 
         public static List<BlockColor> PrimaryColors { get; } = new List<BlockColor>();
         public static List<BlockColor> SecondaryColors { get; } = new List<BlockColor>();
@@ -72,6 +79,7 @@ namespace Assets.Scripts.Blocks.components.colors
         public static BlockColor Orange { get; } = new BlockColor(BuildOrangeConfig());
         public static BlockColor Purple { get; } = new BlockColor(BuildPurpleConfig());
         public static BlockColor Green { get; } = new BlockColor(BuildGreenConfig());
+        public static BlockColor White { get; } = new BlockColor(BuildWhiteConfig());
 
         public static IBlockColor GenerateRandomPrimaryColor()
         {
@@ -87,7 +95,8 @@ namespace Assets.Scripts.Blocks.components.colors
             { ColorType.Yellow, Yellow },
             { ColorType.Orange, Orange },
             { ColorType.Purple, Purple },
-            { ColorType.Green, Green }
+            { ColorType.Green, Green },
+            { ColorType.White, White }
         };
 
 

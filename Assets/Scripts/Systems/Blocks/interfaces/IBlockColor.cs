@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Assets.Scripts.Blocks.interfaces
 {
     public enum ColorRank { Primary, Secondary }
-    public enum ColorType { Red, Blue, Yellow, Orange, Purple, Green }
+    public enum ColorType { Red, Blue, Yellow, Orange, Purple, Green, White }
     public interface IBlockColor
     {
 
