@@ -1,40 +1,36 @@
-﻿
+﻿using Assets.Scripts.Data;
 using Assets.Scripts.Tools.Data;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using UnityEditor;
+using UnityEngine;
 
-namespace Assets.Scripts.Data
+namespace Assets.Scripts.Systems.Data.Progress
 {
-    [Serializable]
-    public class DataConfigurationCollection<T> where T : IDataConfiguration, new()
+    public class SaveAndLoadGameProgressCache : IDataConfigurationCache
     {
-        public List<T> configurations = new();
 
-    }
+        private readonly string DATABASEPATH = Path.Combine(Application.persistentDataPath, "Data.json");
 
-    public class ColorBlockConfigurationCache : IDataConfigurationCache
-    {
-        private readonly string DATABASEPATH = "Assets/Editor/ColorBlockConfigurations.json";
+        public List<LevelConfigurationData> Configurations { get => _collection.configurations; }
 
-        public List<ColorBlockGroupConfigurationData> Configurations { get => _collection.configurations; }
-
-        private DataConfigurationCollection<ColorBlockGroupConfigurationData> _collection = new();
+        private DataConfigurationCollection<LevelConfigurationData> _collection = new();
 
 
-        void IDataConfigurationCache.UpdateConfiguration(IDataConfiguration configuration) 
+        void IDataConfigurationCache.UpdateConfiguration(IDataConfiguration configuration)
         {
             if (!Configurations.Any(c => (c as IDataConfiguration).id == configuration.id))
             {
-                Configurations.Add((ColorBlockGroupConfigurationData)configuration);
+                Configurations.Add((LevelConfigurationData)configuration);
             }
             else
             {
                 var index = Configurations.FindIndex(c => (c as IDataConfiguration).id == configuration.id);
-                Configurations[index] = (ColorBlockGroupConfigurationData)configuration;
+                Configurations[index] = (LevelConfigurationData)configuration;
             }
-
-           
         }
 
         void IDataConfigurationCache.DeleteConfiguration(string id)
@@ -51,15 +47,14 @@ namespace Assets.Scripts.Data
             _collection.configurations = Configurations;
             SaveAndLoadConfigurationDataFiles.SaveToDisk(_collection, DATABASEPATH);
         }
+
         void IDataConfigurationCache.LoadFromDisk()
         {
-            _collection = SaveAndLoadConfigurationDataFiles.LoadFromDisk<DataConfigurationCollection<ColorBlockGroupConfigurationData>>(DATABASEPATH);
-           
+            _collection = SaveAndLoadConfigurationDataFiles.LoadFromDisk<DataConfigurationCollection<LevelConfigurationData>>(DATABASEPATH);
         }
         IDataConfiguration IDataConfigurationCache.GetConfigurationDataByID(string id)
         {
             return Configurations.FirstOrDefault(x => (x as IDataConfiguration)?.id == id);
         }
     }
-
 }

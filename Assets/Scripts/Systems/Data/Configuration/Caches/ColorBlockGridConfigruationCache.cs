@@ -40,6 +40,15 @@ namespace Assets.Scripts.Data
             }
         }
 
+        void IDataConfigurationCache.DeleteConfiguration(string id)
+        {
+            var index = Configurations.FindIndex(c => (c as IDataConfiguration).id == id);
+            if (index != -1)
+            {
+                Configurations.RemoveAt(index);
+            }
+        }
+
         void IDataConfigurationCache.SaveToDisk()
         {
             _collection.configurations = Configurations;

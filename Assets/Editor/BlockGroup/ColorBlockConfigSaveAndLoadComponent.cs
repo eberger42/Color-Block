@@ -11,7 +11,7 @@ namespace Assets.Editor.Components
     internal class ColorBlockConfigSaveAndLoadComponent : SaveAndLoadEditorComponentaseBase
     {
 
-        private readonly int GRIDSIZE = 4;
+        private readonly int GRIDSIZE = 3;
         internal ColorBlockConfigSaveAndLoadComponent(IUseSaveAndLoadEditorComponent listener, int gridsize) : base(listener)
         {
             GRIDSIZE = gridsize;
@@ -62,7 +62,23 @@ namespace Assets.Editor.Components
         protected override void DrawSavedList()
         {
             GUILayout.Label($"Saved Color Block Groups", EditorStyles.boldLabel);
+
+            GUILayout.BeginHorizontal();
             GUILayout.Label($"Currently Editing: {(_currentConfigurationGroup as IDataConfiguration)?.name}", EditorStyles.boldLabel);
+            // Trash icon button
+            GUIContent trashIcon = EditorGUIUtility.IconContent("TreeEditor.Trash");
+            var deletePressed = GUILayout.Button(trashIcon, GUILayout.Width(24), GUILayout.Height(24));
+            if (deletePressed)
+            {
+                if (_currentConfigurationGroup != null)
+                {
+                    _configurationCache.DeleteConfiguration(_currentConfigurationGroup.id);
+                    _currentConfigurationGroup = null;
+                    CreateNewConfiguration();
+                }
+            }
+
+            GUILayout.EndHorizontal();
 
             scrollPos = GUILayout.BeginScrollView(scrollPos, GUILayout.Width(250), GUILayout.Height(400));
 

@@ -15,7 +15,7 @@ namespace Assets.Editor
         //Static Members
 
         //Const Members
-        private const int GRIDSIZE = 4;
+        private const int GRIDSIZE = 3;
         private GridPosition pivotPosition;
 
 

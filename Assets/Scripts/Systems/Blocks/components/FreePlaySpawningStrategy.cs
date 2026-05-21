@@ -18,6 +18,10 @@ using static UnityEngine.GraphicsBuffer;
 public class FreePlaySpawningStrategy : ISpawningStrategy
 {
 
+
+    private ColorType _lastColor;
+
+
     ///////////////////////////////////////////////////////////
     /// ISpawningStrategy implementation
     ///////////////////////////////////////////////////////////
@@ -40,6 +44,8 @@ public class FreePlaySpawningStrategy : ISpawningStrategy
 
             var blockDataSet = (blockConfiguration as IBlockGroupConfiguration).GetPositions();
             var randomColor = GenerateRandomPrimaryColor();
+
+            _lastColor = (randomColor as IBlockColor).GetColorType();
 
             foreach (var blockData in blockDataSet)
             {
@@ -73,7 +79,7 @@ public class FreePlaySpawningStrategy : ISpawningStrategy
 
     private BlockColor GenerateRandomPrimaryColor()
     { //TODO: Potentially update so it is sudo random and not truly random to ensure a better distribution of colors
-        var primaryColors = BlockColor.PrimaryColors;
+        var primaryColors = BlockColor.PrimaryColors.Where(x => ((x as IBlockColor).GetColorType()) != _lastColor).ToList();
         return primaryColors[UnityEngine.Random.Range(0, primaryColors.Count)];
     }
     #endregion

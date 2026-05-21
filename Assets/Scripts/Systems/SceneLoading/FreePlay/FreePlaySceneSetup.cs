@@ -57,7 +57,7 @@ namespace Assets.Scripts.Systems.SceneLoading.FreePlay
         {
             var colorGridManager = context.GetSingletonData<ColorGridManager>();
 
-            var configData = new LevelConfigurationData() { id = "_freePlay", name = "Free Play", height = 20, width = 10};
+            var configData = new LevelConfigurationData() { id = "_freePlay", name = "Free Play", height = 20, width = 12};
             var gridConfig = new GridConfiguration(configData);
 
             colorGridManager.InitializeGrid(gridConfig);
